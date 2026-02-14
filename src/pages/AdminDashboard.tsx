@@ -77,6 +77,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
 
   const [managingReviews, setManagingReviews] = useState<string | null>(null);
   const [reviewsList, setReviewsList] = useState<ReviewRow[]>([]);
@@ -162,6 +163,25 @@ const AdminDashboard = () => {
     await supabase.from("property_images").delete().eq("id", imageId);
     fetchImages(managingImages!);
     toast.success("Image deleted");
+  };
+
+  const handleReorderImages = async (dragId: string, dropId: string) => {
+    if (dragId === dropId) return;
+    const oldList = [...images];
+    const dragIdx = oldList.findIndex((i) => i.id === dragId);
+    const dropIdx = oldList.findIndex((i) => i.id === dropId);
+    if (dragIdx < 0 || dropIdx < 0) return;
+    const [moved] = oldList.splice(dragIdx, 1);
+    oldList.splice(dropIdx, 0, moved);
+    const reordered = oldList.map((img, idx) => ({ ...img, display_order: idx }));
+    setImages(reordered);
+    // Persist all display_order updates
+    await Promise.all(
+      reordered.map((img) =>
+        supabase.from("property_images").update({ display_order: img.display_order } as any).eq("id", img.id)
+      )
+    );
+    toast.success("Order updated");
   };
 
   const handleSetHero = async (propertyId: string, imageUrl: string) => {
@@ -401,9 +421,21 @@ const AdminDashboard = () => {
                 {images.map((img) => {
                   const prop = properties.find((p) => p.id === managingImages);
                   const isHero = prop?.hero_image === img.image_url;
+                  const isDragging = draggedImageId === img.id;
                   return (
-                    <div key={img.id} className="relative group border border-border">
+                    <div
+                      key={img.id}
+                      draggable
+                      onDragStart={() => setDraggedImageId(img.id)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => { if (draggedImageId) handleReorderImages(draggedImageId, img.id); setDraggedImageId(null); }}
+                      onDragEnd={() => setDraggedImageId(null)}
+                      className={`relative group border border-border cursor-grab active:cursor-grabbing transition-opacity ${isDragging ? "opacity-40" : ""}`}
+                    >
                       <img src={img.image_url} alt={img.alt_text || ""} className="w-full h-40 object-cover" />
+                      <div className="absolute top-2 right-2 flex gap-1">
+                        <span className="px-1.5 py-0.5 text-[10px] bg-background/80 text-muted-foreground border border-border">{img.display_order + 1}</span>
+                      </div>
                       {isHero && (
                         <span className="absolute top-2 left-2 px-2 py-0.5 text-xs bg-primary text-primary-foreground">Hero</span>
                       )}
