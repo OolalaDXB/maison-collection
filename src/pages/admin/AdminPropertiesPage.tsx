@@ -2,8 +2,9 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
+import { seedAtlantiqueImages } from "@/utils/seedAtlantiqueImages";
 
 // ... keep all existing interfaces
 interface PropertyRow {
@@ -293,10 +294,28 @@ const AdminPropertiesPage = () => {
                 );
               })}
             </div>
-            <label className="inline-block px-4 py-2 border border-border text-sm cursor-pointer hover:border-primary transition-colors">
-              {uploading ? "Uploading…" : "＋ Upload Image"}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleUploadImage(managingImages, file); }} />
-            </label>
+            <div className="flex gap-3">
+              <label className="inline-block px-4 py-2 border border-border text-sm cursor-pointer hover:border-primary transition-colors">
+                {uploading ? "Uploading…" : "＋ Upload Image"}
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleUploadImage(managingImages, file); }} />
+              </label>
+              {images.length === 0 && properties.find(p => p.id === managingImages)?.slug === "atlantique" && (
+                <button
+                  onClick={async () => {
+                    setUploading(true);
+                    const result = await seedAtlantiqueImages(managingImages);
+                    if (result.errors.length > 0) result.errors.forEach(e => toast.error(e));
+                    if (result.success > 0) toast.success(`${result.success} images imported`);
+                    fetchImages(managingImages);
+                    setUploading(false);
+                  }}
+                  disabled={uploading}
+                  className="px-4 py-2 border border-primary text-primary text-sm flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  <Download size={14} /> Import 10 local images
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
