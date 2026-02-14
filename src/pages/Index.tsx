@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-import { Star, Award, Heart } from "lucide-react";
-import { motion, useInView } from "framer-motion";
+import { Star } from "lucide-react";
+import { motion } from "framer-motion";
 import { properties } from "@/data/properties";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,55 +10,28 @@ import { useSiteContent } from "@/hooks/useSiteContent";
 
 const services = [
   {
-    icon: "◇",
+    num: "01",
     title: "Selection & Positioning",
     description:
       "We identify properties with character and potential, transforming them into memorable destinations with narrative positioning and editorial storytelling.",
   },
   {
-    icon: "◎",
+    num: "02",
     title: "Management",
     description:
       "Complete operational management: welcome, maintenance, guest screening, multilingual support in French, English, and Russian. Same-day response.",
   },
   {
-    icon: "△",
+    num: "03",
     title: "Revenue",
     description:
       "Intelligent pricing strategy, occupancy optimization focused on quality over volume. We position your property above the ordinary.",
   },
 ];
 
-const AnimatedRating = () => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const duration = 1500;
-    const steps = 50;
-    const increment = 5.0 / steps;
-    const stepTime = duration / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= 5.0) {
-        setValue(5.0);
-        clearInterval(interval);
-      } else {
-        setValue(Math.round(current * 10) / 10);
-      }
-    }, stepTime);
-    return () => clearInterval(interval);
-  }, [isInView]);
-
-  return <span ref={ref}>{value.toFixed(1)}</span>;
-};
-
 const Index = () => {
   const heroTitle = useSiteContent("home", "hero_title", "Houses with a point of view");
-  const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe and the Caucasus. Each property tells a story, shaped by its landscape and chosen with intention.");
+  const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe, the Caucasus, and the Gulf.");
   const philosophyTitle = useSiteContent("home", "philosophy_title", "Not rentals. Residences.");
   const philosophyText = useSiteContent("home", "philosophy_text", "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.");
 
@@ -126,63 +98,49 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="bg-[#0a1628] py-[80px] md:py-[120px]">
-        <div className="max-container px-[5%] text-center">
+      {/* Social Proof — compact, light */}
+      <section className="bg-[#fafaf8] py-16 md:py-20">
+        <div className="max-container px-[5%]">
           <FadeIn>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Star size={28} className="text-[#c1695f] fill-[#c1695f]" />
-              <span className="font-display text-5xl text-white">
-                <AnimatedRating />
-              </span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-3 mb-3">
+                <Star size={16} className="text-primary fill-primary" />
+                <span className="font-display text-2xl text-foreground">5.0</span>
+                <span className="font-body font-light text-sm text-[#666666]">
+                  across all properties · Superhost · Guest Favourite · 30+ five-star reviews
+                </span>
+              </div>
+              <div className="w-[200px] h-px bg-[#e8e8e8]" />
             </div>
-            <p className="font-body font-light text-white/70 text-base mb-16">
-              — across all properties
-            </p>
           </FadeIn>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              { icon: Award, title: "Superhost", subtitle: "Awarded for outstanding hospitality" },
-              { icon: Heart, title: "Guest Favourite", subtitle: "Among the highest-rated homes on Airbnb" },
-              { icon: Star, title: "30+ Reviews", subtitle: "Every single one — five stars" },
-            ].map((badge, i) => (
-              <FadeIn key={badge.title} delay={i * 0.2}>
-                <div className="border border-[rgba(255,255,255,0.3)] px-8 py-6 text-center">
-                  <badge.icon size={20} className="text-white mx-auto mb-3" strokeWidth={1.5} />
-                  <p className="font-body uppercase tracking-wider text-sm text-white mb-1">{badge.title}</p>
-                  <p className="font-body font-light text-xs text-[rgba(255,255,255,0.6)]">{badge.subtitle}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* Philosophy */}
-      <section className="dark-section section-padding">
+      {/* Philosophy — light */}
+      <section className="section-padding">
         <div className="max-container">
           <FadeIn>
-            <p className="section-label" style={{ color: "#999999" }}>Philosophy</p>
-            <h2 className="font-display text-3xl md:text-4xl text-white mb-8 max-w-2xl">
+            <p className="section-label">Philosophy</p>
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-8 max-w-2xl">
               {philosophyTitle}
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <p className="text-[rgba(255,255,255,0.7)] text-lg max-w-2xl mb-12 font-light leading-relaxed">
+            <p className="text-[#444444] text-lg max-w-2xl mb-12 font-light leading-relaxed">
               {philosophyText}
             </p>
           </FadeIn>
           <FadeIn delay={0.3}>
-            <blockquote className="font-display italic text-2xl md:text-3xl text-[rgba(255,255,255,0.85)] max-w-lg">
+            <blockquote className="font-display italic text-2xl text-primary max-w-lg mb-6">
               "Where houses become places."
             </blockquote>
+            <div className="w-[60px] h-px bg-[#e8e8e8]" />
           </FadeIn>
         </div>
       </section>
 
       {/* Services Preview */}
-      <section className="warm-section section-padding">
+      <section className="bg-[#f5f3f0] section-padding">
         <div className="max-container">
           <FadeIn>
             <p className="section-label">Services</p>
@@ -197,9 +155,9 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {services.map((service, i) => (
               <FadeIn key={service.title} delay={i * 0.1}>
-                <div className="p-8 bg-background border border-[#f0f0f0] hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-all duration-500">
-                  <span className="inline-flex items-center justify-center w-12 h-12 border border-[#e0e0e0] text-foreground text-lg mb-6">
-                    {service.icon}
+                <div className="p-8 bg-background border border-[#eeeeee] hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-all duration-500">
+                  <span className="font-display text-2xl text-[#e0e0e0] block mb-6">
+                    {service.num}
                   </span>
                   <h3 className="font-display text-xl mb-3">{service.title}</h3>
                   <p className="text-sm font-light text-[#444444] leading-[1.75]">
@@ -256,7 +214,7 @@ const Index = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-white p-12 md:p-16"
+            className="bg-[#fafaf8] p-12 md:p-16"
           >
             <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] mb-4">For Travelers</p>
             <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
@@ -278,7 +236,7 @@ const Index = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-[#f5f3f0] p-12 md:p-16"
+            className="bg-[#f0ede8] p-12 md:p-16"
           >
             <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] mb-4">For Owners</p>
             <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
@@ -294,26 +252,6 @@ const Index = () => {
               Talk to us
             </Link>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section className="warm-section section-padding">
-        <div className="max-container text-center">
-          <FadeIn>
-            <p className="section-label">Contact</p>
-            <h2 className="font-display text-3xl md:text-5xl text-foreground mb-8">
-              Let's talk
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <a
-              href="mailto:chez@maisons.co"
-              className="font-display text-xl md:text-2xl text-primary hover:underline underline-offset-4 transition-all"
-            >
-              chez@maisons.co
-            </a>
-          </FadeIn>
         </div>
       </section>
 
