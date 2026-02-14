@@ -227,6 +227,27 @@ export type Database = {
           },
         ]
       }
+      fx_rates: {
+        Row: {
+          base_currency: string
+          fetched_at: string | null
+          rate: number
+          target_currency: string
+        }
+        Insert: {
+          base_currency?: string
+          fetched_at?: string | null
+          rate: number
+          target_currency: string
+        }
+        Update: {
+          base_currency?: string
+          fetched_at?: string | null
+          rate?: number
+          target_currency?: string
+        }
+        Relationships: []
+      }
       ical_sync_log: {
         Row: {
           error_message: string | null
