@@ -27,7 +27,7 @@ const AtlantiqueHero = ({ imageCount }: AtlantiqueHeroProps) => {
           Maison Atlantique
         </h1>
         <p className="font-body font-light text-[0.875rem] text-[rgba(255,255,255,0.8)] mb-6">
-          6 guests · 2 bedrooms · 2 bathrooms · 160m²
+          6 guests · 2 bedrooms · 2 bathrooms · 120m² + 40m² terraces · 5 000m² land
         </p>
         <button
           onClick={handleViewPhotos}

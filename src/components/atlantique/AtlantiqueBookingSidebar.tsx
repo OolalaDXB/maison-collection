@@ -27,6 +27,9 @@ const AtlantiqueBookingSidebar = ({
   const [guestOpen, setGuestOpen] = useState(false);
 
   const airbnbUrl = "https://www.airbnb.com/l/LEHC2J81";
+  const bookSubject = checkIn && checkOut
+    ? `Réservation Maison Atlantique — ${format(checkIn, "dd/MM/yyyy")} au ${format(checkOut, "dd/MM/yyyy")} — ${guests} guest${guests > 1 ? "s" : ""}`
+    : "Réservation Maison Atlantique";
   const contactSubject = checkIn && checkOut
     ? `Maison Atlantique — ${format(checkIn, "dd/MM/yyyy")} to ${format(checkOut, "dd/MM/yyyy")}`
     : "Maison Atlantique";
@@ -164,24 +167,32 @@ const AtlantiqueBookingSidebar = ({
       </div>
 
       {/* Actions */}
-      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 flex gap-3">
+      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 space-y-3">
         <a
-          href={`mailto:contact@maisons.co?subject=${encodeURIComponent(contactSubject)}`}
-          className="flex-1 border border-foreground text-foreground font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:bg-foreground hover:text-background transition-colors"
+          href={`mailto:chez@maisons.co?subject=${encodeURIComponent(bookSubject)}`}
+          className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
         >
-          Contact us
+          Book with us
         </a>
-        <a
-          href={airbnbUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
-        >
-          Book on Airbnb
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href={`mailto:chez@maisons.co?subject=${encodeURIComponent(contactSubject)}`}
+            className="flex-1 border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
+          >
+            Contact us
+          </a>
+          <a
+            href={airbnbUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 border border-[hsl(0,0%,88%)] text-muted-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground hover:text-foreground transition-colors"
+          >
+            Book on Airbnb
+          </a>
+        </div>
       </div>
       <p className="font-body font-light text-xs text-muted-foreground mt-3 text-center">
-        contact@maisons.co
+        chez@maisons.co
       </p>
     </div>
   );
