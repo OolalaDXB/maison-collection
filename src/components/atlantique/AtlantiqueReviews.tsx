@@ -14,9 +14,14 @@ interface Props {
 const AtlantiqueReviews = ({ reviews }: Props) => {
   return (
     <div className="border-t border-[#e0e0e0] pt-10 mb-10">
-      <h3 className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] font-normal mb-8">
-        Guest Reviews
-      </h3>
+      <div className="flex items-baseline gap-3 mb-8">
+        <h3 className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] font-normal">
+          Guest Reviews
+        </h3>
+        <span className="font-body font-light text-[0.75rem] text-[#bbbbbb] italic">
+          — and that's just a handful of them
+        </span>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {reviews.map((review, i) => (
           <div
