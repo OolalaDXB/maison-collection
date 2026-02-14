@@ -166,19 +166,19 @@ const Index = () => {
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
               Beyond hospitality
             </h2>
-            <p className="font-light text-muted-foreground leading-[1.75] max-w-xl mb-10">
+            <p className="font-light text-muted-foreground leading-[1.75] max-w-xl mb-8">
               We also partner with select property owners to bring their vision to life.
             </p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {services.map((service, i) => (
-              <FadeIn key={service.title} delay={i * 0.1}>
-                <div className="p-8 bg-background border border-border hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)] transition-all duration-500">
-                  <span className="font-display text-2xl text-border block mb-5">
+              <FadeIn key={service.title} delay={i * 0.1} className="h-full">
+                <div className="h-full p-8 bg-background border border-border hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)] transition-all duration-500 flex flex-col">
+                  <span className="font-display text-2xl text-border block mb-4">
                     {service.num}
                   </span>
-                  <h3 className="font-display text-xl mb-3">{service.title}</h3>
+                  <h3 className="font-display text-xl mb-2">{service.title}</h3>
                   <p className="text-sm font-light text-muted-foreground leading-[1.75]">
                     {service.description}
                   </p>
