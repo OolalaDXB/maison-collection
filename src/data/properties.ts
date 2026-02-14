@@ -6,9 +6,19 @@ import property5 from "@/assets/property-5.avif";
 import property6 from "@/assets/property-6.avif";
 import property7 from "@/assets/property-7.avif";
 import property8 from "@/assets/property-8.avif";
+import georgia5 from "@/assets/georgia-5.jpg";
+import georgia6 from "@/assets/georgia-6.png";
+import georgia7 from "@/assets/georgia-7.png";
+import georgia8 from "@/assets/georgia-8.jpg";
+import georgia9 from "@/assets/georgia-9.png";
+import georgia10 from "@/assets/georgia-10.png";
+import georgia11 from "@/assets/georgia-11.png";
+import georgia12 from "@/assets/georgia-12.png";
+import georgia13 from "@/assets/georgia-13.jpg";
+import georgia14 from "@/assets/georgia-14.jpg";
 
 export const propertyImages = {
-  georgia: [property1, property2, property3, property4],
+  georgia: [property1, property2, property3, property4, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14],
   atlantique: [property5, property6, property7, property8],
 };
 
@@ -73,7 +83,7 @@ export const properties: Property[] = [
     status: "active",
     tags: ["Ski Season", "Superhost", "Guest Favourite"],
     heroImage: property2,
-    galleryImages: [property1, property2, property3, property4],
+    galleryImages: [property1, property2, property3, property4, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14],
   },
   {
     name: "Maison Atlantique",
