@@ -7,6 +7,16 @@ import property6 from "@/assets/property-6.avif";
 import property7 from "@/assets/property-7.avif";
 import property8 from "@/assets/property-8.avif";
 import atlantiqueHero from "@/assets/atlantique-hero.png";
+import atlantique1 from "@/assets/atlantique-1.avif";
+import atlantique2 from "@/assets/atlantique-2.avif";
+import atlantique3 from "@/assets/atlantique-3.avif";
+import atlantique4 from "@/assets/atlantique-4.avif";
+import atlantique5 from "@/assets/atlantique-5.avif";
+import atlantique6 from "@/assets/atlantique-6.avif";
+import atlantique7 from "@/assets/atlantique-7.avif";
+import atlantique8 from "@/assets/atlantique-8.avif";
+import atlantique9 from "@/assets/atlantique-9.avif";
+import atlantique10 from "@/assets/atlantique-10.avif";
 import georgia5 from "@/assets/georgia-5.jpg";
 import georgia6 from "@/assets/georgia-6.png";
 import georgia7 from "@/assets/georgia-7.png";
@@ -20,7 +30,7 @@ import georgia14 from "@/assets/georgia-14.jpg";
 
 export const propertyImages = {
   georgia: [property1, property2, property3, property4, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14],
-  atlantique: [],
+  atlantique: [atlantique1, atlantique2, atlantique3, atlantique4, atlantique5, atlantique6, atlantique7, atlantique8, atlantique9, atlantique10],
 };
 
 export interface Property {
@@ -142,7 +152,7 @@ export const properties: Property[] = [
       ],
     },
     heroImage: atlantiqueHero,
-    galleryImages: [],
+    galleryImages: [atlantique1, atlantique2, atlantique3, atlantique4, atlantique5, atlantique6, atlantique7, atlantique8, atlantique9, atlantique10],
   },
   {
     name: "Maison Arabia",
