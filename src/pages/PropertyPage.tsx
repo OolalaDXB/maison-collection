@@ -113,6 +113,43 @@ const PropertyPage = () => {
               </p>
             </FadeIn>
 
+            {/* Layout section for Georgia */}
+            {property.slug === "georgia" && (
+              <FadeIn delay={0.05}>
+                <div className="border-t border-border pt-8 mt-8">
+                  <p className="section-label mb-6">Layout</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Level 1 */}
+                    <div className="border border-border p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground text-sm font-display rounded-full">1</span>
+                        <h3 className="font-display text-lg">Level 1</h3>
+                      </div>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Open studio living</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Sofa bed 160×200</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Equipped kitchen</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Wood fireplace</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bathroom with bathtub</li>
+                      </ul>
+                    </div>
+                    {/* Level 2 */}
+                    <div className="border border-border p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground text-sm font-display rounded-full">2</span>
+                        <h3 className="font-display text-lg">Level 2</h3>
+                      </div>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bedroom 1 — Queen 160×200</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bedroom 2 — Two singles 90×200</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />2 private bathrooms</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            )}
+
             {/* Architecture credits */}
             {property.architectureCredits && (
               <FadeIn delay={0.1}>
