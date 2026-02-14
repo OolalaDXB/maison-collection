@@ -94,17 +94,14 @@ const AdminPropertiesPage = () => {
   };
 
   const handleUploadImage = async (propertyId: string, file: File) => {
-    setUploading(true);
     const ext = file.name.split(".").pop();
-    const path = `${propertyId}/${Date.now()}.${ext}`;
+    const path = `${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
     const { error: uploadError } = await supabase.storage.from("property-images").upload(path, file);
-    if (uploadError) { toast.error(uploadError.message); setUploading(false); return; }
+    if (uploadError) { toast.error(`Upload failed: ${file.name}`); return; }
     const { data: urlData } = supabase.storage.from("property-images").getPublicUrl(path);
-    const maxOrder = images.length > 0 ? Math.max(...images.map((i) => i.display_order)) + 1 : 0;
+    const { data: maxData } = await supabase.from("property_images").select("display_order").eq("property_id", propertyId).order("display_order", { ascending: false }).limit(1);
+    const maxOrder = maxData && maxData.length > 0 ? (maxData[0] as any).display_order + 1 : 0;
     await supabase.from("property_images").insert({ property_id: propertyId, image_url: urlData.publicUrl, display_order: maxOrder } as any);
-    fetchImages(propertyId);
-    setUploading(false);
-    toast.success("Image uploaded");
   };
 
   const handleDeleteImage = async (imageId: string, imageUrl: string) => {
@@ -328,8 +325,8 @@ const AdminPropertiesPage = () => {
             </div>
             <div className="flex gap-3">
               <label className="inline-block px-4 py-2 border border-border text-sm cursor-pointer hover:border-primary transition-colors">
-                {uploading ? "Uploading…" : "＋ Upload Image"}
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleUploadImage(managingImages, file); }} />
+                {uploading ? "Uploading…" : "＋ Upload Images"}
+                <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => { const files = e.target.files; if (!files || files.length === 0) return; setUploading(true); for (const file of Array.from(files)) { await handleUploadImage(managingImages, file); } fetchImages(managingImages); setUploading(false); toast.success(`${files.length} image(s) uploaded`); }} />
               </label>
               {images.length === 0 && properties.find(p => p.id === managingImages)?.slug === "atlantique" && (
                 <button
