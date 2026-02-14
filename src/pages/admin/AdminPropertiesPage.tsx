@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download, RotateCcw } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
 import { seedAtlantiqueImages } from "@/utils/seedAtlantiqueImages";
+import { seedGeorgiaImages } from "@/utils/seedGeorgiaImages";
 
 // ... keep all existing interfaces
 interface PropertyRow {
@@ -335,6 +336,22 @@ const AdminPropertiesPage = () => {
                   onClick={async () => {
                     setUploading(true);
                     const result = await seedAtlantiqueImages(managingImages);
+                    if (result.errors.length > 0) result.errors.forEach(e => toast.error(e));
+                    if (result.success > 0) toast.success(`${result.success} images imported`);
+                    fetchImages(managingImages);
+                    setUploading(false);
+                  }}
+                  disabled={uploading}
+                  className="px-4 py-2 border border-primary text-primary text-sm flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  <Download size={14} /> Import 10 local images
+                </button>
+              )}
+              {images.length === 0 && properties.find(p => p.id === managingImages)?.slug === "georgia" && (
+                <button
+                  onClick={async () => {
+                    setUploading(true);
+                    const result = await seedGeorgiaImages(managingImages);
                     if (result.errors.length > 0) result.errors.forEach(e => toast.error(e));
                     if (result.success > 0) toast.success(`${result.success} images imported`);
                     fetchImages(managingImages);
