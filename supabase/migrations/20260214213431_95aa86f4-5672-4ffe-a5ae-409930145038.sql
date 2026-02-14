@@ -1,0 +1,21 @@
+UPDATE properties SET 
+  status = 'active',
+  location = 'The Sustainable City, Dubai',
+  price_per_night = 350,
+  capacity = 6,
+  bedrooms = 4,
+  bathrooms = 3,
+  description = 'A family townhouse in Dubai''s first net-zero energy community. Car-free streets, live-in helper, community pool, and a different way of living.',
+  amenities = ARRAY['Live-in helper', 'Community pool', 'Fitness center', 'Tennis court', 'Car-free streets', 'Solar powered', 'Fast WiFi', 'Air conditioning', 'Washer & dryer', 'Rooftop terrace'],
+  tags = ARRAY['Superhost', 'Sustainable'],
+  airbnb_rating = 5.0,
+  airbnb_reviews_count = 2,
+  min_nights = 3,
+  check_in_time = '15:00',
+  check_out_time = '11:00',
+  latitude = 25.1161,
+  longitude = 55.3033,
+  currency = 'EUR',
+  region = 'Dubai',
+  country = 'UAE'
+WHERE slug = 'arabia';
