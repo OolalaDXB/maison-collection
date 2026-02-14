@@ -10,19 +10,19 @@ const services = [
     icon: "◇",
     title: "Curation",
     description:
-      "Narrative positioning, editorial storytelling, and competitive benchmarking for distinctive properties.",
-  },
-  {
-    icon: "△",
-    title: "Operations",
-    description:
-      "Automated yet human workflows. Same-day response, guest screening, community building over passing tourists.",
+      "We identify properties with character and potential, transforming them into memorable destinations with narrative positioning and editorial storytelling.",
   },
   {
     icon: "◎",
+    title: "Management",
+    description:
+      "Complete operational management: welcome, maintenance, guest screening, multilingual support in French, English, and Russian. Same-day response.",
+  },
+  {
+    icon: "△",
     title: "Revenue",
     description:
-      "Intelligent pricing strategy focused on quality over volume. Forecast modeling and seasonal strategy.",
+      "Intelligent pricing strategy, occupancy optimization focused on quality over volume. We position your property above the ordinary.",
   },
 ];
 
@@ -49,9 +49,9 @@ const Index = () => {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-base md:text-lg text-[hsl(0,0%,80%)] max-w-xl mb-8 font-light">
-              A curated collection of distinctive homes across Europe and
-              beyond. Each property tells a story, shaped by its landscape and
-              chosen with intention.
+              A collection of distinctive homes across Europe and the Caucasus.
+              Each property tells a story, shaped by its landscape and chosen
+              with intention.
             </p>
           </FadeIn>
           <FadeIn delay={0.4}>
@@ -120,10 +120,13 @@ const Index = () => {
       <section className="warm-section section-padding">
         <div className="max-container">
           <FadeIn>
-            <p className="section-label">Maisons Management</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-16 max-w-2xl">
+            <p className="section-label">Services</p>
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
               Beyond hospitality
             </h2>
+            <p className="text-muted-foreground max-w-xl mb-16 font-light">
+              We also partner with select property owners to bring their vision to life.
+            </p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
