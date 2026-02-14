@@ -101,12 +101,12 @@
 
 @layer utilities {
   .section-padding {
-    @apply py-32 px-[5%];
+    @apply py-16 px-[5%];
   }
 
   @media (max-width: 768px) {
     .section-padding {
-      @apply py-20 px-[5%];
+      @apply py-10 px-[5%];
     }
   }
 
