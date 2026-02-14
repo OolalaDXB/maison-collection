@@ -1,6 +1,28 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
+import community1 from "@/assets/arabia-community-1.jpeg";
+import community2 from "@/assets/arabia-community-2.jpeg";
+import community3 from "@/assets/arabia-community-3.jpeg";
+import community4 from "@/assets/arabia-community-4.jpeg";
+import community5 from "@/assets/arabia-community-5.jpeg";
+import community6 from "@/assets/arabia-community-6.jpeg";
+import interior1 from "@/assets/arabia-interior-1.jpeg";
+import interior2 from "@/assets/arabia-interior-2.avif";
+import interior3 from "@/assets/arabia-interior-3.jpeg";
+
+const fallbackImages = [
+  { src: interior2, alt: "Maison Arabia — living area" },
+  { src: community5, alt: "The Sustainable City — community pool" },
+  { src: interior1, alt: "Maison Arabia — walk-in closet" },
+  { src: community1, alt: "The Sustainable City — bio-domes aerial view" },
+  { src: interior3, alt: "Maison Arabia — bathroom" },
+  { src: community4, alt: "The Sustainable City — cycling track" },
+  { src: community2, alt: "The Sustainable City — entrance" },
+  { src: community3, alt: "The Sustainable City — fitness center" },
+  { src: community6, alt: "The Sustainable City — gardens & walkways" },
+];
+
 interface Props {
   images: { image_url: string; alt_text: string | null }[];
 }
@@ -8,7 +30,9 @@ interface Props {
 const ArabiaGallery = ({ images }: Props) => {
   const [lightbox, setLightbox] = useState<number | null>(null);
 
-  const photos = images.map(img => ({ src: img.image_url, alt: img.alt_text || "Maison Arabia" }));
+  const photos = images.length > 0
+    ? images.map(img => ({ src: img.image_url, alt: img.alt_text || "Maison Arabia" }))
+    : fallbackImages;
 
   if (photos.length === 0) {
     return (
