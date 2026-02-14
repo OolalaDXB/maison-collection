@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Mail, MessageCircle, Send, Instagram, Facebook, Linkedin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Footer = () => {
@@ -12,10 +13,11 @@ const Footer = () => {
 
     setStatus("loading");
     const { error } = await supabase.from("inquiries").insert({
-      name: "Newsletter subscriber",
+      name: email.split("@")[0],
       email: email.trim(),
       type: "newsletter",
       subject: "Newsletter signup",
+      message: "Newsletter signup from footer",
     });
 
     if (error) {
@@ -27,92 +29,120 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#1a1a1a] py-16 md:py-20">
-      <div className="max-container px-[5%]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
-          {/* Column 1: Newsletter */}
-          <div className="lg:col-span-1">
-            <p className="font-body font-normal uppercase tracking-wider text-sm text-white mb-4">
-              Stay Inspired
+    <footer className="bg-white border-t border-[#eeeeee] pt-16 pb-8 px-[5%]">
+      <div className="max-container">
+        {/* 5-column grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-y-10 gap-x-8">
+          {/* Column 1: Newsletter (wider) */}
+          <div className="lg:col-span-2">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#1a1a1a] mb-6">
+              Join the Maisons family
             </p>
             {status === "success" ? (
-              <p className="font-body font-light text-sm text-[rgba(255,255,255,0.7)]">
+              <p className="font-body font-light text-sm text-[#444444]">
                 Thank you — you're in.
               </p>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-0 mb-3">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  required
-                  className="flex-1 bg-transparent border-b border-[rgba(255,255,255,0.3)] text-white placeholder:text-[rgba(255,255,255,0.4)] font-body font-light text-sm py-2 outline-none focus:border-[rgba(255,255,255,0.6)] transition-colors"
-                />
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="bg-white text-[#1a1a1a] font-body font-normal uppercase text-xs tracking-wider px-5 py-2 hover:bg-[#f0f0f0] transition-colors disabled:opacity-50"
-                >
-                  Subscribe
-                </button>
-              </form>
+              <>
+                <form onSubmit={handleSubscribe} className="flex gap-0 mb-3">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Your email"
+                    required
+                    className="flex-1 border border-[#dddddd] bg-white text-[#1a1a1a] placeholder:text-[#999999] font-body font-light text-sm px-4 py-2.5 outline-none focus:border-[#999999] transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="bg-[#1a1a1a] text-white font-body font-normal uppercase text-xs tracking-wider px-5 py-2.5 hover:bg-[#333333] transition-colors disabled:opacity-50"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+                <p className="font-body font-light text-xs text-[#999999] leading-relaxed">
+                  Travel stories, new properties, and insider tips. A few emails a year.
+                </p>
+              </>
             )}
-            <p className="font-body font-light text-xs text-[rgba(255,255,255,0.4)] leading-relaxed">
-              A few emails per year. Travel stories, new properties, and insider tips.
-            </p>
           </div>
 
           {/* Column 2: Destinations */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[rgba(255,255,255,0.6)] mb-4">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
               Destinations
             </p>
-            <nav className="flex flex-col gap-3">
-              <Link to="/georgia" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">Georgia</Link>
-              <Link to="/atlantique" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">Brittany</Link>
-              <Link to="/arabia" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">Dubai</Link>
+            <nav className="flex flex-col gap-2">
+              <Link to="/georgia" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Georgia</Link>
+              <Link to="/atlantique" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Brittany</Link>
+              <Link to="/arabia" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Dubai</Link>
             </nav>
           </div>
 
           {/* Column 3: Maisons */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[rgba(255,255,255,0.6)] mb-4">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
               Maisons
             </p>
-            <nav className="flex flex-col gap-3">
-              <Link to="/management" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">Management</Link>
-              <Link to="/about" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">About us</Link>
-              <Link to="/about" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">Our story</Link>
+            <nav className="flex flex-col gap-2">
+              <a href="/#collection" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Our collection</a>
+              <Link to="/management" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Management</Link>
+              <Link to="/about" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">About us</Link>
             </nav>
           </div>
 
-          {/* Column 4: Contact */}
+          {/* Column 4: Contact Us */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[rgba(255,255,255,0.6)] mb-4">
-              Contact
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
+              Contact us
             </p>
-            <nav className="flex flex-col gap-3">
-              <a href="mailto:chez@maisons.co" className="font-body font-light text-sm text-[rgba(255,255,255,0.8)] hover:text-white transition-colors">chez@maisons.co</a>
+            <nav className="flex flex-col gap-2">
+              <a href="mailto:chez@maisons.co" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2">
+                <Mail size={14} className="text-[#666666]" />
+                chez@maisons.co
+              </a>
+              <a href="mailto:chez@maisons.co" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2">
+                <Send size={14} className="text-[#666666]" />
+                Send a message
+              </a>
             </nav>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-[rgba(255,255,255,0.1)] mt-16 pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-          <p className="font-body font-light text-xs text-[rgba(255,255,255,0.4)]">
+        <div className="border-t border-[#eeeeee] mt-12 pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          {/* Left: copyright */}
+          <p className="font-body font-light text-xs text-[#bbbbbb]">
             <Link
               to="/admin/login"
-              className="no-underline hover:no-underline cursor-text"
+              className="no-underline hover:no-underline cursor-default"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               &copy;
             </Link>{" "}
-            2026 Maisons.
+            2026 Maisons. All rights reserved.
           </p>
-          <p className="font-body font-light text-xs text-[rgba(255,255,255,0.3)]">
-            Made by The Studio MT
-          </p>
+
+          {/* Center: legal */}
+          <div className="flex items-center gap-1 text-xs">
+            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">Privacy policy</a>
+            <span className="text-[#bbbbbb]">·</span>
+            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">Terms of use</a>
+          </div>
+
+          {/* Right: social icons */}
+          <div className="flex items-center gap-4">
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
+              <Instagram size={18} />
+            </a>
+            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
+              <Facebook size={18} />
+            </a>
+            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
+              <Linkedin size={18} />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
