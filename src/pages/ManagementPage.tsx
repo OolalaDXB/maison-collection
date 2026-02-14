@@ -218,9 +218,9 @@ const ManagementPage = () => {
                   5.0 · 22+ reviews · Superhost · Guest Favourite
                 </p>
                 <div className="space-y-1 font-body font-light text-sm text-white mb-6">
-                  <p>€35,000+ / year revenue</p>
-                  <p>85% occupancy in season</p>
-                  <p>Top 1% Gudauri listings</p>
+                  <p>+35% net revenue growth in 2 years</p>
+                  <p>90%+ occupancy in season</p>
+                  <p>Superhost · Guest Favourite</p>
                 </div>
                 <Link
                   to="/georgia"
