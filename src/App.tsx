@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminProfilePage from "./pages/AdminProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/atlantique" element={<PropertyPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/profile" element={<AdminProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

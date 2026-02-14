@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -213,7 +213,9 @@ const AdminDashboard = () => {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="font-display text-2xl">Admin Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <Link to="/admin/profile" className="text-sm text-muted-foreground hover:text-foreground">
+              {user?.user_metadata?.display_name || user?.email}
+            </Link>
             <button onClick={signOut} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
               <LogOut size={14} /> Sign Out
             </button>
