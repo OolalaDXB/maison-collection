@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { properties } from "@/data/properties";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -101,7 +101,7 @@ const Index = () => {
       </section>
 
       {/* Collection */}
-      <section id="collection" className="section-padding">
+      <section id="collection" className="py-10 md:py-14 px-[5%]">
         <div className="max-container">
           <FadeIn>
             <p className="section-label">The Collection</p>
@@ -120,13 +120,13 @@ const Index = () => {
       </section>
 
       {/* Social Proof */}
-      <section className="py-16 px-[5%] bg-background">
+      <section className="py-10 md:py-12 px-[5%] bg-background">
         <div className="max-container text-center">
           <FadeIn>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <Star size={22} className="text-primary fill-primary" />
-              <span className="font-display text-3xl md:text-4xl text-foreground">5.0</span>
-              <span className="font-body text-base md:text-lg text-[hsl(0,0%,40%)]">
+              <Star size={26} className="text-primary fill-primary" />
+              <span className="font-display text-4xl md:text-5xl text-foreground">5.0</span>
+              <span className="font-body text-lg md:text-xl text-muted-foreground">
                 across all properties · Superhost · Guest Favourite · 30+ five-star reviews
               </span>
             </div>
@@ -135,21 +135,21 @@ const Index = () => {
       </section>
 
       {/* Philosophy */}
-      <section className="py-16 px-[5%] bg-background">
+      <section className="py-10 md:py-14 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
+          <div className="border-t border-border mb-10 md:mb-12" />
           <FadeIn>
             <p className="section-label">Philosophy</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
               {philosophyTitle}
             </h2>
           </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="text-[hsl(0,0%,27%)] text-lg max-w-2xl mb-10 font-light leading-relaxed">
+          <FadeIn delay={0.15}>
+            <p className="text-muted-foreground text-lg max-w-2xl mb-6 font-light leading-relaxed">
               {philosophyText}
             </p>
           </FadeIn>
-          <FadeIn delay={0.3}>
+          <FadeIn delay={0.25}>
             <blockquote className="font-display italic text-2xl text-primary max-w-lg">
               "Where houses become places."
             </blockquote>
@@ -158,28 +158,28 @@ const Index = () => {
       </section>
 
       {/* Services Preview */}
-      <section className="py-20 px-[5%] bg-background">
+      <section className="py-10 md:py-14 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
+          <div className="border-t border-border mb-10 md:mb-12" />
           <FadeIn>
             <p className="section-label">Services</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
               Beyond hospitality
             </h2>
-            <p className="font-light text-[hsl(0,0%,27%)] leading-[1.75] max-w-xl mb-16">
+            <p className="font-light text-muted-foreground leading-[1.75] max-w-xl mb-10">
               We also partner with select property owners to bring their vision to life.
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {services.map((service, i) => (
               <FadeIn key={service.title} delay={i * 0.1}>
-                <div className="p-8 bg-background border border-[hsl(0,0%,93%)] hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-all duration-500">
-                  <span className="font-display text-2xl text-[hsl(0,0%,88%)] block mb-6">
+                <div className="p-8 bg-background border border-border hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)] transition-all duration-500">
+                  <span className="font-display text-2xl text-border block mb-5">
                     {service.num}
                   </span>
                   <h3 className="font-display text-xl mb-3">{service.title}</h3>
-                  <p className="text-sm font-light text-[hsl(0,0%,27%)] leading-[1.75]">
+                  <p className="text-sm font-light text-muted-foreground leading-[1.75]">
                     {service.description}
                   </p>
                 </div>
@@ -199,23 +199,23 @@ const Index = () => {
       </section>
 
       {/* About Preview */}
-      <section className="py-20 px-[5%] bg-background">
+      <section className="py-10 md:py-14 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
+          <div className="border-t border-border mb-10 md:mb-12" />
           <FadeIn>
             <p className="section-label">About</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
               Darya & Micka&euml;l
             </h2>
           </FadeIn>
           <FadeIn delay={0.15}>
-            <p className="font-light text-[hsl(0,0%,27%)] leading-[1.75] max-w-2xl mb-8">
+            <p className="font-light text-muted-foreground leading-[1.75] max-w-2xl mb-6">
               Expatriate proprietors who returned to their roots to restore
               properties in places they know intimately. Not an agency. Not
               endless scaling. Just houses cared for properly.
             </p>
           </FadeIn>
-          <FadeIn delay={0.25}>
+          <FadeIn delay={0.2}>
             <Link
               to="/about"
               className="inline-block text-sm text-primary hover:underline underline-offset-4 transition-all"
@@ -227,53 +227,45 @@ const Index = () => {
       </section>
 
       {/* Dual CTA */}
-      <section className="bg-background">
+      <section className="py-10 md:py-14 bg-background">
         <div className="max-container px-[5%]">
-          <div className="border-t border-[hsl(0,0%,93%)]" />
+          <div className="border-t border-border mb-10 md:mb-12" />
           <div className="grid grid-cols-1 md:grid-cols-2">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="py-16 pr-4 md:pr-16"
-            >
-              <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[hsl(0,0%,60%)] mb-4">For Travelers</p>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-                Stay in homes with a point of view.
-              </h3>
-              <p className="font-body font-light text-[hsl(0,0%,27%)] leading-relaxed mb-8">
-                Few properties, high standards, real people behind every stay.
-              </p>
-              <a
-                href="#collection"
-                className="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
-              >
-                Browse the collection
-              </a>
-            </motion.div>
+            <FadeIn>
+              <div className="py-4 pr-4 md:pr-16">
+                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">For Travelers</p>
+                <h3 className="font-display text-2xl md:text-3xl text-foreground mb-3">
+                  Stay in homes with a point of view.
+                </h3>
+                <p className="font-body font-light text-muted-foreground leading-relaxed mb-6">
+                  Few properties, high standards, real people behind every stay.
+                </p>
+                <a
+                  href="#collection"
+                  className="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
+                >
+                  Browse the collection
+                </a>
+              </div>
+            </FadeIn>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="py-16 pl-4 md:pl-16 border-t md:border-t-0 md:border-l border-[hsl(0,0%,93%)]"
-            >
-              <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[hsl(0,0%,60%)] mb-4">For Owners</p>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-                We don't manage every property.
-              </h3>
-              <p className="font-body font-light text-[hsl(0,0%,27%)] leading-relaxed mb-8">
-                Just the ones worth it. And if yours isn't ready yet — we'll get it there.
-              </p>
-              <Link
-                to="/management"
-                className="inline-block px-8 py-3 border border-primary text-primary text-sm uppercase tracking-[0.1em] hover:bg-primary hover:text-primary-foreground transition-all"
-              >
-                Talk to us
-              </Link>
-            </motion.div>
+            <FadeIn delay={0.15}>
+              <div className="py-4 pl-4 md:pl-16 border-t md:border-t-0 md:border-l border-border mt-8 md:mt-0 pt-8 md:pt-4">
+                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">For Owners</p>
+                <h3 className="font-display text-2xl md:text-3xl text-foreground mb-3">
+                  We don't manage every property.
+                </h3>
+                <p className="font-body font-light text-muted-foreground leading-relaxed mb-6">
+                  Just the ones worth it. And if yours isn't ready yet — we'll get it there.
+                </p>
+                <Link
+                  to="/management"
+                  className="inline-block px-8 py-3 border border-primary text-primary text-sm uppercase tracking-[0.1em] hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  Talk to us
+                </Link>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </section>
