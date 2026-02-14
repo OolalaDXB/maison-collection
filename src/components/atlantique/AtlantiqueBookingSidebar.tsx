@@ -67,7 +67,11 @@ const AtlantiqueBookingSidebar = ({
       </p>
       <div className="flex items-center gap-1.5 mb-5">
         <Star size={14} className="text-primary fill-primary" />
-        <span className="font-body font-light text-sm text-muted-foreground">5.0 · 22 reviews · Superhost</span>
+        <span className="font-body font-light text-sm text-muted-foreground">
+          5.0 ·{" "}
+          <a href="#reviews" className="underline underline-offset-2 hover:text-foreground transition-colors cursor-pointer">22 reviews</a>
+          {" "}· Superhost
+        </span>
       </div>
 
       <div className="border-t border-[hsl(0,0%,88%)] pt-5 space-y-4">

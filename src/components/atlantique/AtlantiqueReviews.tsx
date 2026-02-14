@@ -13,7 +13,7 @@ interface Props {
 
 const AtlantiqueReviews = ({ reviews }: Props) => {
   return (
-    <div className="border-t border-[#e0e0e0] pt-10 mb-10">
+    <div id="reviews" className="border-t border-[#e0e0e0] pt-10 mb-10">
       <div className="flex items-baseline gap-3 mb-8">
         <h3 className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] font-normal">
           Guest Reviews
