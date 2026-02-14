@@ -98,56 +98,54 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Social Proof — compact, light */}
-      <section className="bg-[#fafaf8] py-16 md:py-20">
-        <div className="max-container px-[5%]">
+      {/* Social Proof */}
+      <section className="py-16 px-[5%] bg-background">
+        <div className="max-container text-center">
           <FadeIn>
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-3 mb-3">
-                <Star size={16} className="text-primary fill-primary" />
-                <span className="font-display text-2xl text-foreground">5.0</span>
-                <span className="font-body font-light text-sm text-[#666666]">
-                  across all properties · Superhost · Guest Favourite · 30+ five-star reviews
-                </span>
-              </div>
-              <div className="w-[200px] h-px bg-[#e8e8e8]" />
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Star size={22} className="text-primary fill-primary" />
+              <span className="font-display text-3xl md:text-4xl text-foreground">5.0</span>
+              <span className="font-body text-base md:text-lg text-[hsl(0,0%,40%)]">
+                across all properties · Superhost · Guest Favourite · 30+ five-star reviews
+              </span>
             </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* Philosophy — light */}
-      <section className="section-padding">
+      {/* Philosophy */}
+      <section className="py-16 px-[5%] bg-background">
         <div className="max-container">
+          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
           <FadeIn>
             <p className="section-label">Philosophy</p>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-8 max-w-2xl">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
               {philosophyTitle}
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <p className="text-[#444444] text-lg max-w-2xl mb-12 font-light leading-relaxed">
+            <p className="text-[hsl(0,0%,27%)] text-lg max-w-2xl mb-10 font-light leading-relaxed">
               {philosophyText}
             </p>
           </FadeIn>
           <FadeIn delay={0.3}>
-            <blockquote className="font-display italic text-2xl text-primary max-w-lg mb-6">
+            <blockquote className="font-display italic text-2xl text-primary max-w-lg">
               "Where houses become places."
             </blockquote>
-            <div className="w-[60px] h-px bg-[#e8e8e8]" />
           </FadeIn>
         </div>
       </section>
 
       {/* Services Preview */}
-      <section className="bg-[#f5f3f0] section-padding">
+      <section className="py-20 px-[5%] bg-background">
         <div className="max-container">
+          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
           <FadeIn>
             <p className="section-label">Services</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
               Beyond hospitality
             </h2>
-            <p className="font-light text-[#444444] leading-[1.75] max-w-xl mb-16">
+            <p className="font-light text-[hsl(0,0%,27%)] leading-[1.75] max-w-xl mb-16">
               We also partner with select property owners to bring their vision to life.
             </p>
           </FadeIn>
@@ -155,12 +153,12 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {services.map((service, i) => (
               <FadeIn key={service.title} delay={i * 0.1}>
-                <div className="p-8 bg-background border border-[#eeeeee] hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-all duration-500">
-                  <span className="font-display text-2xl text-[#e0e0e0] block mb-6">
+                <div className="p-8 bg-background border border-[hsl(0,0%,93%)] hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-all duration-500">
+                  <span className="font-display text-2xl text-[hsl(0,0%,88%)] block mb-6">
                     {service.num}
                   </span>
                   <h3 className="font-display text-xl mb-3">{service.title}</h3>
-                  <p className="text-sm font-light text-[#444444] leading-[1.75]">
+                  <p className="text-sm font-light text-[hsl(0,0%,27%)] leading-[1.75]">
                     {service.description}
                   </p>
                 </div>
@@ -180,8 +178,9 @@ const Index = () => {
       </section>
 
       {/* About Preview */}
-      <section className="section-padding">
+      <section className="py-20 px-[5%] bg-background">
         <div className="max-container">
+          <div className="border-t border-[hsl(0,0%,93%)] mb-16" />
           <FadeIn>
             <p className="section-label">About</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6 max-w-2xl">
@@ -189,7 +188,7 @@ const Index = () => {
             </h2>
           </FadeIn>
           <FadeIn delay={0.15}>
-            <p className="font-light text-[#444444] leading-[1.75] max-w-2xl mb-8">
+            <p className="font-light text-[hsl(0,0%,27%)] leading-[1.75] max-w-2xl mb-8">
               Expatriate proprietors who returned to their roots to restore
               properties in places they know intimately. Not an agency. Not
               endless scaling. Just houses cared for properly.
@@ -207,51 +206,54 @@ const Index = () => {
       </section>
 
       {/* Dual CTA */}
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-[#fafaf8] p-12 md:p-16"
-          >
-            <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] mb-4">For Travelers</p>
-            <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-              Stay in homes with a point of view.
-            </h3>
-            <p className="font-body font-light text-[#444444] leading-relaxed mb-8">
-              Few properties, high standards, real people behind every stay.
-            </p>
-            <a
-              href="#collection"
-              className="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
+      <section className="bg-background">
+        <div className="max-container px-[5%]">
+          <div className="border-t border-[hsl(0,0%,93%)]" />
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="py-16 pr-4 md:pr-16"
             >
-              Browse the collection
-            </a>
-          </motion.div>
+              <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[hsl(0,0%,60%)] mb-4">For Travelers</p>
+              <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+                Stay in homes with a point of view.
+              </h3>
+              <p className="font-body font-light text-[hsl(0,0%,27%)] leading-relaxed mb-8">
+                Few properties, high standards, real people behind every stay.
+              </p>
+              <a
+                href="#collection"
+                className="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
+              >
+                Browse the collection
+              </a>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-[#f0ede8] p-12 md:p-16"
-          >
-            <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[#999999] mb-4">For Owners</p>
-            <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-              We don't manage every property.
-            </h3>
-            <p className="font-body font-light text-[#444444] leading-relaxed mb-8">
-              Just the ones worth it. And if yours isn't ready yet — we'll get it there.
-            </p>
-            <Link
-              to="/management"
-              className="inline-block px-8 py-3 border border-primary text-primary text-sm uppercase tracking-[0.1em] hover:bg-primary hover:text-primary-foreground transition-all"
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="py-16 pl-4 md:pl-16 border-t md:border-t-0 md:border-l border-[hsl(0,0%,93%)]"
             >
-              Talk to us
-            </Link>
-          </motion.div>
+              <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-[hsl(0,0%,60%)] mb-4">For Owners</p>
+              <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+                We don't manage every property.
+              </h3>
+              <p className="font-body font-light text-[hsl(0,0%,27%)] leading-relaxed mb-8">
+                Just the ones worth it. And if yours isn't ready yet — we'll get it there.
+              </p>
+              <Link
+                to="/management"
+                className="inline-block px-8 py-3 border border-primary text-primary text-sm uppercase tracking-[0.1em] hover:bg-primary hover:text-primary-foreground transition-all"
+              >
+                Talk to us
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
 
