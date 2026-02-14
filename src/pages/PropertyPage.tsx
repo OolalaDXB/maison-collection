@@ -100,6 +100,11 @@ const PropertyPage = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[hsl(0,0%,0%,0.6)] via-transparent to-transparent" />
+          {property.slug === "atlantique" && (
+            <span className="absolute bottom-4 right-4 text-[0.65rem] text-[hsl(0,0%,100%,0.4)] z-10">
+              anthropie architecture(s) | my-linh tôn
+            </span>
+          )}
         </div>
         <div className="relative z-10 max-container px-[5%] pb-16 md:pb-20 w-full">
           <FadeIn>
