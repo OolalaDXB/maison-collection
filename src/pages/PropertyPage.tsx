@@ -107,7 +107,7 @@ const PropertyPage = () => {
         <div className="max-container grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2">
             <FadeIn>
-              <h2 className="font-display text-3xl mb-6">About this maison</h2>
+              <h2 className="font-display text-3xl mb-6">About {property.name}</h2>
               <p className="text-muted-foreground leading-relaxed font-light text-lg mb-8">
                 {property.longDescription || property.description}
               </p>
