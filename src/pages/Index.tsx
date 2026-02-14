@@ -194,10 +194,10 @@ const Index = () => {
           </FadeIn>
           <FadeIn delay={0.2}>
             <a
-              href="mailto:contact@maisons.co"
+              href="mailto:chez@maisons.co"
               className="font-display text-xl md:text-2xl text-primary hover:underline underline-offset-4 transition-all"
             >
-              contact@maisons.co
+              chez@maisons.co
             </a>
           </FadeIn>
         </div>

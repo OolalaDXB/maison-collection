@@ -350,7 +350,7 @@ const PropertyPage = () => {
                     </a>
                   )}
                   <a
-                    href="mailto:contact@maisons.co"
+                    href="mailto:chez@maisons.co"
                     className="block w-full text-center px-6 py-3 border border-border text-foreground text-sm uppercase tracking-[0.1em] hover:border-primary hover:text-primary transition-colors"
                   >
                     Contact Us
