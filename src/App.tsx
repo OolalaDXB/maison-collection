@@ -15,12 +15,14 @@ import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
 import AdminCalendarPage from "./pages/admin/AdminCalendarPage";
 import AdminPricingPage from "./pages/admin/AdminPricingPage";
 import AdminBookingsPage from "./pages/admin/AdminBookingsPage";
+import AdminGuestsPage from "./pages/admin/AdminGuestsPage";
+import AdminReviewsPage from "./pages/admin/AdminReviewsPage";
+import AdminContentPage from "./pages/admin/AdminContentPage";
+import AdminInquiriesPage from "./pages/admin/AdminInquiriesPage";
+import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
+import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
 import BookingPage from "./pages/BookingPage";
-import {
-  AdminGuestsPage,
-  AdminContentPage, AdminInquiriesPage, AdminPaymentsPage, AdminSettingsPage
-} from "./pages/admin/AdminPlaceholderPages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,7 +49,7 @@ const App = () => (
           <Route path="/admin/pricing" element={<AdminPricingPage />} />
           <Route path="/admin/bookings" element={<AdminBookingsPage />} />
           <Route path="/admin/guests" element={<AdminGuestsPage />} />
-          <Route path="/admin/reviews" element={<AdminPropertiesPage />} />
+          <Route path="/admin/reviews" element={<AdminReviewsPage />} />
           <Route path="/admin/content" element={<AdminContentPage />} />
           <Route path="/admin/inquiries" element={<AdminInquiriesPage />} />
           <Route path="/admin/payments" element={<AdminPaymentsPage />} />

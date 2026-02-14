@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import FadeIn from "@/components/FadeIn";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 const services = [
   {
@@ -27,6 +28,11 @@ const services = [
 ];
 
 const Index = () => {
+  const heroTitle = useSiteContent("home", "hero_title", "Houses with a point of view");
+  const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe and the Caucasus. Each property tells a story, shaped by its landscape and chosen with intention.");
+  const philosophyTitle = useSiteContent("home", "philosophy_title", "Not rentals. Residences.");
+  const philosophyText = useSiteContent("home", "philosophy_text", "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.");
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -44,14 +50,12 @@ const Index = () => {
         <div className="relative z-10 max-container px-[5%] pb-20 md:pb-28 w-full">
           <FadeIn>
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-[hsl(0,0%,100%)] mb-6 max-w-3xl">
-              Houses with a point of view
+              {heroTitle}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-base md:text-lg text-[hsl(0,0%,80%)] max-w-xl mb-8 font-light">
-              A collection of distinctive homes across Europe and the Caucasus.
-              Each property tells a story, shaped by its landscape and chosen
-              with intention.
+              {heroSubtitle}
             </p>
           </FadeIn>
           <FadeIn delay={0.4}>
@@ -98,14 +102,12 @@ const Index = () => {
           <FadeIn>
             <p className="section-label text-terra-cotta-light">Philosophy</p>
             <h2 className="font-display text-3xl md:text-4xl text-[hsl(0,0%,100%)] mb-8 max-w-2xl">
-              Not rentals. Residences.
+              {philosophyTitle}
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-[hsl(0,0%,70%)] text-lg max-w-2xl mb-12 font-light leading-relaxed">
-              We don't believe in vacation rentals. We believe in places that
-              change how you see the world — houses that become part of your
-              story, not just your itinerary.
+              {philosophyText}
             </p>
           </FadeIn>
           <FadeIn delay={0.3}>
