@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Search, Palette, Camera, TrendingUp, Users, Wrench, BarChart3, Shield, Star,
-} from "lucide-react";
+import { Star } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
@@ -17,65 +15,52 @@ import {
 const steps = [
   {
     num: "01",
-    title: "Audit & Selection",
-    desc: "We visit. We assess. Not every property makes it into the collection. We look for character, location, and potential — not just square meters. If your property isn't ready, we tell you honestly what it needs.",
+    text: "We visit your property. We assess it honestly. Not every home makes it into the collection. We look for character, location, and something worth building on. If it's not ready, we'll tell you what it needs.",
   },
   {
     num: "02",
-    title: "Elevation",
-    desc: "If needed, we bring your property to the level. Interior styling, photography direction, listing narrative, amenity upgrades, operational setup. We don't just list — we transform. We work with our network of architects, designers, and local artisans.",
+    text: "We get it to the level. Styling, photography direction, the listing narrative, amenity upgrades if needed. We work with architects, designers, and photographers we trust. We don't just put your property online — we make it the version of itself that guests remember.",
   },
   {
     num: "03",
-    title: "Management",
-    desc: "Once live, we handle everything. Pricing strategy, guest screening, multilingual communication (French, English, Russian), maintenance coordination, and quality control. Same-day response before 10am. You get a monthly report and peace of mind.",
+    text: "We handle everything. Pricing that adapts to demand, guest vetting, multilingual communication in French, English and Russian, check-in coordination, cleaning, maintenance, quality checks. You get a monthly report and peace of mind. Same-day response before 10am.",
   },
 ];
 
-const serviceItems = [
-  { icon: Search, title: "Property Audit", desc: "On-site visit. Honest assessment of strengths, gaps, and potential. Competitive benchmarking." },
-  { icon: Palette, title: "Styling & Staging", desc: "Interior recommendations, furniture sourcing, styling direction to match the collection's standard." },
-  { icon: Camera, title: "Photography & Narrative", desc: "Professional photography direction. Editorial listing copy. Consistent brand identity." },
-  { icon: TrendingUp, title: "Revenue & Pricing", desc: "Dynamic pricing strategy. Seasonal adjustments. Focus on quality bookings, not volume." },
-  { icon: Users, title: "Guest Management", desc: "Screening, communication in FR/EN/RU, check-in coordination, issue resolution. Same-day response." },
-  { icon: Wrench, title: "Maintenance & Operations", desc: "Cleaning coordination, restocking, minor repairs, vendor management. Regular quality checks." },
-  { icon: BarChart3, title: "Reporting", desc: "Monthly owner report: revenue, occupancy, guest feedback, maintenance log, recommendations." },
-  { icon: Shield, title: "Legal & Compliance", desc: "Rental contracts, insurance guidance, local regulation compliance, tourist tax handling." },
-];
-
 const elevationTags = [
-  "Interior styling & furniture",
+  "Interior styling",
   "Professional photography",
-  "Listing optimization",
-  "Amenity audit & upgrades",
+  "Listing narrative",
+  "Amenity audit",
   "Operational setup",
   "Architectural consultation",
 ];
 
 const faqs = [
-  { q: "What types of properties do you manage?", a: "Homes with character — architectural projects, renovated heritage properties, well-designed apartments in exceptional locations. We look for places with a story, not generic rentals." },
-  { q: "What commission do you take?", a: "Our management fee is between 15–20% of booking revenue depending on the scope of services. No hidden fees. We discuss everything transparently before starting." },
-  { q: "Do you only manage properties in France and Georgia?", a: "Today, yes — Brittany and the Caucasus. We're expanding selectively to the Gulf region in 2026. If your property is elsewhere and exceptional, talk to us." },
-  { q: "What if my property needs work before going live?", a: "That's part of what we do. We'll audit your property, give you an honest assessment, and propose a plan — from light staging to full renovation management." },
-  { q: "How long before my property is live?", a: "For collection-ready properties: 2–4 weeks (photography, listing, operational setup). For properties needing work: depends on scope, but we move fast." },
-];
-
-const serviceTypeOptions = [
-  "Full management",
-  "Seasonal management",
-  "Property audit only",
-  "Help getting my property ready",
-  "Just exploring",
+  {
+    q: "What kind of properties do you work with?",
+    a: "Homes with character — architectural renovations, well-designed apartments in exceptional locations, heritage properties with a story. We're looking for places guests will remember, not generic rentals. If you're unsure, just reach out.",
+  },
+  {
+    q: "How much does it cost?",
+    a: "Our fee is 15–20% of booking revenue, depending on the scope. No setup fees, no hidden costs. We discuss everything before we start.",
+  },
+  {
+    q: "What if my property needs work first?",
+    a: "That's part of what we do. We'll visit, give you an honest assessment, and propose a plan — from light staging to a full renovation. We manage the process end to end.",
+  },
+  {
+    q: "Where do you operate?",
+    a: "Today: Brittany, the Caucasus, and Dubai. We're expanding selectively. If your property is elsewhere and it's exceptional, talk to us.",
+  },
+  {
+    q: "How quickly can my property go live?",
+    a: "If it's ready: 2–4 weeks (photos, listing, setup). If it needs work: depends on scope, but we move fast and we'll give you a timeline upfront.",
+  },
 ];
 
 const ManagementPage = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    location: "",
-    serviceType: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,16 +71,14 @@ const ManagementPage = () => {
       const { error } = await supabase.from("inquiries").insert({
         name: formData.name,
         email: formData.email,
-        subject: formData.location,
-        type: formData.serviceType || "general",
         message: formData.message,
+        type: "management",
         status: "new",
       });
       if (error) throw error;
       setSubmitted(true);
     } catch {
-      // Fallback to mailto
-      const body = `Name: ${formData.name}%0AEmail: ${formData.email}%0ALocation: ${formData.location}%0AService: ${formData.serviceType}%0A%0A${encodeURIComponent(formData.message)}`;
+      const body = `Name: ${formData.name}%0AEmail: ${formData.email}%0A%0A${encodeURIComponent(formData.message)}`;
       window.location.href = `mailto:chez@maisons.co?subject=${encodeURIComponent("Management Inquiry — " + formData.name)}&body=${body}`;
       setSubmitted(true);
     } finally {
@@ -104,152 +87,138 @@ const ManagementPage = () => {
   };
 
   const inputClass =
-    "w-full px-4 py-3 border border-[hsl(var(--border))] bg-background text-foreground text-sm font-body focus:outline-none focus:border-primary transition-colors";
+    "w-full px-4 py-3 border border-[hsl(var(--border))] bg-background text-foreground text-sm font-body focus:outline-none focus:border-foreground transition-colors";
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       {/* S1: Hero */}
-      <section className="px-[5%] pt-32 md:pt-40 pb-20 md:pb-28">
-        <div className="max-container">
+      <section className="px-[5%] pt-32 md:pt-40 pb-16 md:pb-24">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <p className="section-label">For Property Owners</p>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h1 className="font-display text-4xl md:text-6xl text-foreground max-w-3xl">
-              We don't manage every property.
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1]">
+              We started with our own homes.
             </h1>
           </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="font-display italic text-2xl md:text-3xl text-[#666666] mt-4">
-              Just the ones worth it.
-            </p>
+          <FadeIn delay={0.15}>
+            <div className="font-body font-light text-lg text-[hsl(0,0%,27%)] leading-relaxed mt-6 space-y-4">
+              <p>
+                A mountain duplex in the Caucasus. A stone house reimagined by
+                architects in Brittany. A family townhouse in Dubai's only
+                net-zero community.
+              </p>
+              <p>
+                We didn't start as managers — we started as owners. We learned
+                what it takes to earn five stars every time: the right photos,
+                the right words, the right pricing, the right welcome. Now we
+                bring that to a handful of other properties. Not an agency. Not a
+                platform. Just us, doing for your home what we do for ours.
+              </p>
+            </div>
           </FadeIn>
-          <FadeIn delay={0.3}>
-            <p className="font-body font-light text-[#444444] text-lg leading-relaxed max-w-2xl mt-8">
-              We started with our own homes — a mountain duplex in the Caucasus, an
-              architect-renovated stone house in Brittany. We learned what it takes to
-              deliver five-star stays, every single time. Now we bring that standard to a
-              select number of properties.
-            </p>
+          <FadeIn delay={0.25}>
+            <div className="mt-8">
+              <div className="w-[60px] h-px bg-[hsl(0,0%,91%)]" />
+              <a
+                href="mailto:chez@maisons.co"
+                className="font-body font-light text-sm text-[hsl(0,0%,60%)] mt-4 inline-block hover:text-foreground transition-colors"
+              >
+                chez@maisons.co
+              </a>
+            </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* S2: Approach */}
-      <section className="section-padding">
-        <div className="max-container">
+      {/* S2: What we do */}
+      <section className="px-[5%] py-16 md:py-24">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <p className="section-label">Our Approach</p>
-            <h2 className="font-display text-3xl text-foreground mb-12">
-              Three steps. No shortcuts.
+            <h2 className="font-display text-3xl text-foreground mb-10">
+              What we do.
             </h2>
           </FadeIn>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="space-y-8">
             {steps.map((s, i) => (
-              <FadeIn key={s.num} delay={i * 0.15}>
-                <div>
-                  <span className="font-display text-4xl text-[#e0e0e0] block mb-4">
+              <FadeIn key={s.num} delay={i * 0.1}>
+                <p className="font-body font-light text-base text-[hsl(0,0%,27%)] leading-relaxed">
+                  <span className="font-display text-xl text-[hsl(0,0%,87%)] mr-2">
                     {s.num}
                   </span>
-                  <h3 className="font-body uppercase tracking-wider text-sm text-foreground mb-3">
-                    {s.title}
-                  </h3>
-                  <p className="font-body font-light text-[#444444] text-sm leading-relaxed">
-                    {s.desc}
-                  </p>
-                </div>
+                  <span className="text-[hsl(0,0%,60%)] mr-2">—</span>
+                  {s.text}
+                </p>
               </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
-      {/* S3: Services */}
-      <section className="bg-[#f5f3f0] section-padding">
-        <div className="max-container">
+      {/* Divider */}
+      <div className="max-w-[750px] mx-auto px-[5%]">
+        <div className="h-px bg-[hsl(0,0%,93%)]" />
+      </div>
+
+      {/* S3: Proof */}
+      <section className="px-[5%] py-16 md:py-24">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <p className="section-label">Services</p>
             <h2 className="font-display text-3xl text-foreground mb-12">
-              What's included
+              Our own track record.
             </h2>
           </FadeIn>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {serviceItems.map((s, i) => (
-              <FadeIn key={s.title} delay={i * 0.08}>
-                <div className="flex gap-4">
-                  <s.icon size={20} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
-                  <div>
-                    <h3 className="font-body text-sm text-foreground mb-1">{s.title}</h3>
-                    <p className="font-body font-light text-[#444444] text-sm leading-relaxed">
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* S4: Proof */}
-      <section className="bg-[#0a1628] section-padding">
-        <div className="max-container">
-          <FadeIn>
-            <p className="font-body uppercase tracking-wider text-[0.7rem] text-[rgba(255,255,255,0.6)] mb-4">
-              Track Record
-            </p>
-            <h2 className="font-display text-3xl text-white mb-12">
-              We proved it on our own homes first.
-            </h2>
-          </FadeIn>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FadeIn delay={0.1}>
-              <div className="border border-[rgba(255,255,255,0.3)] p-8">
-                <h3 className="font-display text-2xl text-white mb-2">
+              <div className="border border-[hsl(0,0%,93%)] p-8">
+                <h3 className="font-display text-xl text-foreground mb-1">
                   Maison Georgia
                 </h3>
-                <p className="font-body font-light text-[rgba(255,255,255,0.5)] text-sm mb-4">
+                <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
                   Gudauri, Caucasus
                 </p>
-                <p className="font-body text-sm text-[rgba(255,255,255,0.7)] mb-4">
-                  <Star size={14} className="inline text-[#c1695f] fill-[#c1695f] -mt-0.5 mr-1" />
+                <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
+                  <Star
+                    size={14}
+                    className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
+                  />
                   5.0 · 22+ reviews · Superhost · Guest Favourite
                 </p>
-                <div className="space-y-1 font-body font-light text-sm text-white mb-6">
+                <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
                   <p>+35% net revenue growth in 2 years</p>
                   <p>90%+ occupancy in season</p>
-                  <p>Superhost · Guest Favourite</p>
                 </div>
                 <Link
                   to="/georgia"
-                  className="font-body text-sm text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+                  className="font-body text-sm text-[hsl(0,0%,60%)] hover:text-foreground transition-colors"
                 >
                   View the property →
                 </Link>
               </div>
             </FadeIn>
             <FadeIn delay={0.2}>
-              <div className="border border-[rgba(255,255,255,0.3)] p-8">
-                <h3 className="font-display text-2xl text-white mb-2">
+              <div className="border border-[hsl(0,0%,93%)] p-8">
+                <h3 className="font-display text-xl text-foreground mb-1">
                   Maison Atlantique
                 </h3>
-                <p className="font-body font-light text-[rgba(255,255,255,0.5)] text-sm mb-4">
+                <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
                   Quistinic, Brittany
                 </p>
-                <p className="font-body text-sm text-[rgba(255,255,255,0.7)] mb-4">
-                  <Star size={14} className="inline text-[#c1695f] fill-[#c1695f] -mt-0.5 mr-1" />
-                  5.0 · Superhost
+                <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
+                  <Star
+                    size={14}
+                    className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
+                  />
+                  5.0 · 22 reviews · Superhost
                 </p>
-                <div className="space-y-1 font-body font-light text-sm text-white mb-6">
+                <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
                   <p>Architecture by Anthropie (2020–2022)</p>
                   <p>Featured in Archibien, Houzz</p>
-                  <p>First full season: sold out</p>
+                  <p>First full season: fully booked</p>
                 </div>
                 <Link
                   to="/atlantique"
-                  className="font-body text-sm text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+                  className="font-body text-sm text-[hsl(0,0%,60%)] hover:text-foreground transition-colors"
                 >
                   View the property →
                 </Link>
@@ -259,39 +228,45 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* S5: Elevation */}
-      <section className="section-padding">
-        <div className="max-container">
+      {/* Divider */}
+      <div className="max-w-[750px] mx-auto px-[5%]">
+        <div className="h-px bg-[hsl(0,0%,93%)]" />
+      </div>
+
+      {/* S4: Not ready yet */}
+      <section className="px-[5%] py-16 md:py-24">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <h2 className="font-display text-3xl text-foreground mb-4">
-              Your property isn't at the level yet?
+            <h2 className="font-display text-3xl text-foreground mb-2">
+              Your property isn't there yet?
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
-            <p className="font-display italic text-xl text-[#666666] mb-8">
-              That's exactly why we're here.
+            <p className="font-display italic text-xl text-[hsl(0,0%,40%)] mb-8">
+              That's why we're here.
             </p>
           </FadeIn>
-          <FadeIn delay={0.2}>
-            <div className="font-body font-light text-[#444444] text-lg leading-relaxed max-w-2xl space-y-4 mb-10">
+          <FadeIn delay={0.15}>
+            <div className="font-body font-light text-base text-[hsl(0,0%,27%)] leading-relaxed max-w-2xl space-y-4 mb-10">
               <p>
-                Not every home is collection-ready on day one. Some need styling. Some
-                need better photography. Some need a complete rethink of their guest
-                experience.
+                Not every home is ready on day one. Some need styling. Some need
+                better photography. Some need a complete rethink of how guests
+                experience the space.
               </p>
               <p>
-                We work with a network of architects, interior designers, photographers,
-                and local artisans to bring properties up to standard. From a weekend of
-                staging to a full renovation — we scope it, manage it, and deliver it.
+                We work with architects, interior designers, and photographers
+                to bring properties up to the standard. From a weekend of
+                staging to a full renovation — we scope it, manage it, and
+                deliver it.
               </p>
             </div>
           </FadeIn>
-          <FadeIn delay={0.3}>
+          <FadeIn delay={0.2}>
             <div className="flex flex-wrap gap-2">
               {elevationTags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-body font-light text-xs border border-[#e0e0e0] px-3 py-1.5 text-[#666666]"
+                  className="font-body font-light text-xs border border-[hsl(0,0%,88%)] px-3 py-1.5 text-[hsl(0,0%,40%)]"
                 >
                   {tag}
                 </span>
@@ -301,15 +276,20 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* S6: Contact */}
-      <section className="bg-[#f5f3f0] section-padding">
-        <div className="max-container max-w-2xl">
+      {/* Divider */}
+      <div className="max-w-[750px] mx-auto px-[5%]">
+        <div className="h-px bg-[hsl(0,0%,93%)]" />
+      </div>
+
+      {/* S5: Contact */}
+      <section className="px-[5%] py-16 md:py-24">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <h2 className="font-display text-3xl text-foreground mb-4">
+            <h2 className="font-display text-3xl text-foreground mb-2">
               Let's talk about your property.
             </h2>
-            <p className="font-body font-light text-[#444444] mb-8">
-              Tell us about your property and what you're looking for. We'll get back to
+            <p className="font-body font-light text-[hsl(0,0%,27%)] mb-8">
+              Tell us where it is and what you're thinking. We'll get back to
               you within 24 hours.
             </p>
           </FadeIn>
@@ -326,7 +306,9 @@ const ManagementPage = () => {
                     placeholder="Your name"
                     required
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className={inputClass}
                   />
                   <input
@@ -334,44 +316,27 @@ const ManagementPage = () => {
                     placeholder="Your email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className={inputClass}
                   />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Property location (city, region, country)"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className={inputClass}
-                />
-                <select
-                  value={formData.serviceType}
-                  onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                  className={`${inputClass} ${!formData.serviceType ? "text-[#999999]" : ""}`}
-                >
-                  <option value="" disabled>
-                    What are you looking for?
-                  </option>
-                  {serviceTypeOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
                 <textarea
-                  placeholder="Tell us about your property"
+                  placeholder="Tell us about your property — where it is, what it's like, and what you need."
                   rows={4}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
                   className={`${inputClass} resize-none`}
                 />
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-60"
+                  className="px-8 py-3 bg-primary text-primary-foreground text-xs font-body uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-60"
                 >
-                  {submitting ? "Sending…" : "Send inquiry"}
+                  {submitting ? "Sending…" : "Send"}
                 </button>
               </form>
             )}
@@ -379,22 +344,31 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* S7: FAQ */}
-      <section className="section-padding">
-        <div className="max-container max-w-3xl">
+      {/* Divider */}
+      <div className="max-w-[750px] mx-auto px-[5%]">
+        <div className="h-px bg-[hsl(0,0%,93%)]" />
+      </div>
+
+      {/* S6: FAQ */}
+      <section className="px-[5%] py-16 md:py-20">
+        <div className="max-w-[750px] mx-auto">
           <FadeIn>
-            <h2 className="font-display text-3xl text-foreground mb-8">
-              Common questions
+            <h2 className="font-display text-2xl text-foreground mb-8">
+              Questions.
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border-b border-[#e0e0e0]">
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="border-b border-[hsl(0,0%,93%)]"
+                >
                   <AccordionTrigger className="font-body text-sm text-foreground py-5 hover:no-underline">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="font-body font-light text-[#444444] text-sm leading-relaxed pb-5">
+                  <AccordionContent className="font-body font-light text-sm text-[hsl(0,0%,27%)] leading-relaxed pb-5">
                     {faq.a}
                   </AccordionContent>
                 </AccordionItem>
