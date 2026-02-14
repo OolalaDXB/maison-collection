@@ -17,6 +17,14 @@ interface DbReview {
   stay_date: string | null;
 }
 
+interface DbPoi {
+  id: string;
+  label: string;
+  emoji: string;
+  latitude: number;
+  longitude: number;
+}
+
 const PropertyPage = () => {
   const location = useLocation();
   const slug = location.pathname.replace("/", "");
@@ -24,29 +32,34 @@ const PropertyPage = () => {
   const staticReviews = reviews.filter((r) => r.propertySlug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [dbReviews, setDbReviews] = useState<DbReview[]>([]);
+  const [dbPois, setDbPois] = useState<DbPoi[]>([]);
+  const [dbPropertyId, setDbPropertyId] = useState<string | null>(null);
+  const [dbLat, setDbLat] = useState<number | null>(null);
+  const [dbLng, setDbLng] = useState<number | null>(null);
 
-  // Try to load reviews from DB, fallback to static
   useEffect(() => {
     if (!property) return;
-    const loadReviews = async () => {
-      // Get property ID from DB by slug
+    const loadData = async () => {
       const { data: props } = await supabase
         .from("properties")
-        .select("id")
+        .select("id, latitude, longitude")
         .eq("slug", slug)
         .limit(1);
       if (props && props.length > 0) {
-        const { data } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("property_id", props[0].id)
-          .order("stay_date", { ascending: false });
-        if (data && data.length > 0) {
-          setDbReviews(data as DbReview[]);
-        }
+        const propId = props[0].id;
+        setDbPropertyId(propId);
+        setDbLat(props[0].latitude);
+        setDbLng(props[0].longitude);
+
+        const [reviewsRes, poisRes] = await Promise.all([
+          supabase.from("reviews").select("*").eq("property_id", propId).order("stay_date", { ascending: false }),
+          supabase.from("property_pois").select("*").eq("property_id", propId).order("display_order"),
+        ]);
+        if (reviewsRes.data && reviewsRes.data.length > 0) setDbReviews(reviewsRes.data as DbReview[]);
+        if (poisRes.data) setDbPois(poisRes.data as DbPoi[]);
       }
     };
-    loadReviews();
+    loadData();
   }, [slug, property]);
 
   if (!property || property.status === "coming_soon") {
@@ -317,34 +330,50 @@ const PropertyPage = () => {
         <div className="max-container">
           <FadeIn>
             <p className="section-label mb-6">Location</p>
-            {property.slug === "georgia" ? (
-              <PropertyMap
-                center={[44.4735, 42.4575]}
-                zoom={14}
-                propertyName={property.name}
-                pois={[
+            {(() => {
+              // Determine center coordinates
+              const fallbackCoords: Record<string, [number, number]> = {
+                georgia: [44.4735, 42.4575],
+                atlantique: [-3.3455, 47.9135],
+              };
+              const fallbackPois: Record<string, { label: string; coords: [number, number]; emoji: string }[]> = {
+                georgia: [
                   { label: "Gondola", coords: [44.4710, 42.4560], emoji: "🎿" },
                   { label: "Ski Rental", coords: [44.4725, 42.4570], emoji: "⛷️" },
                   { label: "Restaurants", coords: [44.4745, 42.4580], emoji: "🍽️" },
                   { label: "Supermarket", coords: [44.4750, 42.4565], emoji: "🛒" },
-                ]}
-              />
-            ) : property.slug === "atlantique" ? (
-              <PropertyMap
-                center={[-3.3455, 47.9135]}
-                zoom={13}
-                propertyName={property.name}
-                pois={[
+                ],
+                atlantique: [
                   { label: "Atlantic Coast", coords: [-3.3600, 47.7200], emoji: "🌊" },
                   { label: "Lorient", coords: [-3.3600, 47.7500], emoji: "🏙️" },
-                ]}
-              />
-            ) : (
-              <div className="border border-border p-12 flex flex-col items-center justify-center text-center bg-muted/30">
-                <p className="font-display text-xl text-foreground mb-2">Location</p>
-                <p className="text-sm text-muted-foreground">{property.location}, {property.country}</p>
-              </div>
-            )}
+                ],
+              };
+
+              const center: [number, number] | null =
+                (dbLng && dbLat) ? [dbLng, dbLat] : fallbackCoords[property.slug] || null;
+
+              const pois = dbPois.length > 0
+                ? dbPois.map((p) => ({ label: p.label, coords: [p.longitude, p.latitude] as [number, number], emoji: p.emoji }))
+                : fallbackPois[property.slug] || [];
+
+              if (!center) {
+                return (
+                  <div className="border border-border p-12 flex flex-col items-center justify-center text-center bg-muted/30">
+                    <p className="font-display text-xl text-foreground mb-2">Location</p>
+                    <p className="text-sm text-muted-foreground">{property.location}, {property.country}</p>
+                  </div>
+                );
+              }
+
+              return (
+                <PropertyMap
+                  center={center}
+                  zoom={14}
+                  propertyName={property.name}
+                  pois={pois}
+                />
+              );
+            })()}
           </FadeIn>
         </div>
       </section>

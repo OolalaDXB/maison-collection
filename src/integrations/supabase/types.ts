@@ -157,6 +157,47 @@ export type Database = {
           },
         ]
       }
+      property_pois: {
+        Row: {
+          created_at: string
+          display_order: number
+          emoji: string | null
+          id: string
+          label: string
+          latitude: number
+          longitude: number
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          emoji?: string | null
+          id?: string
+          label: string
+          latitude: number
+          longitude: number
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          emoji?: string | null
+          id?: string
+          label?: string
+          latitude?: number
+          longitude?: number
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_pois_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           created_at: string
