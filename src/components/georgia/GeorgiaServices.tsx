@@ -7,29 +7,27 @@ import {
 } from "@/components/ui/accordion";
 
 const included = [
-  "Fresh linen, towels & cotton bed linens",
-  "Wood-burning fireplace with unlimited supply",
-  "Starlink WiFi",
-  "Smart TV & Hi-Fi system",
+  "Fresh linen and towels",
+  "Wood-burning fireplace (unlimited wood supply)",
   "Fully equipped kitchen",
-  "Washer",
+  "Fast WiFi & Smart TV",
   "Self check-in 24/7 via secure lockbox",
-  "Dedicated contact throughout your stay",
   "Ski lockers in basement",
   "Free parking in front of building",
-  "Elevator access",
-  "Blackout blinds in bedrooms",
+  "Dedicated contact throughout your stay",
+  "Balcony with mountain views",
+  "Washing machine",
 ];
 
 const alaCarte = [
   "Airport transfer (Tbilisi, 2h)",
-  "Ski equipment rental (50m away)",
-  "Ski instructor",
-  "SPA access (basement, fee)",
+  "Ski rental delivery",
+  "Private ski instructor",
   "Grocery delivery",
-  "Private chef / catering",
-  "Guided mountain tours",
+  "Georgian wine tasting",
   "Paragliding",
+  "Mountain guide & hiking",
+  "Chef at home (Georgian cuisine)",
 ];
 
 const GeorgiaServices = () => {
@@ -41,9 +39,6 @@ const GeorgiaServices = () => {
             Included Services
           </AccordionTrigger>
           <AccordionContent>
-            <p className="font-body font-light text-xs uppercase tracking-[0.1em] text-muted-foreground mb-4">
-              In-home services & amenities
-            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {included.map((s) => (
                 <div key={s} className="flex items-start gap-3">
@@ -60,9 +55,6 @@ const GeorgiaServices = () => {
             À la Carte Services
           </AccordionTrigger>
           <AccordionContent>
-            <p className="font-body font-light text-sm text-[hsl(0,0%,27%)] mb-5">
-              Tailor your stay with our services and local partners.
-            </p>
             <div className="grid grid-cols-2 gap-3 mb-6">
               {alaCarte.map((s) => (
                 <div key={s} className="flex items-start gap-2">
@@ -71,7 +63,7 @@ const GeorgiaServices = () => {
                 </div>
               ))}
             </div>
-            <div className="bg-[hsl(0,0%,97%)] p-5">
+            <div className="bg-[hsl(0,0%,97%)] p-4">
               <p className="font-body font-light text-sm text-muted-foreground leading-relaxed">
                 This is a glimpse of what's possible. Offerings vary by season
                 and availability. Contact us and we'll craft your stay.

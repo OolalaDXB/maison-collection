@@ -26,13 +26,10 @@ const GeorgiaBookingSidebar = ({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [guestOpen, setGuestOpen] = useState(false);
 
-  const airbnbUrl = "https://www.airbnb.com/h/gudaurichalet";
+  const airbnbUrl = "https://www.airbnb.com/rooms/869235153625498854";
   const bookSubject = checkIn && checkOut
-    ? `Réservation Maison Georgia — ${format(checkIn, "dd/MM/yyyy")} au ${format(checkOut, "dd/MM/yyyy")} — ${guests} guest${guests > 1 ? "s" : ""}`
-    : "Réservation Maison Georgia";
-  const contactSubject = checkIn && checkOut
-    ? `Maison Georgia — ${format(checkIn, "dd/MM/yyyy")} to ${format(checkOut, "dd/MM/yyyy")}`
-    : "Maison Georgia";
+    ? `Booking Maison Georgia — ${format(checkIn, "dd/MM/yyyy")} to ${format(checkOut, "dd/MM/yyyy")} — ${guests} guest${guests > 1 ? "s" : ""}`
+    : "Booking Maison Georgia";
 
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
@@ -57,8 +54,9 @@ const GeorgiaBookingSidebar = ({
     setCheckOut(undefined);
   };
 
-  const gbp = (total * 0.86).toFixed(0);
   const usd = (total * 1.08).toFixed(0);
+  const aed = (total * 3.97).toFixed(0);
+  const gel = (total * 2.95).toFixed(0);
 
   return (
     <div className="border border-[hsl(0,0%,88%)] p-6">
@@ -67,7 +65,7 @@ const GeorgiaBookingSidebar = ({
       </p>
       <div className="flex items-center gap-1.5 mb-5">
         <Star size={14} className="text-primary fill-primary" />
-        <span className="font-body font-light text-sm text-muted-foreground">5.0 · 20 reviews · Superhost</span>
+        <span className="font-body font-light text-sm text-muted-foreground">5.0 · Superhost · 22+ reviews</span>
       </div>
 
       <div className="border-t border-[hsl(0,0%,88%)] pt-5 space-y-4">
@@ -148,7 +146,7 @@ const GeorgiaBookingSidebar = ({
               <span className="font-body font-medium text-base text-foreground">€{total.toLocaleString()}</span>
             </div>
             <p className="font-body font-light text-xs text-muted-foreground mb-1">
-              ~£{gbp} · ~${usd}
+              ~${usd} · {aed} AED · {gel} ₾
             </p>
             <p className="font-body font-light text-xs text-muted-foreground">
               Tourist tax not included.
@@ -167,29 +165,23 @@ const GeorgiaBookingSidebar = ({
       </div>
 
       {/* Actions */}
-      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 space-y-3">
+      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5">
         <a
           href={`mailto:chez@maisons.co?subject=${encodeURIComponent(bookSubject)}`}
-          className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
+          className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity mb-3"
         >
           Book with us
         </a>
-        <div className="flex items-center gap-3">
-          <a
-            href={`mailto:chez@maisons.co?subject=${encodeURIComponent(contactSubject)}`}
-            className="flex-1 border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
-          >
-            Contact us
-          </a>
+        <p className="text-center">
           <a
             href={airbnbUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 border border-[hsl(0,0%,88%)] text-muted-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground hover:text-foreground transition-colors"
+            className="font-body font-light text-xs text-muted-foreground underline hover:text-foreground transition-colors"
           >
             Book on Airbnb
           </a>
-        </div>
+        </p>
       </div>
       <p className="font-body font-light text-xs text-muted-foreground mt-3 text-center">
         chez@maisons.co

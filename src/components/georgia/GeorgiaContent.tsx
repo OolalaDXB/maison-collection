@@ -2,24 +2,21 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import FadeIn from "@/components/FadeIn";
 import {
-  Mountain, Bath, Car, Wifi, Flame, Monitor, Armchair,
-  Snowflake, Cable, Dumbbell, Lock, WashingMachine, Building
+  Mountain, Bath, Car, Wifi, Flame, Lock,
+  Dumbbell, BedDouble, Maximize2, CableCar
 } from "lucide-react";
 
 const features = [
-  { icon: Mountain, label: "Panoramic Caucasus views" },
-  { icon: Cable, label: "200m from gondola / ski-in ski-out" },
-  { icon: Flame, label: "Wood fireplace (unlimited supply)" },
-  { icon: Bath, label: "3 private bathrooms (1 with tub)" },
-  { icon: Armchair, label: "Double-height living space" },
-  { icon: Snowflake, label: "Ski season: Dec–Apr" },
-  { icon: Monitor, label: "Smart TV & Hi-Fi system" },
-  { icon: Wifi, label: "Starlink WiFi" },
-  { icon: Dumbbell, label: "SPA in basement (fee)" },
+  { icon: Mountain, label: "2,200m altitude, Caucasus views" },
+  { icon: CableCar, label: "200m from gondola (4 min walk)" },
+  { icon: Flame, label: "Wood-burning fireplace" },
+  { icon: Maximize2, label: "100m² duplex, double-height windows" },
+  { icon: Bath, label: "3 private bathrooms" },
+  { icon: BedDouble, label: "Sleeps 6 (queen + twins + sofa bed)" },
+  { icon: Wifi, label: "Fast WiFi & Smart TV" },
   { icon: Car, label: "Free parking" },
   { icon: Lock, label: "Self check-in 24/7" },
-  { icon: WashingMachine, label: "Washer" },
-  { icon: Building, label: "Elevator" },
+  { icon: Dumbbell, label: "SPA in building (paid access)" },
 ];
 
 const GeorgiaContent = () => {
@@ -41,38 +38,34 @@ const GeorgiaContent = () => {
           <h2 className="font-display text-3xl text-foreground mb-1">Maison Georgia</h2>
           <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">Gudauri, Greater Caucasus, Georgia</p>
           <p className="font-body font-light text-muted-foreground text-sm">
-            6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m² duplex · 200m from gondola
+            6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m²
           </p>
         </div>
 
         {/* Description */}
         <div className="mb-4">
           <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-            Mountain duplex at the crossroads of Europe and Asia. 100m² spread across 
-            two levels in New Gudauri, just 200m from the gondola. Double-height windows 
-            frame the Caucasus peaks, flooding the space with light and offering breathtaking 
-            sunrise views.
+            A mountain duplex at 2,200 meters, 200 meters from the gondola in New Gudauri. 
+            Double-height windows frame the Greater Caucasus range from sunrise to sunset. 
+            Two levels, two private bedrooms sleeping six, three full bathrooms, a wood-burning 
+            fireplace with unlimited supply, and a fully equipped kitchen.
           </p>
           <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-            Two private bedrooms sleeping 6, three bathrooms including one with a bathtub. 
-            A wood-burning fireplace with unlimited supply creates the perfect atmosphere 
-            after a day on the slopes. Equipped kitchen, panoramic balcony, fast Starlink WiFi 
-            and Smart TV.
+            Level 1 opens onto a bright studio living space — sofa bed, kitchen, fireplace, 
+            bathroom with bathtub. Level 2 holds a queen bedroom and a twin bedroom, each 
+            with private en-suite bathrooms. Ski lockers in the basement, rental shop 50 meters 
+            away, SPA accessible for a fee.
           </p>
 
           {expanded && (
             <div className="mt-4">
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-                Level 1: Open studio with sofa bed, kitchen, fireplace, bathroom with tub. 
-                Level 2: Bedroom with queen bed, second bedroom with two singles, two private 
-                bathrooms.
-              </p>
-              <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-                Why guests love it: Optimal ski location — literally 4 minutes walk to the gondola. 
-                Panoramic double-height bay windows with sunrise over the peaks. Guaranteed comfort 
-                even at −15°C. Three bathrooms means zero morning wait. Self check-in 24/7 via secure 
-                lockbox. Ski lockers in basement, rental shop 50m away. SPA in basement available for 
-                a fee. Free parking in front of building.
+                Why guests love it: the location is genuinely ski-in/ski-out — four minutes on foot 
+                to the gondola. Panoramic double-height bay windows catch the sunrise over the peaks 
+                every morning. Three bathrooms mean zero morning queues, even with six guests. Self 
+                check-in 24/7 via secure lockbox. Restaurants, supermarket, and ski rental are all 
+                within walking distance. Free parking in front of the building. Guaranteed warmth 
+                even at −15°C — the fireplace and modern insulation make it effortless.
               </p>
             </div>
           )}

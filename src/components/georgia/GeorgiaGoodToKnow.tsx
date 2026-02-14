@@ -1,15 +1,11 @@
 import { Check } from "lucide-react";
 
 const items = [
-  "Duplex apartment in a modern building — no shared living spaces.",
-  "Ski season: December through April (conditions permitting).",
-  "Sleeps 6 comfortably: 2 bedrooms + sofa bed in living area.",
-  "Long-term stays welcome.",
-  "Fireplace with unlimited wood supply — light it every evening!",
-  "SPA in building basement available for a fee.",
-  "Ski rental shop 50m from the building.",
-  "Restaurants, bars, and supermarket within walking distance.",
-  "Altitude: 2,200m — acclimatise if needed.",
+  "New Gudauri complex — modern construction (2019), excellent insulation",
+  "SPA in basement accessible for a fee (sauna, hammam, pool)",
+  "Ski rental shop 50m from the building",
+  "Restaurants, supermarket, pharmacy all within walking distance",
+  "Snow season: December–mid-April. Summer hiking: June–September",
 ];
 
 const GeorgiaGoodToKnow = () => {

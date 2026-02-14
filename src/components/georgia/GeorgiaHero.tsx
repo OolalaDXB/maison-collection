@@ -1,4 +1,4 @@
-import georgia10 from "@/assets/georgia-10.png";
+import heroImg from "@/assets/property-1.avif";
 
 interface GeorgiaHeroProps {
   imageCount: number;
@@ -13,7 +13,7 @@ const GeorgiaHero = ({ imageCount }: GeorgiaHeroProps) => {
   return (
     <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px]">
       <img
-        src={georgia10}
+        src={heroImg}
         alt="Maison Georgia — ski loft in Gudauri, Caucasus"
         className="w-full h-full object-cover"
       />
@@ -27,7 +27,7 @@ const GeorgiaHero = ({ imageCount }: GeorgiaHeroProps) => {
           Maison Georgia
         </h1>
         <p className="font-body font-light text-[0.875rem] text-[rgba(255,255,255,0.8)] mb-6">
-          6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m² duplex · 200m from gondola
+          6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m²
         </p>
         <button
           onClick={handleViewPhotos}
