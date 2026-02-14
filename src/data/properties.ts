@@ -6,6 +6,7 @@ import property5 from "@/assets/property-5.avif";
 import property6 from "@/assets/property-6.avif";
 import property7 from "@/assets/property-7.avif";
 import property8 from "@/assets/property-8.avif";
+import atlantiqueHero from "@/assets/atlantique-hero.png";
 import georgia5 from "@/assets/georgia-5.jpg";
 import georgia6 from "@/assets/georgia-6.png";
 import georgia7 from "@/assets/georgia-7.png";
@@ -140,7 +141,7 @@ export const properties: Property[] = [
         },
       ],
     },
-    heroImage: property5,
+    heroImage: atlantiqueHero,
     galleryImages: [],
   },
   {
