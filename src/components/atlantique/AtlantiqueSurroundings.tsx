@@ -20,7 +20,12 @@ const AtlantiqueSurroundings = () => {
             Setting
           </h4>
           <div className="space-y-2">
-            {["Out of town", "Private property", "Bocage countryside"].map((s) => (
+            {[
+              "Out of town — absolute tranquility",
+              "5 000m² private wooded grounds",
+              "Bocage countryside",
+              "Near historic village of Poul Fétan",
+            ].map((s) => (
               <p key={s} className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s}</p>
             ))}
           </div>
@@ -31,9 +36,11 @@ const AtlantiqueSurroundings = () => {
           </h4>
           <div className="space-y-2">
             {[
-              "Beach — 20 min by car",
-              "Restaurants — 10 min by car",
-              "Lorient — 25 min by car",
+              "Blavet Valley — 5 min",
+              "Beaches — 30 min by car",
+              "Lorient — 50 min by car",
+              "Carnac — 50 min",
+              "Vannes — 50 min",
               "Gulf of Morbihan — 30 min",
               "Quiberon — 40 min",
             ].map((s) => (

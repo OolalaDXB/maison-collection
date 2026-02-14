@@ -7,12 +7,21 @@ import {
 } from "@/components/ui/accordion";
 
 const included = [
-  "Fresh linen and towels",
-  "Welcome basket with local products",
-  "Heated pool access (April–September)",
-  "Garden and outdoor furniture",
-  "Self check-in with smart lock",
+  "Fresh linen, towels & cotton bed linens",
+  "Welcome basket with local products & coffee",
+  "Heated pool 12×6m under enclosure (late April–September)",
+  "Garden furniture, hammock & sun loungers",
+  "Self check-in with digital keypad lock",
   "Dedicated contact throughout your stay",
+  "Washer & dryer",
+  "Dishwasher & fully equipped kitchen",
+  "Pellet stove (pellets provided)",
+  "TV, piano & children's toys",
+  "Crib available on request",
+  "Zip line, swing, basketball court & football area",
+  "Free private parking (4 spaces)",
+  "Fibre WiFi & dedicated workspace",
+  "Solar panels — eco-friendly initiative",
 ];
 
 const alaCarte = [
@@ -36,12 +45,12 @@ const AtlantiqueServices = () => {
           </AccordionTrigger>
           <AccordionContent>
             <p className="font-body font-light text-xs uppercase tracking-[0.1em] text-muted-foreground mb-4">
-              In-home services
+              In-home services & amenities
             </p>
-            <div className="space-y-3 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {included.map((s) => (
-                <div key={s} className="flex items-center gap-3">
-                  <Check size={16} className="text-muted-foreground shrink-0" strokeWidth={1.5} />
+                <div key={s} className="flex items-start gap-3">
+                  <Check size={16} className="text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
                   <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s}</span>
                 </div>
               ))}

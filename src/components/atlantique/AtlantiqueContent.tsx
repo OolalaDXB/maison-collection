@@ -2,22 +2,27 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import FadeIn from "@/components/FadeIn";
 import {
-  Waves, Building2, Mountain, TreePine, Bath, Car, Wifi, Flame, LandPlot, CircleDot, Sun, UtensilsCrossed
+  Waves, Building2, Mountain, Bath, Car, Wifi, Flame, LandPlot, CircleDot, Sun, UtensilsCrossed,
+  Zap, Monitor, Leaf, ShowerHead, Armchair, BriefcaseBusiness
 } from "lucide-react";
 
 const features = [
-  { icon: Waves, label: "Heated covered pool" },
-  { icon: Building2, label: "Contemporary architecture" },
-  { icon: Mountain, label: "Stone masonry construction" },
+  { icon: Waves, label: "Heated pool 12×6m under enclosure" },
+  { icon: Building2, label: "Contemporary architecture (2020–2022)" },
+  { icon: Mountain, label: "Stone masonry + Douglas fir extension" },
   { icon: LandPlot, label: "5 000m² private grounds" },
   { icon: Sun, label: "20m² covered terrace (enclosable)" },
-  { icon: TreePine, label: "20m² open terrace" },
-  { icon: Bath, label: "2 private bathrooms" },
-  { icon: CircleDot, label: "Basketball hoop" },
-  { icon: UtensilsCrossed, label: "Barbecue" },
-  { icon: Car, label: "20 min from Atlantic coast" },
-  { icon: Wifi, label: "Fast WiFi" },
-  { icon: Flame, label: "Wood stove" },
+  { icon: Armchair, label: "20m² open terrace with sun loungers" },
+  { icon: Bath, label: "2 private en-suite bathrooms" },
+  { icon: CircleDot, label: "Basketball court" },
+  { icon: UtensilsCrossed, label: "BBQ grill & outdoor dining" },
+  { icon: Zap, label: "Zip line, swing & outdoor playground" },
+  { icon: BriefcaseBusiness, label: "Dedicated workspace with fibre WiFi" },
+  { icon: Flame, label: "Pellet stove (pellets provided)" },
+  { icon: Monitor, label: "TV & piano" },
+  { icon: Leaf, label: "Solar panels — eco-friendly" },
+  { icon: Car, label: "30 min from Morbihan beaches" },
+  { icon: Wifi, label: "Fibre WiFi" },
 ];
 
 const AtlantiqueContent = () => {
@@ -39,40 +44,39 @@ const AtlantiqueContent = () => {
           <h2 className="font-display text-3xl text-foreground mb-1">Maison Atlantique</h2>
           <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">Quistinic, Brittany, France</p>
           <p className="font-body font-light text-muted-foreground text-sm">
-            6 guests · 2 bedrooms · 2 bathrooms · 120m² + 40m² terraces · 5 000m² land
+            4 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²
           </p>
         </div>
 
         {/* Description */}
         <div className="mb-4">
           <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-            A 19th-century Breton penty, meticulously reimagined by Anthropie Architecture
-            between 2020 and 2022. The original stone masonry meets a bold contemporary
-            extension in Douglas fir with black pigmented cladding, creating 120m² of refined
-            living space, complemented by 40m² of terraces — including a covered,
-            enclosable terrace — set on 5 000m² of private grounds.
+            Welcome to a 19th-century Breton Pen Ty house, reimagined by an architecture 
+            studio between 2020 and 2022. Ancient stone meets contemporary design: original 
+            rubble masonry and a black Douglas fir extension creating 120m² of refined living 
+            space, complemented by 40m² of terraces — including a covered, enclosable 
+            terrace — set on 5 000m² of private wooded grounds.
           </p>
           <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-            The heated pool is sheltered beneath an elegant covering, extending the
-            swimming season from April through September. Set in the peaceful bocage
-            countryside of Morbihan, the property offers complete serenity —
-            twenty minutes from the Atlantic coast.
+            Large bay windows frame the landscape — fields, centuries-old oak forests, 
+            Breton sky — and flood the spaces with light. The heated pool (12×6m) is 
+            sheltered beneath an elegant enclosure, extending the swimming season from 
+            late April through September. Steps from the historic village of Poul Fétan, 
+            in absolute tranquility, 30 minutes from Morbihan beaches.
           </p>
 
           {expanded && (
             <div className="mt-4">
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-                The renovation preserves the character of the original penty — thick stone walls, 
-                exposed beams, and a sense of rootedness in the landscape — while introducing 
-                a contemporary extension in Douglas fir frame with black pigmented cladding. 
-                The double-height living space brings together old and new with a wood stove, 
-                open kitchen, and dining for six.
+                Designed for both work and relaxation: fibre WiFi, a bright dedicated 
+                workspace overlooking the garden, covered terrace, and pellet stove for 
+                cool evenings. The upper floor offers an open space perfect for children.
               </p>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-                The property sits on a private plot in the bocage countryside of Quistinic, 
-                surrounded by hedgerows and meadows. There are no neighbors in sight. 
-                The Gulf of Morbihan, Quiberon peninsula, and the beaches of southern Brittany 
-                are all within easy reach.
+                The garden features a zip line, swing, basketball court, and football area. 
+                Many hiking trails surround the house. The Blavet Valley is 5 minutes away, 
+                and the beaches of Carnac, Quiberon, and the Gulf of Morbihan are all 
+                within easy reach.
               </p>
             </div>
           )}

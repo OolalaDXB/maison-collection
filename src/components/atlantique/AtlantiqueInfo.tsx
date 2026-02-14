@@ -12,27 +12,34 @@ const AtlantiqueInfo = () => {
           <Calendar size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Check-in</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">16:00</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">15:00</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Calendar size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Check-out</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">10:00</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">11:00</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Car size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Parking</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">Free, on property</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">Free, 4 spaces</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-3">
-        {["Self check-in with smart lock", "Pets welcome on request", "Non-smoking property"].map((item) => (
+        {[
+          "Self check-in with digital keypad lock",
+          "Luggage drop-off for early arrival / late departure",
+          "Pets welcome on request",
+          "Non-smoking property",
+          "No air conditioning",
+          "Welcome guide sent before arrival",
+        ].map((item) => (
           <div key={item} className="flex items-center gap-3">
             <Check size={16} className="text-muted-foreground shrink-0" strokeWidth={1.5} />
             <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{item}</span>

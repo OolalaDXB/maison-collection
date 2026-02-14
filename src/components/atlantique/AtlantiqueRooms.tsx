@@ -10,18 +10,23 @@ interface Room {
 const rooms: Room[] = [
   {
     name: "Master Bedroom",
-    description: "Double bed (160×200), private bathroom with shower, direct access to the garden.",
-    tags: ["Contemporary design", "Garden view"],
+    description: "Double bed (160×200), private en-suite bathroom with shower, direct access to the garden. Room-darkening shades.",
+    tags: ["Ground floor", "Garden view", "En-suite"],
   },
   {
-    name: "Second Bedroom",
-    description: "Two single beds (90×200), private bathroom with shower, overlooking the bocage.",
-    tags: ["Countryside view"],
+    name: "Upper Bedroom",
+    description: "Large double bedroom (160×200) on the upper floor with private en-suite shower. Open mezzanine space perfect for children.",
+    tags: ["Upper floor", "Countryside view", "En-suite"],
   },
   {
     name: "Open Living Space",
-    description: "Double-height ceiling, open kitchen, dining area for 6, sofa bed (160×200), wood stove.",
-    tags: ["Stone walls", "Wood stove"],
+    description: "Double-height ceiling, open kitchen with Bosch oven & dishwasher, dining for 6, comfortable sofa bed (160×200), pellet stove, piano.",
+    tags: ["Stone walls", "Pellet stove", "Piano", "Bay windows"],
+  },
+  {
+    name: "Outdoor Spaces",
+    description: "5 000m² private grounds with heated pool (12×6m) under enclosure, basketball court, zip line, swing, hammock, sun loungers, BBQ & outdoor dining area.",
+    tags: ["Pool", "Basketball", "Zip line", "BBQ"],
   },
 ];
 
