@@ -14,16 +14,171 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      properties: {
+        Row: {
+          airbnb_link: string | null
+          airbnb_rating: number | null
+          airbnb_reviews_count: number | null
+          amenities: string[]
+          architect_links: Json | null
+          architect_location: string | null
+          architect_name: string | null
+          architect_year: number | null
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          capacity: number | null
+          country: string
+          created_at: string
+          currency: string
+          description: string
+          display_order: number
+          hero_image: string | null
+          id: string
+          location: string
+          long_description: string | null
+          name: string
+          price_per_night: number | null
+          region: string
+          slug: string
+          status: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          airbnb_link?: string | null
+          airbnb_rating?: number | null
+          airbnb_reviews_count?: number | null
+          amenities?: string[]
+          architect_links?: Json | null
+          architect_location?: string | null
+          architect_name?: string | null
+          architect_year?: number | null
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          capacity?: number | null
+          country?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          display_order?: number
+          hero_image?: string | null
+          id?: string
+          location?: string
+          long_description?: string | null
+          name: string
+          price_per_night?: number | null
+          region?: string
+          slug: string
+          status?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          airbnb_link?: string | null
+          airbnb_rating?: number | null
+          airbnb_reviews_count?: number | null
+          amenities?: string[]
+          architect_links?: Json | null
+          architect_location?: string | null
+          architect_name?: string | null
+          architect_year?: number | null
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          capacity?: number | null
+          country?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          display_order?: number
+          hero_image?: string | null
+          id?: string
+          location?: string
+          long_description?: string | null
+          name?: string
+          price_per_night?: number | null
+          region?: string
+          slug?: string
+          status?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      property_images: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          property_id: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          property_id: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_images_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +305,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

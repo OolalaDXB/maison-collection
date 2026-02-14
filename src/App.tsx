@@ -9,6 +9,8 @@ import ArabiaPage from "./pages/ArabiaPage";
 import ManagementPage from "./pages/ManagementPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/georgia" element={<PropertyPage />} />
           <Route path="/atlantique" element={<PropertyPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
