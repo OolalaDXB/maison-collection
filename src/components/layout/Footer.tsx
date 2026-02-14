@@ -18,7 +18,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-col md:items-end gap-2">
             <p className="text-sm text-[hsl(0,0%,60%)]">
-              Brittany · Caucasus · Dubai
+              Brittany · Georgia · Dubai
             </p>
             <p className="text-xs text-[hsl(0,0%,45%)]">
               &copy; 2026 Maisons. All rights reserved.
