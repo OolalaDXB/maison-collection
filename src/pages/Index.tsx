@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import FadeIn from "@/components/FadeIn";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { supabase } from "@/integrations/supabase/client";
 
 const services = [
   {
@@ -30,6 +32,25 @@ const services = [
 ];
 
 const Index = () => {
+  const [heroOverrides, setHeroOverrides] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchHeroes = async () => {
+      const { data } = await supabase.from("properties").select("slug, hero_image").not("hero_image", "is", null);
+      if (data) {
+        const overrides: Record<string, string> = {};
+        data.forEach((p: any) => { if (p.hero_image) overrides[p.slug] = p.hero_image; });
+        setHeroOverrides(overrides);
+      }
+    };
+    fetchHeroes();
+  }, []);
+
+  const enrichedProperties = properties.map(p => ({
+    ...p,
+    heroImage: p.heroImage || heroOverrides[p.slug] || "",
+  }));
+
   const heroTitle = useSiteContent("home", "hero_title", "Houses with a point of view");
   const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe, the Caucasus, and the Gulf.");
   const philosophyTitle = useSiteContent("home", "philosophy_title", "Not rentals. Residences.");
@@ -91,7 +112,7 @@ const Index = () => {
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property, i) => (
+            {enrichedProperties.map((property, i) => (
               <PropertyCard key={property.slug} property={property} index={i} />
             ))}
           </div>
