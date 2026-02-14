@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, GripVertical, LogOut, Image, Save, X, MessageSquare, MapPin } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, LogOut, Image, Save, X, MessageSquare, MapPin, RefreshCw } from "lucide-react";
+import { useFxRates } from "@/hooks/useFxRates";
 
 interface PropertyRow {
   id: string;
@@ -68,6 +69,8 @@ interface PoiRow {
 }
 
 const AdminDashboard = () => {
+  const { rates, isLoading: fxLoading, lastUpdated, formatPrice } = useFxRates();
+  const [refreshingFx, setRefreshingFx] = useState(false);
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [properties, setProperties] = useState<PropertyRow[]>([]);
@@ -562,6 +565,59 @@ const AdminDashboard = () => {
           ))}
           {properties.length === 0 && (
             <p className="text-center text-muted-foreground py-12">No properties yet. Add your first one.</p>
+          )}
+        </div>
+
+        {/* Exchange Rates */}
+        <div className="mt-16 border-t border-border pt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-display text-xl">Exchange Rates</h2>
+            <button
+              onClick={async () => {
+                setRefreshingFx(true);
+                try {
+                  const { data, error } = await supabase.functions.invoke("refresh-fx-rates");
+                  if (error) throw error;
+                  toast.success(`Rates refreshed — ${data?.updated || 0} updated`);
+                  // Invalidate react-query cache
+                  window.location.reload();
+                } catch (e: any) {
+                  toast.error(e.message || "Failed to refresh rates");
+                } finally {
+                  setRefreshingFx(false);
+                }
+              }}
+              disabled={refreshingFx}
+              className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={refreshingFx ? "animate-spin" : ""} />
+              {refreshingFx ? "Refreshing…" : "Refresh Now"}
+            </button>
+          </div>
+
+          {fxLoading ? (
+            <p className="text-muted-foreground text-sm">Loading rates…</p>
+          ) : rates.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No rates yet. Click "Refresh Now" to fetch from ECB.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {rates.map((r) => (
+                  <div key={r.target_currency} className="border border-border p-4">
+                    <p className="text-xs text-muted-foreground mb-1">EUR → {r.target_currency}</p>
+                    <p className="text-lg font-display text-foreground">{r.rate.toFixed(4)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      1€ = {formatPrice(Math.round(r.rate * 100) / 100, r.target_currency)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {lastUpdated && (
+                <p className="text-xs text-muted-foreground">
+                  Last updated: {new Date(lastUpdated).toLocaleString()}
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
