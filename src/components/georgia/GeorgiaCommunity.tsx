@@ -1,51 +1,51 @@
-import { Leaf, Baby, TreePine } from "lucide-react";
+import { Mountain, Snowflake, Church } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
 const cards = [
   {
-    icon: Leaf,
-    title: "Net-Zero Energy",
-    text: "Solar panels generate as much energy as the community consumes. Average water use: 162L/capita vs Dubai's 278L.",
+    icon: Mountain,
+    title: "The Greater Caucasus",
+    text: "Gudauri sits at 2,200m on the southern slopes of the Greater Caucasus, one of Europe's last wild mountain ranges. Peaks above 4,000m, deep gorges, and alpine meadows.",
   },
   {
-    icon: Baby,
-    title: "Family-First Design",
-    text: "Car-free residential streets. 4 playgrounds, equestrian center, farm with animals. Children run free.",
+    icon: Snowflake,
+    title: "Year-Round Adventure",
+    text: "Winter: 57km of pistes, off-piste freeride, heliskiing. Summer: paragliding, hiking the Caucasus Trail, mountain biking. Gudauri has 300 days of sunshine a year.",
   },
   {
-    icon: TreePine,
-    title: "Living Green",
-    text: "11 bio-dome greenhouses, urban farms, 10,000 trees. Residents grow their own produce.",
+    icon: Church,
+    title: "Kazbegi & Beyond",
+    text: "The iconic Gergeti Trinity Church (2,170m) and Mount Kazbek (5,047m) are 1h30 north. The Georgian Military Highway is one of the world's most scenic drives.",
   },
 ];
 
 const links = [
-  { label: "The Sustainable City", url: "https://thesustainablecity.com/cities/dubai/" },
-  { label: "Instagram", url: "https://www.instagram.com/thesustainablecity" },
-  { label: "SEE Institute", url: "https://www.seeinstitute.ae/" },
+  { label: "Visit Georgia", url: "https://www.georgia.travel/" },
+  { label: "Gudauri Ski Resort", url: "https://gudauri.info/" },
+  { label: "Kazbegi National Park", url: "https://www.georgia.travel/destinations/kazbegi" },
 ];
 
-const ArabiaCommunity = () => {
+const GeorgiaCommunity = () => {
   return (
     <section className="bg-[#0a1628] py-16 md:py-20 px-[5%]">
       <div className="max-w-[1200px] mx-auto">
         <FadeIn>
           <p className="font-body uppercase tracking-wider text-[0.7rem] text-white/60 mb-3">
-            The Community
+            The Region
           </p>
           <h3 className="font-display font-normal text-3xl text-white mb-2">
-            The Sustainable City
+            Gudauri & Kazbegi
           </h3>
           <p className="font-body font-light text-lg text-white/70 mb-8">
-            The first net-zero energy community in the Middle East.
+            Where Europe meets Asia, on the roof of the Caucasus.
           </p>
 
           <div className="max-w-2xl mb-10">
             <p className="font-body font-light text-white/80 leading-relaxed mb-4">
-              Built by Diamond Developers in 2015, this 113-acre community of 500 homes was designed around one idea: prove that sustainable living doesn't mean sacrifice. Car-free streets, solar-powered homes, urban farms, a 30-metre tree belt, and a community where neighbours actually know each other.
+              Gudauri is Georgia's premier mountain resort, perched on the Greater Caucasus range along the ancient Georgian Military Highway — the route that once connected empires. In winter, it's one of Europe's best-kept skiing secrets. In summer, it transforms into a base for hiking, paragliding, and exploring one of the world's most dramatic landscapes.
             </p>
             <p className="font-body font-light text-white/80 leading-relaxed">
-              Awarded "Happiest Community" by the Gulf Real Estate Awards and recognised by the SEE Institute as a model for sustainable urban development. Over 60% of the city is dedicated to green spaces. 8,000+ tons of CO₂ avoided annually.
+              Just 90 minutes north lies Kazbegi (Stepantsminda), a village at the foot of Mount Kazbek (5,047m) and the legendary Gergeti Trinity Church. The drive there — through the Jvari Pass at 2,379m — is unforgettable. Tbilisi, Georgia's vibrant capital, is 2 hours south.
             </p>
           </div>
         </FadeIn>
@@ -82,4 +82,4 @@ const ArabiaCommunity = () => {
   );
 };
 
-export default ArabiaCommunity;
+export default GeorgiaCommunity;
