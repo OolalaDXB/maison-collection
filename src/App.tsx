@@ -10,8 +10,13 @@ import ManagementPage from "./pages/ManagementPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
+import {
+  AdminCalendarPage, AdminPricingPage, AdminBookingsPage, AdminGuestsPage,
+  AdminContentPage, AdminInquiriesPage, AdminPaymentsPage, AdminSettingsPage
+} from "./pages/admin/AdminPlaceholderPages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +36,17 @@ const App = () => (
           <Route path="/georgia" element={<PropertyPage />} />
           <Route path="/atlantique" element={<PropertyPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/properties" element={<AdminPropertiesPage />} />
+          <Route path="/admin/calendar" element={<AdminCalendarPage />} />
+          <Route path="/admin/pricing" element={<AdminPricingPage />} />
+          <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+          <Route path="/admin/guests" element={<AdminGuestsPage />} />
+          <Route path="/admin/reviews" element={<AdminPropertiesPage />} />
+          <Route path="/admin/content" element={<AdminContentPage />} />
+          <Route path="/admin/inquiries" element={<AdminInquiriesPage />} />
+          <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
           <Route path="/admin/profile" element={<AdminProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
