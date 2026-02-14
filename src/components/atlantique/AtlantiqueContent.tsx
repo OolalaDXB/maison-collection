@@ -44,7 +44,7 @@ const AtlantiqueContent = () => {
           <h2 className="font-display text-3xl text-foreground mb-1">Maison Atlantique</h2>
           <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">Quistinic, Brittany, France</p>
           <p className="font-body font-light text-muted-foreground text-sm">
-            4 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²
+            6 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²
           </p>
         </div>
 
