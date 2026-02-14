@@ -21,6 +21,9 @@ const Footer = () => {
               Brittany · Georgia · Dubai
             </p>
             <p className="text-xs text-[hsl(0,0%,45%)]">
+              Made with passion by The Studio MT
+            </p>
+            <p className="text-xs text-[hsl(0,0%,45%)]">
               &copy; 2026 Maisons. All rights reserved.
             </p>
           </div>
