@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, GripVertical, LogOut, Image, Save, X, MessageSquare } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, LogOut, Image, Save, X, MessageSquare, MapPin } from "lucide-react";
 
 interface PropertyRow {
   id: string;
@@ -57,6 +57,16 @@ interface ReviewRow {
   stay_date: string | null;
 }
 
+interface PoiRow {
+  id: string;
+  property_id: string;
+  label: string;
+  emoji: string;
+  latitude: number;
+  longitude: number;
+  display_order: number;
+}
+
 const AdminDashboard = () => {
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -68,10 +78,13 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Reviews state
   const [managingReviews, setManagingReviews] = useState<string | null>(null);
   const [reviewsList, setReviewsList] = useState<ReviewRow[]>([]);
   const [editingReview, setEditingReview] = useState<ReviewRow | null>(null);
+
+  const [managingPois, setManagingPois] = useState<string | null>(null);
+  const [poisList, setPoisList] = useState<PoiRow[]>([]);
+  const [editingPoi, setEditingPoi] = useState<PoiRow | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -84,57 +97,40 @@ const AdminDashboard = () => {
   }, [isAdmin]);
 
   const fetchProperties = async () => {
-    const { data, error } = await supabase
-      .from("properties")
-      .select("*")
-      .order("display_order");
-    if (error) {
-      toast.error("Error loading properties");
-    } else {
-      setProperties((data as any[]) || []);
-    }
+    const { data, error } = await supabase.from("properties").select("*").order("display_order");
+    if (error) toast.error("Error loading properties");
+    else setProperties((data as any[]) || []);
     setLoading(false);
   };
 
   const fetchImages = async (propertyId: string) => {
-    const { data } = await supabase
-      .from("property_images")
-      .select("*")
-      .eq("property_id", propertyId)
-      .order("display_order");
+    const { data } = await supabase.from("property_images").select("*").eq("property_id", propertyId).order("display_order");
     setImages((data as any[]) || []);
   };
 
   const fetchReviews = async (propertyId: string) => {
-    const { data } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("property_id", propertyId)
-      .order("stay_date", { ascending: false });
+    const { data } = await supabase.from("reviews").select("*").eq("property_id", propertyId).order("stay_date", { ascending: false });
     setReviewsList((data as any[]) || []);
+  };
+
+  const fetchPois = async (propertyId: string) => {
+    const { data } = await supabase.from("property_pois").select("*").eq("property_id", propertyId).order("display_order");
+    setPoisList((data as any[]) || []);
   };
 
   const handleSave = async () => {
     if (!editing) return;
     setSaving(true);
-
     const { id, ...rest } = editing;
     const isNew = !properties.find((p) => p.id === id);
-
     let error;
     if (isNew) {
       ({ error } = await supabase.from("properties").insert({ ...rest } as any));
     } else {
       ({ error } = await supabase.from("properties").update(rest as any).eq("id", id));
     }
-
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Saved");
-      setEditing(null);
-      fetchProperties();
-    }
+    if (error) toast.error(error.message);
+    else { toast.success("Saved"); setEditing(null); fetchProperties(); }
     setSaving(false);
   };
 
@@ -142,39 +138,18 @@ const AdminDashboard = () => {
     if (!confirm("Delete this property?")) return;
     const { error } = await supabase.from("properties").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else {
-      toast.success("Deleted");
-      fetchProperties();
-    }
+    else { toast.success("Deleted"); fetchProperties(); }
   };
 
   const handleUploadImage = async (propertyId: string, file: File) => {
     setUploading(true);
     const ext = file.name.split(".").pop();
     const path = `${propertyId}/${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("property-images")
-      .upload(path, file);
-
-    if (uploadError) {
-      toast.error(uploadError.message);
-      setUploading(false);
-      return;
-    }
-
-    const { data: urlData } = supabase.storage
-      .from("property-images")
-      .getPublicUrl(path);
-
+    const { error: uploadError } = await supabase.storage.from("property-images").upload(path, file);
+    if (uploadError) { toast.error(uploadError.message); setUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("property-images").getPublicUrl(path);
     const maxOrder = images.length > 0 ? Math.max(...images.map((i) => i.display_order)) + 1 : 0;
-
-    await supabase.from("property_images").insert({
-      property_id: propertyId,
-      image_url: urlData.publicUrl,
-      display_order: maxOrder,
-    } as any);
-
+    await supabase.from("property_images").insert({ property_id: propertyId, image_url: urlData.publicUrl, display_order: maxOrder } as any);
     fetchImages(propertyId);
     setUploading(false);
     toast.success("Image uploaded");
@@ -183,9 +158,7 @@ const AdminDashboard = () => {
   const handleDeleteImage = async (imageId: string, imageUrl: string) => {
     if (!confirm("Delete this image?")) return;
     const urlParts = imageUrl.split("/property-images/");
-    if (urlParts[1]) {
-      await supabase.storage.from("property-images").remove([urlParts[1]]);
-    }
+    if (urlParts[1]) await supabase.storage.from("property-images").remove([urlParts[1]]);
     await supabase.from("property_images").delete().eq("id", imageId);
     fetchImages(managingImages!);
     toast.success("Image deleted");
@@ -197,28 +170,16 @@ const AdminDashboard = () => {
     fetchProperties();
   };
 
-  // Review handlers
   const handleSaveReview = async () => {
     if (!editingReview || !managingReviews) return;
     setSaving(true);
-
     const { id, ...rest } = editingReview;
     const isNew = !reviewsList.find((r) => r.id === id);
-
     let error;
-    if (isNew) {
-      ({ error } = await supabase.from("reviews").insert({ ...rest } as any));
-    } else {
-      ({ error } = await supabase.from("reviews").update(rest as any).eq("id", id));
-    }
-
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Review saved");
-      setEditingReview(null);
-      fetchReviews(managingReviews);
-    }
+    if (isNew) ({ error } = await supabase.from("reviews").insert({ ...rest } as any));
+    else ({ error } = await supabase.from("reviews").update(rest as any).eq("id", id));
+    if (error) toast.error(error.message);
+    else { toast.success("Review saved"); setEditingReview(null); fetchReviews(managingReviews); }
     setSaving(false);
   };
 
@@ -226,10 +187,27 @@ const AdminDashboard = () => {
     if (!confirm("Delete this review?")) return;
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else {
-      toast.success("Review deleted");
-      if (managingReviews) fetchReviews(managingReviews);
-    }
+    else { toast.success("Review deleted"); if (managingReviews) fetchReviews(managingReviews); }
+  };
+
+  const handleSavePoi = async () => {
+    if (!editingPoi || !managingPois) return;
+    setSaving(true);
+    const { id, ...rest } = editingPoi;
+    const isNew = !poisList.find((p) => p.id === id);
+    let error;
+    if (isNew) ({ error } = await supabase.from("property_pois").insert({ ...rest } as any));
+    else ({ error } = await supabase.from("property_pois").update(rest as any).eq("id", id));
+    if (error) toast.error(error.message);
+    else { toast.success("POI saved"); setEditingPoi(null); fetchPois(managingPois); }
+    setSaving(false);
+  };
+
+  const handleDeletePoi = async (id: string) => {
+    if (!confirm("Delete this POI?")) return;
+    const { error } = await supabase.from("property_pois").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("POI deleted"); if (managingPois) fetchPois(managingPois); }
   };
 
   if (authLoading || loading) {
@@ -241,47 +219,25 @@ const AdminDashboard = () => {
   }
 
   const newProperty = (): PropertyRow => ({
-    id: crypto.randomUUID(),
-    slug: "",
-    name: "",
-    location: "",
-    region: "",
-    country: "",
-    description: "",
-    long_description: null,
-    price_per_night: null,
-    currency: "EUR",
-    capacity: null,
-    bedrooms: null,
-    bathrooms: null,
-    area_sqm: null,
-    amenities: [],
-    airbnb_link: null,
-    airbnb_rating: null,
-    airbnb_reviews_count: null,
-    status: "active",
-    tags: [],
-    hero_image: null,
-    architect_name: null,
-    architect_location: null,
-    architect_year: null,
-    architect_links: [],
-    display_order: properties.length,
-    check_in_time: "15:00",
-    check_out_time: "11:00",
+    id: crypto.randomUUID(), slug: "", name: "", location: "", region: "", country: "",
+    description: "", long_description: null, price_per_night: null, currency: "EUR",
+    capacity: null, bedrooms: null, bathrooms: null, area_sqm: null, amenities: [],
+    airbnb_link: null, airbnb_rating: null, airbnb_reviews_count: null, status: "active",
+    tags: [], hero_image: null, architect_name: null, architect_location: null,
+    architect_year: null, architect_links: [], display_order: properties.length,
+    check_in_time: "15:00", check_out_time: "11:00",
     parking_info: "Free parking in front of building (non-reserved)",
-    latitude: null,
-    longitude: null,
+    latitude: null, longitude: null,
   });
 
   const newReview = (propertyId: string): ReviewRow => ({
-    id: crypto.randomUUID(),
-    property_id: propertyId,
-    guest_name: "",
-    guest_location: null,
-    rating: 5,
-    review_text: "",
-    stay_date: null,
+    id: crypto.randomUUID(), property_id: propertyId, guest_name: "",
+    guest_location: null, rating: 5, review_text: "", stay_date: null,
+  });
+
+  const newPoi = (propertyId: string): PoiRow => ({
+    id: crypto.randomUUID(), property_id: propertyId, label: "", emoji: "📍",
+    latitude: 0, longitude: 0, display_order: poisList.length,
   });
 
   return (
@@ -302,6 +258,68 @@ const AdminDashboard = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* POIs manager modal */}
+        {managingPois && (
+          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-background border border-border max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-display text-xl">
+                  POIs — {properties.find((p) => p.id === managingPois)?.name}
+                </h2>
+                <button onClick={() => { setManagingPois(null); setEditingPoi(null); }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {editingPoi && (
+                <div className="border border-border p-6 mb-6 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Field label="Label" value={editingPoi.label} onChange={(v) => setEditingPoi({ ...editingPoi, label: v })} />
+                    <Field label="Emoji" value={editingPoi.emoji} onChange={(v) => setEditingPoi({ ...editingPoi, emoji: v })} />
+                    <Field label="Latitude" value={editingPoi.latitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, latitude: parseFloat(v) || 0 })} type="number" />
+                    <Field label="Longitude" value={editingPoi.longitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, longitude: parseFloat(v) || 0 })} type="number" />
+                  </div>
+                  <Field label="Display Order" value={editingPoi.display_order.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, display_order: parseInt(v) || 0 })} type="number" />
+                  <div className="flex gap-3">
+                    <button onClick={handleSavePoi} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2">
+                      <Save size={14} /> {saving ? "Saving…" : "Save POI"}
+                    </button>
+                    <button onClick={() => setEditingPoi(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 mb-6">
+                {poisList.map((poi) => (
+                  <div key={poi.id} className="flex items-center gap-4 p-4 border border-border">
+                    <span className="text-lg">{poi.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{poi.label}</p>
+                      <p className="text-xs text-muted-foreground">{poi.latitude}, {poi.longitude}</p>
+                    </div>
+                    <button onClick={() => setEditingPoi(poi)} className="p-2 hover:bg-secondary transition-colors">
+                      <Pencil size={14} />
+                    </button>
+                    <button onClick={() => handleDeletePoi(poi.id)} className="p-2 hover:bg-secondary transition-colors text-destructive">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+                {poisList.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">No POIs yet.</p>
+                )}
+              </div>
+
+              <button
+                onClick={() => setEditingPoi(newPoi(managingPois))}
+                className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary transition-colors"
+              >
+                <Plus size={14} /> Add POI
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Reviews manager modal */}
         {managingReviews && (
           <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -315,7 +333,6 @@ const AdminDashboard = () => {
                 </button>
               </div>
 
-              {/* Review editor */}
               {editingReview && (
                 <div className="border border-border p-6 mb-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -334,7 +351,6 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Reviews list */}
               <div className="space-y-3 mb-6">
                 {reviewsList.map((review) => (
                   <div key={review.id} className="flex items-start gap-4 p-4 border border-border">
@@ -393,17 +409,11 @@ const AdminDashboard = () => {
                       )}
                       <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         {!isHero && (
-                          <button
-                            onClick={() => handleSetHero(managingImages, img.image_url)}
-                            className="px-3 py-1 text-xs bg-primary text-primary-foreground"
-                          >
+                          <button onClick={() => handleSetHero(managingImages, img.image_url)} className="px-3 py-1 text-xs bg-primary text-primary-foreground">
                             Set as Hero
                           </button>
                         )}
-                        <button
-                          onClick={() => handleDeleteImage(img.id, img.image_url)}
-                          className="px-3 py-1 text-xs bg-destructive text-destructive-foreground"
-                        >
+                        <button onClick={() => handleDeleteImage(img.id, img.image_url)} className="px-3 py-1 text-xs bg-destructive text-destructive-foreground">
                           Delete
                         </button>
                       </div>
@@ -413,15 +423,7 @@ const AdminDashboard = () => {
               </div>
               <label className="inline-block px-4 py-2 border border-border text-sm cursor-pointer hover:border-primary transition-colors">
                 {uploading ? "Uploading…" : "＋ Upload Image"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleUploadImage(managingImages, file);
-                  }}
-                />
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleUploadImage(managingImages, file); }} />
               </label>
             </div>
           </div>
@@ -458,8 +460,6 @@ const AdminDashboard = () => {
                 <Field label="Amenities (comma separated)" value={editing.amenities.join(", ")} onChange={(v) => setEditing({ ...editing, amenities: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
                 <Field label="Tags (comma separated)" value={editing.tags.join(", ")} onChange={(v) => setEditing({ ...editing, tags: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
               </div>
-
-              {/* Practical info */}
               <div className="mt-4 border-t border-border pt-4">
                 <p className="text-sm text-muted-foreground mb-3">Practical Information</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -468,8 +468,6 @@ const AdminDashboard = () => {
                   <Field label="Parking Info" value={editing.parking_info || ""} onChange={(v) => setEditing({ ...editing, parking_info: v || null })} className="md:col-span-2" />
                 </div>
               </div>
-
-              {/* Location */}
               <div className="mt-4 border-t border-border pt-4">
                 <p className="text-sm text-muted-foreground mb-3">Map Location</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -477,8 +475,6 @@ const AdminDashboard = () => {
                   <Field label="Longitude" value={editing.longitude?.toString() || ""} onChange={(v) => setEditing({ ...editing, longitude: v ? parseFloat(v) : null })} type="number" />
                 </div>
               </div>
-
-              {/* Architecture */}
               <div className="mt-4 border-t border-border pt-4">
                 <p className="text-sm text-muted-foreground mb-3">Architecture Credits (optional)</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -488,16 +484,10 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="mt-6 flex gap-3">
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="px-6 py-2 bg-primary text-primary-foreground text-sm uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-                >
+                <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-primary text-primary-foreground text-sm uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2">
                   <Save size={14} /> {saving ? "Saving…" : "Save"}
                 </button>
-                <button onClick={() => setEditing(null)} className="px-6 py-2 border border-border text-sm">
-                  Cancel
-                </button>
+                <button onClick={() => setEditing(null)} className="px-6 py-2 border border-border text-sm">Cancel</button>
               </div>
             </div>
           </div>
@@ -506,10 +496,7 @@ const AdminDashboard = () => {
         {/* Property list */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-display text-xl">Properties</h2>
-          <button
-            onClick={() => setEditing(newProperty())}
-            className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"
-          >
+          <button onClick={() => setEditing(newProperty())} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2">
             <Plus size={14} /> Add Property
           </button>
         </div>
@@ -518,34 +505,19 @@ const AdminDashboard = () => {
           {properties.map((prop) => (
             <div key={prop.id} className="flex items-center gap-4 p-4 border border-border">
               <GripVertical size={16} className="text-muted-foreground" />
-              {prop.hero_image && (
-                <img src={prop.hero_image} alt="" className="w-16 h-12 object-cover" />
-              )}
+              {prop.hero_image && <img src={prop.hero_image} alt="" className="w-16 h-12 object-cover" />}
               <div className="flex-1">
                 <p className="font-medium text-foreground">{prop.name}</p>
                 <p className="text-sm text-muted-foreground">{prop.location} · {prop.status}</p>
               </div>
-              {prop.price_per_night && (
-                <span className="text-sm text-muted-foreground">€{prop.price_per_night}/night</span>
-              )}
-              <button
-                onClick={() => {
-                  setManagingReviews(prop.id);
-                  fetchReviews(prop.id);
-                }}
-                className="p-2 hover:bg-secondary transition-colors"
-                title="Manage reviews"
-              >
+              {prop.price_per_night && <span className="text-sm text-muted-foreground">€{prop.price_per_night}/night</span>}
+              <button onClick={() => { setManagingPois(prop.id); fetchPois(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage POIs">
+                <MapPin size={16} />
+              </button>
+              <button onClick={() => { setManagingReviews(prop.id); fetchReviews(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage reviews">
                 <MessageSquare size={16} />
               </button>
-              <button
-                onClick={() => {
-                  setManagingImages(prop.id);
-                  fetchImages(prop.id);
-                }}
-                className="p-2 hover:bg-secondary transition-colors"
-                title="Manage images"
-              >
+              <button onClick={() => { setManagingImages(prop.id); fetchImages(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage images">
                 <Image size={16} />
               </button>
               <button onClick={() => setEditing(prop)} className="p-2 hover:bg-secondary transition-colors" title="Edit">
@@ -570,12 +542,8 @@ const Field = ({ label, value, onChange, type = "text", className = "" }: {
 }) => (
   <div className={className}>
     <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary"
-    />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
+      className="w-full px-3 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary" />
   </div>
 );
 
@@ -584,12 +552,8 @@ const AreaField = ({ label, value, onChange }: {
 }) => (
   <div>
     <label className="block text-xs text-muted-foreground mb-1">{label}</label>
-    <textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      rows={3}
-      className="w-full px-3 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary resize-y"
-    />
+    <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3}
+      className="w-full px-3 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary resize-y" />
   </div>
 );
 
