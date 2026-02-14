@@ -94,7 +94,7 @@ const ManagementPage = () => {
       <Header />
 
       {/* S1: Hero */}
-      <section className="px-[5%] pt-32 md:pt-40 pb-16 md:pb-24">
+      <section className="px-[5%] pt-32 md:pt-40 pb-10 md:pb-16">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1]">
@@ -118,21 +118,18 @@ const ManagementPage = () => {
             </div>
           </FadeIn>
           <FadeIn delay={0.25}>
-            <div className="mt-8">
-              <div className="w-[60px] h-px bg-[hsl(0,0%,91%)]" />
-              <a
-                href="mailto:chez@maisons.co"
-                className="font-body font-light text-sm text-[hsl(0,0%,60%)] mt-4 inline-block hover:text-foreground transition-colors"
-              >
-                chez@maisons.co
-              </a>
-            </div>
+            <a
+              href="mailto:chez@maisons.co"
+              className="font-body text-sm text-primary mt-6 inline-block hover:text-primary/80 transition-colors"
+            >
+              chez@maisons.co →
+            </a>
           </FadeIn>
         </div>
       </section>
 
       {/* S2: What we do */}
-      <section className="px-[5%] py-16 md:py-24">
+      <section className="px-[5%] pt-8 pb-12">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-10">
@@ -144,7 +141,7 @@ const ManagementPage = () => {
               <FadeIn key={s.num} delay={i * 0.1}>
                 <p className="font-body font-light text-base text-[hsl(0,0%,27%)] leading-relaxed">
                   <span className="font-display text-xl text-[hsl(0,0%,87%)] mr-2">
-                    {s.num}
+                    {s.num}.
                   </span>
                   <span className="text-[hsl(0,0%,60%)] mr-2">—</span>
                   {s.text}
@@ -155,13 +152,12 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="max-w-[750px] mx-auto px-[5%]">
-        <div className="h-px bg-[hsl(0,0%,93%)]" />
+        <div className="h-px bg-[hsl(0,0%,88%)]" />
       </div>
 
       {/* S3: Proof */}
-      <section className="px-[5%] py-16 md:py-24">
+      <section className="px-[5%] pt-8 pb-12">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-12">
@@ -190,7 +186,7 @@ const ManagementPage = () => {
                 </div>
                 <Link
                   to="/georgia"
-                  className="font-body text-sm text-[hsl(0,0%,60%)] hover:text-foreground transition-colors"
+                  className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   View the property →
                 </Link>
@@ -218,7 +214,7 @@ const ManagementPage = () => {
                 </div>
                 <Link
                   to="/atlantique"
-                  className="font-body text-sm text-[hsl(0,0%,60%)] hover:text-foreground transition-colors"
+                  className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   View the property →
                 </Link>
@@ -228,13 +224,12 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="max-w-[750px] mx-auto px-[5%]">
-        <div className="h-px bg-[hsl(0,0%,93%)]" />
+        <div className="h-px bg-[hsl(0,0%,88%)]" />
       </div>
 
       {/* S4: Not ready yet */}
-      <section className="px-[5%] py-16 md:py-24">
+      <section className="px-[5%] pt-8 pb-12">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-2">
@@ -276,13 +271,12 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="max-w-[750px] mx-auto px-[5%]">
-        <div className="h-px bg-[hsl(0,0%,93%)]" />
+        <div className="h-px bg-[hsl(0,0%,88%)]" />
       </div>
 
       {/* S5: Contact */}
-      <section className="px-[5%] py-16 md:py-24">
+      <section className="px-[5%] pt-8 pb-12">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-2">
@@ -344,13 +338,12 @@ const ManagementPage = () => {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="max-w-[750px] mx-auto px-[5%]">
-        <div className="h-px bg-[hsl(0,0%,93%)]" />
+        <div className="h-px bg-[hsl(0,0%,88%)]" />
       </div>
 
       {/* S6: FAQ */}
-      <section className="px-[5%] py-16 md:py-20">
+      <section className="px-[5%] pt-8 pb-12">
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-2xl text-foreground mb-8">
