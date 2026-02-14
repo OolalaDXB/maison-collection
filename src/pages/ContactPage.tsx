@@ -32,10 +32,10 @@ const ContactPage = () => {
               For reservations, partnerships, or property management inquiries.
             </p>
             <a
-              href="mailto:contact@maisons.co"
+              href="mailto:chez@maisons.co"
               className="inline-block font-display text-xl text-primary hover:underline underline-offset-4 mb-4"
             >
-              contact@maisons.co
+              chez@maisons.co
             </a>
             <div className="flex gap-6 text-sm text-muted-foreground mb-16">
               <a
