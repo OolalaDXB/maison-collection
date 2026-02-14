@@ -82,7 +82,7 @@ export const properties: Property[] = [
     airbnbReviewsCount: 20,
     status: "active",
     tags: ["Ski Season", "Superhost", "Guest Favourite"],
-    heroImage: property2,
+    heroImage: georgia10,
     galleryImages: [property1, property2, property3, property4, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14],
   },
   {
