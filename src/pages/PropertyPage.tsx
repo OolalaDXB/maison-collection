@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
 import { useState, useEffect } from "react";
 import { X, Clock, Car } from "lucide-react";
+import BookingModal from "@/components/BookingModal";
 import PropertyMap from "@/components/PropertyMap";
 import { supabase } from "@/integrations/supabase/client";
 import { useFxRates } from "@/hooks/useFxRates";
@@ -37,6 +38,7 @@ const PropertyPage = () => {
   const property = properties.find((p) => p.slug === slug);
   const staticReviews = reviews.filter((r) => r.propertySlug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [showBooking, setShowBooking] = useState(false);
   const { getMultiCurrencyDisplay } = useFxRates();
   const [dbReviews, setDbReviews] = useState<DbReview[]>([]);
   const [dbPois, setDbPois] = useState<DbPoi[]>([]);
@@ -331,12 +333,18 @@ const PropertyPage = () => {
                 )}
 
                 <div className="space-y-3">
+                  <button
+                    onClick={() => setShowBooking(true)}
+                    className="block w-full text-center px-6 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
+                  >
+                    Book Direct
+                  </button>
                   {property.airbnbLink && (
                     <a
                       href={property.airbnbLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full text-center px-6 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
+                      className="block w-full text-center px-6 py-3 border border-border text-foreground text-sm uppercase tracking-[0.1em] hover:border-primary hover:text-primary transition-colors"
                     >
                       Book on Airbnb
                     </a>
@@ -348,6 +356,15 @@ const PropertyPage = () => {
                     Contact Us
                   </a>
                 </div>
+
+                {showBooking && property.pricePerNight && (
+                  <BookingModal
+                    propertyId={dbPropertyId}
+                    propertyName={property.name}
+                    pricePerNight={property.pricePerNight}
+                    onClose={() => setShowBooking(false)}
+                  />
+                )}
               </div>
             </FadeIn>
           </div>
