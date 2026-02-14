@@ -2,14 +2,31 @@ import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const ArabiaPage = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    const { error } = await supabase.from("inquiries").insert({
+      name: email.split("@")[0],
+      email,
+      type: "waitlist",
+      subject: "Arabia Waitlist",
+      message: `Waitlist signup for Maison Arabia`,
+    } as any);
+    setSubmitting(false);
+    if (error) {
+      toast.error("Failed to join waitlist. Please try again.");
+    } else {
+      setSubmitted(true);
+      toast.success("You're on the list!");
+    }
   };
 
   return (
@@ -42,23 +59,10 @@ const ArabiaPage = () => {
                 Thank you. We'll be in touch.
               </p>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-              >
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  required
-                  className="flex-1 px-4 py-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
-                >
-                  Join Waitlist
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" required className="flex-1 px-4 py-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-colors" />
+                <button type="submit" disabled={submitting} className="px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-50">
+                  {submitting ? "Joining…" : "Join Waitlist"}
                 </button>
               </form>
             )}
