@@ -101,12 +101,16 @@
 
 @layer utilities {
   .section-padding {
-    @apply py-16 px-[5%];
+    @apply px-[5%];
+    padding-top: 100px;
+    padding-bottom: 100px;
   }
 
   @media (max-width: 768px) {
     .section-padding {
-      @apply py-10 px-[5%];
+      @apply px-[5%];
+      padding-top: 64px;
+      padding-bottom: 64px;
     }
   }
 
@@ -115,7 +119,11 @@
   }
 
   .section-label {
-    @apply uppercase text-primary tracking-[0.15em] text-xs font-medium mb-4;
+    @apply uppercase tracking-[0.15em] font-medium mb-4;
+    color: #999999;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.7rem;
   }
 
   .dark-section {

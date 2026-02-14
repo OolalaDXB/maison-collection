@@ -15,6 +15,8 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
+  const isHomepage = location.pathname === "/";
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
@@ -25,19 +27,24 @@ const Header = () => {
     setMenuOpen(false);
   }, [location]);
 
+  // On homepage, header is transparent over hero when not scrolled
+  const transparentMode = isHomepage && !scrolled;
+
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-400 ${
-          scrolled
-            ? "bg-[#ffffff] border-b border-[#e0e0e0] shadow-none"
-            : "bg-background/92 border-b border-border backdrop-blur-xl"
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          transparentMode
+            ? "bg-transparent border-b border-transparent"
+            : "bg-[#ffffff] border-b border-[#e0e0e0]"
         }`}
       >
         <div className="max-container flex items-center justify-between h-[72px] px-[5%]">
           <Link
             to="/"
-            className="font-body text-foreground uppercase tracking-[0.05em] font-light text-lg"
+            className={`font-body uppercase tracking-[0.05em] font-light text-lg transition-colors duration-300 ${
+              transparentMode ? "text-white" : "text-foreground"
+            }`}
           >
             MAISONS
           </Link>
@@ -48,7 +55,9 @@ const Header = () => {
               <Link
                 key={link.label}
                 to={link.href}
-                className="text-sm font-body font-normal text-muted-foreground hover:text-primary transition-colors duration-300 tracking-wide"
+                className={`text-sm font-body font-normal hover:text-primary transition-colors duration-300 tracking-wide ${
+                  transparentMode ? "text-[rgba(255,255,255,0.85)]" : "text-muted-foreground"
+                }`}
               >
                 {link.label}
               </Link>
@@ -58,7 +67,9 @@ const Header = () => {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-foreground p-2"
+            className={`md:hidden p-2 transition-colors duration-300 ${
+              transparentMode ? "text-white" : "text-foreground"
+            }`}
             aria-label="Toggle menu"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}

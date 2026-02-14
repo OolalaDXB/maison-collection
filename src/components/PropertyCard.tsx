@@ -7,8 +7,21 @@ interface PropertyCardProps {
   index: number;
 }
 
+const locationLabels: Record<string, string> = {
+  georgia: "Gudauri · Georgia",
+  atlantique: "Quistinic · Brittany",
+  arabia: "Dubai · 2026",
+};
+
+const multiCurrency: Record<string, string> = {
+  georgia: "~$195 · 715 AED · 531 ₾",
+  atlantique: "~£215 · ~$270",
+};
+
 const PropertyCard = ({ property, index }: PropertyCardProps) => {
   const isComingSoon = property.status === "coming_soon";
+  const locLabel = locationLabels[property.slug] || property.location;
+  const currencies = multiCurrency[property.slug];
 
   return (
     <FadeIn delay={index * 0.15}>
@@ -16,7 +29,7 @@ const PropertyCard = ({ property, index }: PropertyCardProps) => {
         to={`/${property.slug}`}
         className="group block"
       >
-        <div className="overflow-hidden bg-card border border-border">
+        <div className="overflow-hidden bg-card border border-[#f0f0f0] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-[400ms]">
           {/* Image */}
           <div className="relative h-[320px] overflow-hidden">
             {isComingSoon ? (
@@ -55,12 +68,14 @@ const PropertyCard = ({ property, index }: PropertyCardProps) => {
           </div>
 
           {/* Content */}
-          <div className="p-6 transition-transform duration-500 group-hover:-translate-y-1">
-            <p className="section-label mb-2">{property.location}</p>
+          <div className="p-6">
+            <p className="font-body uppercase tracking-[0.12em] text-[0.7rem] text-[#999999] mb-1">
+              {locLabel}
+            </p>
             <h3 className="font-display text-2xl text-foreground mb-2">
               {property.name}
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
+            <p className="text-sm font-light text-[#444444] leading-[1.75] mb-4 line-clamp-2">
               {property.description}
             </p>
             <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -69,14 +84,23 @@ const PropertyCard = ({ property, index }: PropertyCardProps) => {
                   {property.areaSqm}m² · {property.capacity} guests
                 </span>
               )}
-              {property.pricePerNight && (
-                <span className="font-medium text-foreground">
-                  From €{property.pricePerNight}/night
-                </span>
-              )}
-              {isComingSoon && (
-                <span className="text-primary font-medium">Opening 2026</span>
-              )}
+              <div className="text-right">
+                {property.pricePerNight && (
+                  <>
+                    <span className="font-medium text-foreground">
+                      From €{property.pricePerNight}/night
+                    </span>
+                    {currencies && (
+                      <p className="font-body font-light text-[0.75rem] text-[#999999] mt-0.5">
+                        {currencies}
+                      </p>
+                    )}
+                  </>
+                )}
+                {isComingSoon && (
+                  <span className="text-primary font-medium">Opening 2026</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
