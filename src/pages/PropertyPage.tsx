@@ -7,6 +7,12 @@ import { useState, useEffect } from "react";
 import { X, Clock, Car } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { supabase } from "@/integrations/supabase/client";
+import { useFxRates } from "@/hooks/useFxRates";
+
+const PROPERTY_CURRENCIES: Record<string, string[]> = {
+  georgia: ["EUR", "USD", "AED", "GEL"],
+  atlantique: ["EUR", "GBP", "USD"],
+};
 
 interface DbReview {
   id: string;
@@ -31,6 +37,7 @@ const PropertyPage = () => {
   const property = properties.find((p) => p.slug === slug);
   const staticReviews = reviews.filter((r) => r.propertySlug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const { getMultiCurrencyDisplay } = useFxRates();
   const [dbReviews, setDbReviews] = useState<DbReview[]>([]);
   const [dbPois, setDbPois] = useState<DbPoi[]>([]);
   const [dbPropertyId, setDbPropertyId] = useState<string | null>(null);
@@ -309,6 +316,17 @@ const PropertyPage = () => {
                         /night
                       </span>
                     </p>
+                    {(() => {
+                      const currencies = PROPERTY_CURRENCIES[property.slug];
+                      if (!currencies) return null;
+                      const display = getMultiCurrencyDisplay(property.pricePerNight, currencies);
+                      if (!display) return null;
+                      return (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {display}
+                        </p>
+                      );
+                    })()}
                   </div>
                 )}
 
