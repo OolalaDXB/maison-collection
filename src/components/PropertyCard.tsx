@@ -10,12 +10,13 @@ interface PropertyCardProps {
 const locationLabels: Record<string, string> = {
   georgia: "Gudauri · Georgia",
   atlantique: "Quistinic · Brittany",
-  arabia: "Dubai · 2026",
+  arabia: "The Sustainable City · Dubai",
 };
 
 const multiCurrency: Record<string, string> = {
   georgia: "~$195 · 715 AED · 531 ₾",
   atlantique: "~£215 · ~$270",
+  arabia: "~1,390 AED · ~$378",
 };
 
 const PropertyCard = ({ property, index }: PropertyCardProps) => {
@@ -36,6 +37,12 @@ const PropertyCard = ({ property, index }: PropertyCardProps) => {
               <div className="w-full h-full bg-secondary flex items-center justify-center">
                 <span className="font-display text-2xl italic text-muted-foreground">
                   Coming Soon
+                </span>
+              </div>
+            ) : !property.heroImage ? (
+              <div className="w-full h-full bg-[#f5f3f0] flex items-center justify-center">
+                <span className="font-display text-2xl italic text-foreground/60">
+                  {property.name}
                 </span>
               </div>
             ) : (

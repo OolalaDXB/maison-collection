@@ -26,14 +26,14 @@ const GeorgiaCrossSell = () => {
 
         {/* Arabia */}
         <Link to="/arabia" className="group block">
-          <div className="aspect-[4/3] bg-[hsl(0,0%,95%)] overflow-hidden mb-4 flex items-center justify-center">
-            <p className="font-body font-light text-sm text-muted-foreground">Coming Soon</p>
+          <div className="aspect-[4/3] bg-[#f5f3f0] overflow-hidden mb-4 flex items-center justify-center">
+            <p className="font-display text-xl italic text-foreground/60">Maison Arabia</p>
           </div>
           <p className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-1">
-            Dubai · 2026
+            The Sustainable City · Dubai
           </p>
           <h4 className="font-display text-xl text-foreground mb-1">Maison Arabia</h4>
-          <p className="font-body font-light text-sm text-foreground">Opening 2026</p>
+          <p className="font-body font-light text-sm text-foreground">From 350€ / night</p>
         </Link>
       </div>
     </div>
