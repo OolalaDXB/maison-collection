@@ -4,7 +4,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
 import { useState, useEffect } from "react";
-import { X, Clock, Car, MapPin } from "lucide-react";
+import { X, Clock, Car } from "lucide-react";
+import PropertyMap from "@/components/PropertyMap";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DbReview {
@@ -311,16 +312,39 @@ const PropertyPage = () => {
         </div>
       </section>
 
-      {/* Map placeholder */}
+      {/* Map */}
       <section className="section-padding pt-0">
         <div className="max-container">
           <FadeIn>
-            <div className="border border-border p-12 flex flex-col items-center justify-center text-center bg-muted/30">
-              <MapPin size={32} className="text-primary mb-4" />
-              <p className="font-display text-xl text-foreground mb-2">Location</p>
-              <p className="text-sm text-muted-foreground">{property.location}, {property.country}</p>
-              <p className="text-xs text-muted-foreground mt-2">Interactive map coming soon</p>
-            </div>
+            <p className="section-label mb-6">Location</p>
+            {property.slug === "georgia" ? (
+              <PropertyMap
+                center={[44.4735, 42.4575]}
+                zoom={14}
+                propertyName={property.name}
+                pois={[
+                  { label: "Gondola", coords: [44.4710, 42.4560], emoji: "🎿" },
+                  { label: "Ski Rental", coords: [44.4725, 42.4570], emoji: "⛷️" },
+                  { label: "Restaurants", coords: [44.4745, 42.4580], emoji: "🍽️" },
+                  { label: "Supermarket", coords: [44.4750, 42.4565], emoji: "🛒" },
+                ]}
+              />
+            ) : property.slug === "atlantique" ? (
+              <PropertyMap
+                center={[-3.3455, 47.9135]}
+                zoom={13}
+                propertyName={property.name}
+                pois={[
+                  { label: "Atlantic Coast", coords: [-3.3600, 47.7200], emoji: "🌊" },
+                  { label: "Lorient", coords: [-3.3600, 47.7500], emoji: "🏙️" },
+                ]}
+              />
+            ) : (
+              <div className="border border-border p-12 flex flex-col items-center justify-center text-center bg-muted/30">
+                <p className="font-display text-xl text-foreground mb-2">Location</p>
+                <p className="text-sm text-muted-foreground">{property.location}, {property.country}</p>
+              </div>
+            )}
           </FadeIn>
         </div>
       </section>
