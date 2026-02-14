@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="dark-section section-padding">
       <div className="max-container">
@@ -20,11 +22,17 @@ const Footer = () => {
             <p className="text-sm text-[hsl(0,0%,60%)]">
               Brittany · Georgia · Dubai
             </p>
-            <p className="text-xs text-[hsl(0,0%,45%)]">
-              Made with passion by The Studio MT
+            <p className="text-[0.75rem] text-[#666666]">
+              Made by The Studio MT
             </p>
             <p className="text-xs text-[hsl(0,0%,45%)]">
-              &copy; 2026 Maisons. All rights reserved.
+              <span
+                onClick={() => navigate("/admin/login")}
+                className="select-text"
+              >
+                &copy;
+              </span>{" "}
+              2026 Maisons. All rights reserved.
             </p>
           </div>
         </div>

@@ -8,7 +8,7 @@ import FadeIn from "@/components/FadeIn";
 const services = [
   {
     icon: "◇",
-    title: "Curation",
+    title: "Selection & Positioning",
     description:
       "We identify properties with character and potential, transforming them into memorable destinations with narrative positioning and editorial storytelling.",
   },

@@ -31,7 +31,7 @@ const ArabiaPage = () => {
           <FadeIn delay={0.2}>
             <p className="text-muted-foreground max-w-md mx-auto mb-12 font-light leading-relaxed">
               Our next chapter unfolds in the Gulf. A new maison is being
-              curated with the same intention and care that defines our
+              assembled with the same intention and care that defines our
               collection.
             </p>
           </FadeIn>

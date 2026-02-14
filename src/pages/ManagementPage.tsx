@@ -6,7 +6,7 @@ import FadeIn from "@/components/FadeIn";
 const services = [
   {
     icon: "◇",
-    title: "Curation",
+    title: "Selection & Positioning",
     description:
       "Narrative positioning, editorial storytelling. Competitive benchmarking, strategic recommendations for distinctive properties.",
   },

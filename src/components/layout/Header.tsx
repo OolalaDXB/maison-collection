@@ -28,11 +28,11 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-400 border-b border-border ${
+        className={`fixed top-0 w-full z-50 transition-all duration-400 ${
           scrolled
-            ? "bg-background/97 shadow-[0_1px_30px_rgba(0,0,0,0.04)]"
-            : "bg-background/92"
-        } backdrop-blur-xl`}
+            ? "bg-[#ffffff] border-b border-[#e0e0e0] shadow-none"
+            : "bg-background/92 border-b border-border backdrop-blur-xl"
+        }`}
       >
         <div className="max-container flex items-center justify-between h-[72px] px-[5%]">
           <Link
