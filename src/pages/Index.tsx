@@ -120,13 +120,13 @@ const Index = () => {
       </section>
 
       {/* Social Proof */}
-      <section className="py-10 md:py-12 px-[5%] bg-background">
+      <section className="pt-12 pb-8 px-[5%] bg-background">
         <div className="max-container text-center">
           <FadeIn>
-            <div className="flex items-center justify-center gap-3 flex-wrap">
-              <Star size={26} className="text-primary fill-primary" />
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <Star size={28} className="text-primary fill-primary" />
               <span className="font-display text-4xl md:text-5xl text-foreground">5.0</span>
-              <span className="font-body text-lg md:text-xl text-muted-foreground">
+              <span className="font-body text-lg md:text-xl text-[hsl(0,0%,33%)]">
                 across all properties · Superhost · Guest Favourite · 30+ five-star reviews
               </span>
             </div>
@@ -135,9 +135,9 @@ const Index = () => {
       </section>
 
       {/* Philosophy */}
-      <section className="py-10 md:py-14 px-[5%] bg-background">
+      <section className="pt-8 pb-12 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-border mb-10 md:mb-12" />
+          <div className="border-t-2 border-[hsl(0,0%,88%)] mb-8 md:mb-10" />
           <FadeIn>
             <p className="section-label">Philosophy</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
@@ -158,9 +158,9 @@ const Index = () => {
       </section>
 
       {/* Services Preview */}
-      <section className="py-10 md:py-14 px-[5%] bg-background">
+      <section className="pt-8 pb-12 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-border mb-10 md:mb-12" />
+          <div className="border-t-2 border-[hsl(0,0%,88%)] mb-8 md:mb-10" />
           <FadeIn>
             <p className="section-label">Services</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
@@ -199,9 +199,9 @@ const Index = () => {
       </section>
 
       {/* About Preview */}
-      <section className="py-10 md:py-14 px-[5%] bg-background">
+      <section className="pt-8 pb-12 px-[5%] bg-background">
         <div className="max-container">
-          <div className="border-t border-border mb-10 md:mb-12" />
+          <div className="border-t-2 border-[hsl(0,0%,88%)] mb-8 md:mb-10" />
           <FadeIn>
             <p className="section-label">About</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
@@ -227,9 +227,9 @@ const Index = () => {
       </section>
 
       {/* Dual CTA */}
-      <section className="py-10 md:py-14 bg-background">
+      <section className="pt-8 pb-16 bg-background">
         <div className="max-container px-[5%]">
-          <div className="border-t border-border mb-10 md:mb-12" />
+          <div className="border-t-2 border-[hsl(0,0%,88%)] mb-8 md:mb-10" />
           <div className="grid grid-cols-1 md:grid-cols-2">
             <FadeIn>
               <div className="py-4 pr-4 md:pr-16">
