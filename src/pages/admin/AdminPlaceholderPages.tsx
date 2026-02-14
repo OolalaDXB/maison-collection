@@ -7,9 +7,6 @@ const AdminPlaceholder = ({ title }: { title: string }) => (
   </AdminLayout>
 );
 
-export const AdminCalendarPage = () => <AdminPlaceholder title="Calendar" />;
-export const AdminPricingPage = () => <AdminPlaceholder title="Pricing" />;
-export const AdminBookingsPage = () => <AdminPlaceholder title="Bookings" />;
 export const AdminGuestsPage = () => <AdminPlaceholder title="Guests" />;
 export const AdminContentPage = () => <AdminPlaceholder title="Content" />;
 export const AdminInquiriesPage = () => <AdminPlaceholder title="Inquiries" />;

@@ -12,9 +12,13 @@ import ContactPage from "./pages/ContactPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
+import AdminCalendarPage from "./pages/admin/AdminCalendarPage";
+import AdminPricingPage from "./pages/admin/AdminPricingPage";
+import AdminBookingsPage from "./pages/admin/AdminBookingsPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
+import BookingPage from "./pages/BookingPage";
 import {
-  AdminCalendarPage, AdminPricingPage, AdminBookingsPage, AdminGuestsPage,
+  AdminGuestsPage,
   AdminContentPage, AdminInquiriesPage, AdminPaymentsPage, AdminSettingsPage
 } from "./pages/admin/AdminPlaceholderPages";
 import NotFound from "./pages/NotFound";
@@ -35,6 +39,7 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/georgia" element={<PropertyPage />} />
           <Route path="/atlantique" element={<PropertyPage />} />
+          <Route path="/book/:slug" element={<BookingPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/properties" element={<AdminPropertiesPage />} />
