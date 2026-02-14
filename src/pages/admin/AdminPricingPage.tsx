@@ -1,0 +1,352 @@
+import { useEffect, useState } from "react";
+import AdminLayout from "@/components/admin/AdminLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { toast } from "sonner";
+import { Pencil, Trash2, Plus } from "lucide-react";
+
+interface Property {
+  id: string;
+  name: string;
+  price_per_night: number | null;
+  weekend_price: number | null;
+  cleaning_fee: number | null;
+  tourist_tax_per_person: number | null;
+  min_nights: number | null;
+}
+
+interface Season {
+  id: string;
+  property_id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  price_per_night: number;
+  min_nights: number | null;
+}
+
+interface PromoCode {
+  id: string;
+  code: string;
+  discount_percent: number | null;
+  discount_amount: number | null;
+  valid_from: string | null;
+  valid_until: string | null;
+  max_uses: number | null;
+  current_uses: number | null;
+  property_id: string | null;
+  active: boolean | null;
+}
+
+const AdminPricingPage = () => {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [promos, setPromos] = useState<PromoCode[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editPrices, setEditPrices] = useState<Record<string, Partial<Property>>>({});
+
+  // Season dialog
+  const [seasonDialog, setSeasonDialog] = useState(false);
+  const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>({ property_id: "", name: "", start_date: "", end_date: "", price_per_night: 0, min_nights: 1 });
+
+  // Promo dialog
+  const [promoDialog, setPromoDialog] = useState(false);
+  const [editPromo, setEditPromo] = useState<Partial<PromoCode>>({});
+
+  const loadAll = async () => {
+    const [pRes, sRes, prRes] = await Promise.all([
+      supabase.from("properties").select("id, name, price_per_night, weekend_price, cleaning_fee, tourist_tax_per_person, min_nights").order("display_order"),
+      supabase.from("seasonal_pricing").select("*").order("start_date"),
+      supabase.from("promo_codes").select("*").order("created_at", { ascending: false }),
+    ]);
+    setProperties(pRes.data || []);
+    setSeasons(sRes.data || []);
+    setPromos(prRes.data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadAll(); }, []);
+
+  const handleBaseChange = (propId: string, field: string, value: string) => {
+    setEditPrices((prev) => ({
+      ...prev,
+      [propId]: { ...prev[propId], [field]: value === "" ? null : parseFloat(value) },
+    }));
+  };
+
+  const saveBase = async (propId: string) => {
+    const updates = editPrices[propId];
+    if (!updates) return;
+    const { error } = await supabase.from("properties").update(updates).eq("id", propId);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Prices saved");
+    loadAll();
+    setEditPrices((prev) => { const n = { ...prev }; delete n[propId]; return n; });
+  };
+
+  const saveSeason = async () => {
+    const s = editSeason;
+    if (!s.property_id || !s.name || !s.start_date || !s.end_date || !s.price_per_night) {
+      toast.error("Fill all required fields"); return;
+    }
+    if (s.id) {
+      const { error } = await supabase.from("seasonal_pricing").update({ name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: s.price_per_night, min_nights: s.min_nights }).eq("id", s.id);
+      if (error) { toast.error(error.message); return; }
+    } else {
+      const { error } = await supabase.from("seasonal_pricing").insert({ property_id: s.property_id, name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: s.price_per_night, min_nights: s.min_nights || 1 });
+      if (error) { toast.error(error.message); return; }
+    }
+    toast.success("Season saved");
+    setSeasonDialog(false);
+    loadAll();
+  };
+
+  const deleteSeason = async (id: string) => {
+    if (!confirm("Delete this season?")) return;
+    await supabase.from("seasonal_pricing").delete().eq("id", id);
+    toast.success("Deleted");
+    loadAll();
+  };
+
+  const savePromo = async () => {
+    const p = editPromo;
+    if (!p.code) { toast.error("Code is required"); return; }
+    if (p.id) {
+      const { error } = await supabase.from("promo_codes").update({
+        code: p.code, discount_percent: p.discount_percent, discount_amount: p.discount_amount,
+        valid_from: p.valid_from, valid_until: p.valid_until, max_uses: p.max_uses,
+        property_id: p.property_id, active: p.active ?? true,
+      }).eq("id", p.id);
+      if (error) { toast.error(error.message); return; }
+    } else {
+      const { error } = await supabase.from("promo_codes").insert({
+        code: p.code!, discount_percent: p.discount_percent, discount_amount: p.discount_amount,
+        valid_from: p.valid_from, valid_until: p.valid_until, max_uses: p.max_uses,
+        property_id: p.property_id || null, active: p.active ?? true,
+      });
+      if (error) { toast.error(error.message); return; }
+    }
+    toast.success("Promo code saved");
+    setPromoDialog(false);
+    loadAll();
+  };
+
+  const deletePromo = async (id: string) => {
+    if (!confirm("Delete?")) return;
+    await supabase.from("promo_codes").delete().eq("id", id);
+    toast.success("Deleted");
+    loadAll();
+  };
+
+  const togglePromoActive = async (id: string, active: boolean) => {
+    await supabase.from("promo_codes").update({ active: !active }).eq("id", id);
+    loadAll();
+  };
+
+  return (
+    <AdminLayout>
+      <h1 className="font-display text-2xl mb-6">Pricing</h1>
+      <Tabs defaultValue="base">
+        <TabsList>
+          <TabsTrigger value="base">Base Pricing</TabsTrigger>
+          <TabsTrigger value="seasonal">Seasonal</TabsTrigger>
+          <TabsTrigger value="smart">Smart Pricing</TabsTrigger>
+          <TabsTrigger value="promos">Promo Codes</TabsTrigger>
+        </TabsList>
+
+        {/* Base Pricing */}
+        <TabsContent value="base" className="space-y-4 mt-4">
+          {properties.map((p) => {
+            const edits = editPrices[p.id] || {};
+            const val = (field: keyof Property) => (edits[field] !== undefined ? String(edits[field] ?? "") : String(p[field] ?? ""));
+            return (
+              <Card key={p.id}>
+                <CardHeader><CardTitle className="text-base font-display">{p.name}</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {[
+                      ["price_per_night", "Price/night (€)"],
+                      ["weekend_price", "Weekend (€)"],
+                      ["cleaning_fee", "Cleaning (€)"],
+                      ["tourist_tax_per_person", "Tax/person (€)"],
+                      ["min_nights", "Min nights"],
+                    ].map(([field, label]) => (
+                      <div key={field}>
+                        <label className="text-xs text-muted-foreground">{label}</label>
+                        <Input
+                          type="number"
+                          value={val(field as keyof Property)}
+                          onChange={(e) => handleBaseChange(p.id, field, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <Button size="sm" className="mt-3" onClick={() => saveBase(p.id)} disabled={!editPrices[p.id]}>Save</Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </TabsContent>
+
+        {/* Seasonal */}
+        <TabsContent value="seasonal" className="mt-4">
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={() => { setEditSeason({ property_id: properties[0]?.id || "", name: "", start_date: "", end_date: "", price_per_night: 0, min_nights: 1 }); setSeasonDialog(true); }}>
+              <Plus size={14} className="mr-1" /> Add Season
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Property</TableHead>
+                <TableHead>Season</TableHead>
+                <TableHead>Start</TableHead>
+                <TableHead>End</TableHead>
+                <TableHead>€/night</TableHead>
+                <TableHead>Min nights</TableHead>
+                <TableHead className="w-[80px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {seasons.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell className="text-sm">{properties.find((p) => p.id === s.property_id)?.name || "—"}</TableCell>
+                  <TableCell className="text-sm">{s.name}</TableCell>
+                  <TableCell className="text-sm">{s.start_date}</TableCell>
+                  <TableCell className="text-sm">{s.end_date}</TableCell>
+                  <TableCell className="text-sm">€{s.price_per_night}</TableCell>
+                  <TableCell className="text-sm">{s.min_nights || 1}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => { setEditSeason(s); setSeasonDialog(true); }}><Pencil size={14} /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => deleteSeason(s.id)}><Trash2 size={14} /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {seasons.length === 0 && (
+                <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">No seasonal pricing configured</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TabsContent>
+
+        {/* Smart Pricing */}
+        <TabsContent value="smart" className="mt-4">
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="font-display text-lg text-foreground mb-2">Smart Pricing — Coming Soon</p>
+              <p className="text-sm text-muted-foreground">Automatic price suggestions based on occupancy, demand, and seasonality.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Promo Codes */}
+        <TabsContent value="promos" className="mt-4">
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={() => { setEditPromo({ code: "", active: true }); setPromoDialog(true); }}>
+              <Plus size={14} className="mr-1" /> Add Promo Code
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Code</TableHead>
+                <TableHead>Discount</TableHead>
+                <TableHead>Valid</TableHead>
+                <TableHead>Max Uses</TableHead>
+                <TableHead>Used</TableHead>
+                <TableHead>Active</TableHead>
+                <TableHead className="w-[80px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {promos.map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell className="text-sm font-mono">{p.code}</TableCell>
+                  <TableCell className="text-sm">{p.discount_percent ? `${p.discount_percent}%` : p.discount_amount ? `€${p.discount_amount}` : "—"}</TableCell>
+                  <TableCell className="text-sm">{p.valid_from || "—"} → {p.valid_until || "—"}</TableCell>
+                  <TableCell className="text-sm">{p.max_uses ?? "∞"}</TableCell>
+                  <TableCell className="text-sm">{p.current_uses || 0}</TableCell>
+                  <TableCell>
+                    <button onClick={() => togglePromoActive(p.id, !!p.active)} className={`text-xs px-2 py-0.5 ${p.active ? "bg-[hsl(120,40%,92%)] text-[hsl(120,40%,30%)]" : "bg-muted text-muted-foreground"}`}>
+                      {p.active ? "Active" : "Inactive"}
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => { setEditPromo(p); setPromoDialog(true); }}><Pencil size={14} /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => deletePromo(p.id)}><Trash2 size={14} /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {promos.length === 0 && (
+                <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">No promo codes</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TabsContent>
+      </Tabs>
+
+      {/* Season dialog */}
+      <Dialog open={seasonDialog} onOpenChange={setSeasonDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="font-display">{editSeason.id ? "Edit Season" : "Add Season"}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground">Property</label>
+              <select className="w-full px-3 py-2 border border-border bg-background text-sm" value={editSeason.property_id} onChange={(e) => setEditSeason({ ...editSeason, property_id: e.target.value })}>
+                {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <div><label className="text-xs text-muted-foreground">Season name</label><Input value={editSeason.name} onChange={(e) => setEditSeason({ ...editSeason, name: e.target.value })} /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-muted-foreground">Start</label><Input type="date" value={editSeason.start_date} onChange={(e) => setEditSeason({ ...editSeason, start_date: e.target.value })} /></div>
+              <div><label className="text-xs text-muted-foreground">End</label><Input type="date" value={editSeason.end_date} onChange={(e) => setEditSeason({ ...editSeason, end_date: e.target.value })} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-muted-foreground">Price/night (€)</label><Input type="number" value={editSeason.price_per_night} onChange={(e) => setEditSeason({ ...editSeason, price_per_night: parseFloat(e.target.value) || 0 })} /></div>
+              <div><label className="text-xs text-muted-foreground">Min nights</label><Input type="number" value={editSeason.min_nights ?? 1} onChange={(e) => setEditSeason({ ...editSeason, min_nights: parseInt(e.target.value) || 1 })} /></div>
+            </div>
+            <Button onClick={saveSeason} className="w-full">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Promo dialog */}
+      <Dialog open={promoDialog} onOpenChange={setPromoDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="font-display">{editPromo.id ? "Edit Promo" : "Add Promo Code"}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><label className="text-xs text-muted-foreground">Code</label><Input value={editPromo.code || ""} onChange={(e) => setEditPromo({ ...editPromo, code: e.target.value.toUpperCase() })} /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-muted-foreground">Discount %</label><Input type="number" value={editPromo.discount_percent ?? ""} onChange={(e) => setEditPromo({ ...editPromo, discount_percent: e.target.value ? parseFloat(e.target.value) : null })} /></div>
+              <div><label className="text-xs text-muted-foreground">Discount € (flat)</label><Input type="number" value={editPromo.discount_amount ?? ""} onChange={(e) => setEditPromo({ ...editPromo, discount_amount: e.target.value ? parseFloat(e.target.value) : null })} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-muted-foreground">Valid from</label><Input type="date" value={editPromo.valid_from || ""} onChange={(e) => setEditPromo({ ...editPromo, valid_from: e.target.value || null })} /></div>
+              <div><label className="text-xs text-muted-foreground">Valid until</label><Input type="date" value={editPromo.valid_until || ""} onChange={(e) => setEditPromo({ ...editPromo, valid_until: e.target.value || null })} /></div>
+            </div>
+            <div><label className="text-xs text-muted-foreground">Max uses</label><Input type="number" value={editPromo.max_uses ?? ""} onChange={(e) => setEditPromo({ ...editPromo, max_uses: e.target.value ? parseInt(e.target.value) : null })} /></div>
+            <div>
+              <label className="text-xs text-muted-foreground">Property (optional)</label>
+              <select className="w-full px-3 py-2 border border-border bg-background text-sm" value={editPromo.property_id || ""} onChange={(e) => setEditPromo({ ...editPromo, property_id: e.target.value || null })}>
+                <option value="">All properties</option>
+                {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <Button onClick={savePromo} className="w-full">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
+  );
+};
+
+export default AdminPricingPage;

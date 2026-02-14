@@ -1,14 +1,14 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { properties, reviews } from "@/data/properties";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
-import { useState, useEffect } from "react";
-import { X, Clock, Car } from "lucide-react";
-import BookingModal from "@/components/BookingModal";
+import { useState, useEffect, useMemo } from "react";
+import { X, Clock, Car, ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyMap from "@/components/PropertyMap";
 import { supabase } from "@/integrations/supabase/client";
 import { useFxRates } from "@/hooks/useFxRates";
+import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 
 const PROPERTY_CURRENCIES: Record<string, string[]> = {
   georgia: ["EUR", "USD", "AED", "GEL"],
@@ -34,11 +34,11 @@ interface DbPoi {
 
 const PropertyPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const slug = location.pathname.replace("/", "");
   const property = properties.find((p) => p.slug === slug);
   const staticReviews = reviews.filter((r) => r.propertySlug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [showBooking, setShowBooking] = useState(false);
   const { getMultiCurrencyDisplay } = useFxRates();
   const [dbReviews, setDbReviews] = useState<DbReview[]>([]);
   const [dbPois, setDbPois] = useState<DbPoi[]>([]);
@@ -46,13 +46,21 @@ const PropertyPage = () => {
   const [dbLat, setDbLat] = useState<number | null>(null);
   const [dbLng, setDbLng] = useState<number | null>(null);
   const [dbImages, setDbImages] = useState<string[]>([]);
+  const [dbProperty, setDbProperty] = useState<any>(null);
+  const [availabilityData, setAvailabilityData] = useState<any[]>([]);
+  const [seasonalPricing, setSeasonalPricing] = useState<any[]>([]);
+
+  // Booking widget state
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guestsCount, setGuestsCount] = useState(2);
 
   useEffect(() => {
     if (!property) return;
     const loadData = async () => {
       const { data: props } = await supabase
         .from("properties")
-        .select("id, latitude, longitude")
+        .select("id, latitude, longitude, price_per_night, weekend_price, cleaning_fee, tourist_tax_per_person, min_nights, airbnb_link")
         .eq("slug", slug)
         .limit(1);
       if (props && props.length > 0) {
@@ -60,41 +68,57 @@ const PropertyPage = () => {
         setDbPropertyId(propId);
         setDbLat(props[0].latitude);
         setDbLng(props[0].longitude);
+        setDbProperty(props[0]);
 
-        const [reviewsRes, poisRes, imagesRes] = await Promise.all([
+        const [reviewsRes, poisRes, imagesRes, availRes, spRes] = await Promise.all([
           supabase.from("reviews").select("*").eq("property_id", propId).order("stay_date", { ascending: false }),
           supabase.from("property_pois").select("*").eq("property_id", propId).order("display_order"),
           supabase.from("property_images").select("image_url").eq("property_id", propId).order("display_order"),
+          supabase.from("availability").select("date, price_override, available").eq("property_id", propId),
+          supabase.from("seasonal_pricing").select("start_date, end_date, price_per_night").eq("property_id", propId),
         ]);
         if (reviewsRes.data && reviewsRes.data.length > 0) setDbReviews(reviewsRes.data as DbReview[]);
         if (poisRes.data) setDbPois(poisRes.data as DbPoi[]);
         if (imagesRes.data && imagesRes.data.length > 0) setDbImages(imagesRes.data.map((i: any) => i.image_url));
+        setAvailabilityData(availRes.data || []);
+        setSeasonalPricing(spRes.data || []);
       }
     };
     loadData();
   }, [slug, property]);
 
+  const price = usePriceCalculation({
+    checkIn,
+    checkOut,
+    guestsCount,
+    defaultPrice: dbProperty?.price_per_night || property?.pricePerNight || 0,
+    weekendPrice: dbProperty?.weekend_price || null,
+    cleaningFee: dbProperty?.cleaning_fee || 0,
+    touristTaxPerPerson: dbProperty?.tourist_tax_per_person || 0,
+    availability: availabilityData,
+    seasonalPricing,
+  });
+
   if (!property || property.status === "coming_soon") {
     return null;
   }
 
-  // Use DB images if available, otherwise static
   const galleryImages = dbImages.length > 0 ? dbImages : property.galleryImages;
 
-  // Use DB reviews if available, otherwise static
   const displayReviews = dbReviews.length > 0
-    ? dbReviews.map((r) => ({
-        guestName: r.guest_name,
-        guestLocation: r.guest_location,
-        text: r.review_text,
-        rating: r.rating,
-      }))
-    : staticReviews.map((r) => ({
-        guestName: r.guestName,
-        guestLocation: r.guestLocation,
-        text: r.text,
-        rating: r.rating,
-      }));
+    ? dbReviews.map((r) => ({ guestName: r.guest_name, guestLocation: r.guest_location, text: r.review_text, rating: r.rating }))
+    : staticReviews.map((r) => ({ guestName: r.guestName, guestLocation: r.guestLocation, text: r.text, rating: r.rating }));
+
+  const unavailableDates = new Set(
+    availabilityData.filter((a) => a.available === false).map((a) => a.date)
+  );
+
+  const handleBookDirect = () => {
+    if (!checkIn || !checkOut) {
+      return;
+    }
+    navigate(`/book/${slug}?checkin=${checkIn}&checkout=${checkOut}&guests=${guestsCount}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,11 +127,7 @@ const PropertyPage = () => {
       {/* Hero */}
       <section className="relative h-[70vh] md:h-[80vh] flex items-end">
         <div className="absolute inset-0">
-          <img
-            src={property.heroImage}
-            alt={property.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={property.heroImage} alt={property.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[hsl(0,0%,0%,0.6)] via-transparent to-transparent" />
           {property.slug === "atlantique" && (
             <span className="absolute bottom-4 right-4 text-[0.65rem] text-[hsl(0,0%,100%,0.4)] z-10">
@@ -117,24 +137,14 @@ const PropertyPage = () => {
         </div>
         <div className="relative z-10 max-container px-[5%] pb-16 md:pb-20 w-full">
           <FadeIn>
-            <p className="text-sm uppercase tracking-[0.15em] text-terra-cotta-light mb-3">
-              {property.location}
-            </p>
-            <h1 className="font-display text-4xl md:text-6xl text-[hsl(0,0%,100%)] mb-4">
-              {property.name}
-            </h1>
+            <p className="text-sm uppercase tracking-[0.15em] text-terra-cotta-light mb-3">{property.location}</p>
+            <h1 className="font-display text-4xl md:text-6xl text-[hsl(0,0%,100%)] mb-4">{property.name}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-[hsl(0,0%,80%)]">
               {property.areaSqm && <span>{property.areaSqm}m²</span>}
               {property.capacity && <span>{property.capacity} guests</span>}
-              {property.bathrooms && (
-                <span>{property.bathrooms} bathrooms</span>
-              )}
+              {property.bathrooms && <span>{property.bathrooms} bathrooms</span>}
               {property.airbnbRating && (
-                <span>
-                  ★ {property.airbnbRating}
-                  {property.airbnbReviewsCount &&
-                    ` · ${property.airbnbReviewsCount}+ reviews`}
-                </span>
+                <span>★ {property.airbnbRating}{property.airbnbReviewsCount && ` · ${property.airbnbReviewsCount}+ reviews`}</span>
               )}
             </div>
           </FadeIn>
@@ -146,19 +156,8 @@ const PropertyPage = () => {
         <div className="max-container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {galleryImages.map((img, i) => (
-              <div
-                key={i}
-                className={`overflow-hidden cursor-pointer ${
-                  i === 0 ? "col-span-2 row-span-2" : ""
-                }`}
-                onClick={() => setLightboxIndex(i)}
-              >
-                <img
-                  src={img}
-                  alt={`${property.name} — Photo ${i + 1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                  style={{ minHeight: i === 0 ? "400px" : "200px" }}
-                />
+              <div key={i} className={`overflow-hidden cursor-pointer ${i === 0 ? "col-span-2 row-span-2" : ""}`} onClick={() => setLightboxIndex(i)}>
+                <img src={img} alt={`${property.name} — Photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" style={{ minHeight: i === 0 ? "400px" : "200px" }} />
               </div>
             ))}
           </div>
@@ -167,34 +166,19 @@ const PropertyPage = () => {
 
       {/* Lightbox */}
       {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 z-50 bg-[hsl(0,0%,0%,0.9)] flex items-center justify-center"
-          onClick={() => setLightboxIndex(null)}
-        >
-          <button
-            className="absolute top-6 right-6 text-[hsl(0,0%,100%)]"
-            onClick={() => setLightboxIndex(null)}
-          >
-            <X size={32} />
-          </button>
-          <img
-            src={galleryImages[lightboxIndex]}
-            alt=""
-            className="max-w-[90vw] max-h-[85vh] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+        <div className="fixed inset-0 z-50 bg-[hsl(0,0%,0%,0.9)] flex items-center justify-center" onClick={() => setLightboxIndex(null)}>
+          <button className="absolute top-6 right-6 text-[hsl(0,0%,100%)]" onClick={() => setLightboxIndex(null)}><X size={32} /></button>
+          <img src={galleryImages[lightboxIndex]} alt="" className="max-w-[90vw] max-h-[85vh] object-contain" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 
-      {/* Description */}
+      {/* Description + Sidebar */}
       <section className="section-padding pt-0">
         <div className="max-container grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2">
             <FadeIn>
               <h2 className="font-display text-3xl mb-6">About {property.name}</h2>
-              <p className="text-muted-foreground leading-relaxed font-light text-lg mb-8">
-                {property.longDescription || property.description}
-              </p>
+              <p className="text-muted-foreground leading-relaxed font-light text-lg mb-8">{property.longDescription || property.description}</p>
             </FadeIn>
 
             {/* Layout section for Georgia */}
@@ -271,21 +255,11 @@ const PropertyPage = () => {
                 <div className="border-t border-border pt-8 mt-8">
                   <p className="section-label">Architecture</p>
                   <p className="text-foreground font-medium mb-2">
-                    {property.architectureCredits.architect},{" "}
-                    {property.architectureCredits.location} —{" "}
-                    {property.architectureCredits.year}
+                    {property.architectureCredits.architect}, {property.architectureCredits.location} — {property.architectureCredits.year}
                   </p>
                   <div className="flex flex-wrap gap-4 mt-3">
                     {property.architectureCredits.links.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline underline-offset-4"
-                      >
-                        {link.label} ↗
-                      </a>
+                      <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline underline-offset-4">{link.label} ↗</a>
                     ))}
                   </div>
                 </div>
@@ -293,19 +267,15 @@ const PropertyPage = () => {
             )}
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar with booking widget */}
           <div>
             <FadeIn delay={0.2}>
               <div className="border border-border p-8 sticky top-24">
                 <p className="section-label mb-4">Amenities</p>
                 <ul className="space-y-3 mb-8">
                   {property.amenities.map((a) => (
-                    <li
-                      key={a}
-                      className="text-sm text-muted-foreground flex items-center gap-2"
-                    >
-                      <span className="w-1 h-1 bg-primary rounded-full" />
-                      {a}
+                    <li key={a} className="text-sm text-muted-foreground flex items-center gap-2">
+                      <span className="w-1 h-1 bg-primary rounded-full" />{a}
                     </li>
                   ))}
                 </ul>
@@ -314,30 +284,94 @@ const PropertyPage = () => {
                   <div className="border-t border-border pt-6 mb-6">
                     <p className="text-2xl font-display text-foreground">
                       €{property.pricePerNight}
-                      <span className="text-sm text-muted-foreground font-body">
-                        /night
-                      </span>
+                      <span className="text-sm text-muted-foreground font-body">/night</span>
                     </p>
                     {(() => {
                       const currencies = PROPERTY_CURRENCIES[property.slug];
                       if (!currencies) return null;
                       const display = getMultiCurrencyDisplay(property.pricePerNight, currencies);
                       if (!display) return null;
-                      return (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {display}
-                        </p>
-                      );
+                      return <p className="text-xs text-muted-foreground mt-1">{display}</p>;
+                    })()}
+                  </div>
+                )}
+
+                {/* Date selection */}
+                <div className="space-y-3 mb-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">Check-in</label>
+                      <input
+                        type="date"
+                        value={checkIn}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setCheckIn(e.target.value)}
+                        className="w-full px-2 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">Check-out</label>
+                      <input
+                        type="date"
+                        value={checkOut}
+                        min={checkIn || new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setCheckOut(e.target.value)}
+                        className="w-full px-2 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[0.65rem] text-muted-foreground uppercase tracking-wider">Guests</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={property.capacity || 10}
+                      value={guestsCount}
+                      onChange={(e) => setGuestsCount(parseInt(e.target.value) || 1)}
+                      className="w-full px-2 py-2 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Price breakdown */}
+                {price && (
+                  <div className="border border-border p-4 mb-4 text-sm space-y-1 bg-muted/20">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{price.nights} nights × ~€{price.avgNightlyRate}</span>
+                      <span>€{price.subtotal}</span>
+                    </div>
+                    {price.cleaningFee > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Cleaning fee</span>
+                        <span>€{price.cleaningFee}</span>
+                      </div>
+                    )}
+                    {price.touristTax > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Tourist tax</span>
+                        <span>€{price.touristTax}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-display text-lg border-t border-border pt-2 mt-2">
+                      <span>Total</span>
+                      <span>€{price.total}</span>
+                    </div>
+                    {(() => {
+                      const currencies = PROPERTY_CURRENCIES[property.slug];
+                      if (!currencies) return null;
+                      const display = getMultiCurrencyDisplay(price.total, currencies);
+                      if (!display) return null;
+                      return <p className="text-xs text-muted-foreground mt-1">{display}</p>;
                     })()}
                   </div>
                 )}
 
                 <div className="space-y-3">
                   <button
-                    onClick={() => setShowBooking(true)}
+                    onClick={handleBookDirect}
                     className="block w-full text-center px-6 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
                   >
-                    Book Direct
+                    {price ? `Book Direct — €${price.total}` : "Book Direct"}
                   </button>
                   {property.airbnbLink && (
                     <a
@@ -351,20 +385,11 @@ const PropertyPage = () => {
                   )}
                   <a
                     href="mailto:chez@maisons.co"
-                    className="block w-full text-center px-6 py-3 border border-border text-foreground text-sm uppercase tracking-[0.1em] hover:border-primary hover:text-primary transition-colors"
+                    className="block w-full text-center text-sm text-primary hover:underline underline-offset-4 py-2"
                   >
-                    Contact Us
+                    Contact us
                   </a>
                 </div>
-
-                {showBooking && property.pricePerNight && (
-                  <BookingModal
-                    propertyId={dbPropertyId}
-                    propertyName={property.name}
-                    pricePerNight={property.pricePerNight}
-                    onClose={() => setShowBooking(false)}
-                  />
-                )}
               </div>
             </FadeIn>
           </div>
@@ -377,7 +402,6 @@ const PropertyPage = () => {
           <FadeIn>
             <p className="section-label mb-6">Location</p>
             {(() => {
-              // Determine center coordinates
               const fallbackCoords: Record<string, [number, number]> = {
                 georgia: [44.4735, 42.4575],
                 atlantique: [-3.3455, 47.9135],
@@ -411,14 +435,7 @@ const PropertyPage = () => {
                 );
               }
 
-              return (
-                <PropertyMap
-                  center={center}
-                  zoom={14}
-                  propertyName={property.name}
-                  pois={pois}
-                />
-              );
+              return <PropertyMap center={center} zoom={14} propertyName={property.name} pois={pois} />;
             })()}
           </FadeIn>
         </div>
@@ -432,28 +449,18 @@ const PropertyPage = () => {
               <p className="section-label">Guest Reviews</p>
               <h2 className="font-display text-3xl mb-12">
                 What our guests say
-                <span className="text-lg text-muted-foreground font-body ml-3">
-                  ({displayReviews.length} reviews)
-                </span>
+                <span className="text-lg text-muted-foreground font-body ml-3">({displayReviews.length} reviews)</span>
               </h2>
             </FadeIn>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayReviews.map((review, i) => (
                 <FadeIn key={i} delay={i * 0.05}>
                   <div className="p-6 bg-background border border-border flex flex-col h-full">
-                    <p className="text-muted-foreground leading-relaxed font-light italic flex-1 mb-6 line-clamp-5">
-                      "{review.text}"
-                    </p>
+                    <p className="text-muted-foreground leading-relaxed font-light italic flex-1 mb-6 line-clamp-5">"{review.text}"</p>
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
                       <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {review.guestName}
-                        </p>
-                        {review.guestLocation && (
-                          <p className="text-xs text-muted-foreground">
-                            {review.guestLocation}
-                          </p>
-                        )}
+                        <p className="text-sm font-medium text-foreground">{review.guestName}</p>
+                        {review.guestLocation && <p className="text-xs text-muted-foreground">{review.guestLocation}</p>}
                       </div>
                       <span className="text-sm text-primary">★★★★★</span>
                     </div>
@@ -468,12 +475,7 @@ const PropertyPage = () => {
       {/* Back to collection */}
       <section className="section-padding text-center">
         <FadeIn>
-          <Link
-            to="/"
-            className="text-sm text-primary hover:underline underline-offset-4"
-          >
-            ← Back to the Collection
-          </Link>
+          <Link to="/" className="text-sm text-primary hover:underline underline-offset-4">← Back to the Collection</Link>
         </FadeIn>
       </section>
 

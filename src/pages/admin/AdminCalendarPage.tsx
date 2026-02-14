@@ -1,0 +1,270 @@
+import { useEffect, useState, useMemo } from "react";
+import AdminLayout from "@/components/admin/AdminLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
+
+interface PropertyOption {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface AvailabilityDay {
+  property_id: string;
+  date: string;
+  available: boolean | null;
+  price_override: number | null;
+  source: string | null;
+  booking_id: string | null;
+}
+
+interface BookingBar {
+  id: string;
+  property_id: string;
+  guest_name: string;
+  check_in: string;
+  check_out: string;
+  status: string | null;
+}
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const AdminCalendarPage = () => {
+  const [properties, setProperties] = useState<PropertyOption[]>([]);
+  const [visibleProps, setVisibleProps] = useState<Set<string>>(new Set());
+  const [month, setMonth] = useState(() => new Date());
+  const [availability, setAvailability] = useState<AvailabilityDay[]>([]);
+  const [bookings, setBookings] = useState<BookingBar[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedPropId, setSelectedPropId] = useState<string | null>(null);
+  const [priceOverride, setPriceOverride] = useState("");
+  const [dialogLoading, setDialogLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.from("properties").select("id, name, slug").order("display_order").then(({ data }) => {
+      if (data) {
+        setProperties(data);
+        setVisibleProps(new Set(data.map((p) => p.id)));
+      }
+    });
+  }, []);
+
+  const year = month.getFullYear();
+  const mo = month.getMonth();
+  const daysInMonth = new Date(year, mo + 1, 0).getDate();
+  const firstDow = (new Date(year, mo, 1).getDay() + 6) % 7; // Mon=0
+  const monthStr = `${year}-${String(mo + 1).padStart(2, "0")}`;
+
+  useEffect(() => {
+    const start = `${monthStr}-01`;
+    const end = `${monthStr}-${daysInMonth}`;
+    Promise.all([
+      supabase.from("availability").select("*").gte("date", start).lte("date", end),
+      supabase.from("bookings").select("id, property_id, guest_name, check_in, check_out, status").or(`check_in.lte.${end},check_out.gte.${start}`),
+    ]).then(([avRes, bkRes]) => {
+      setAvailability(avRes.data || []);
+      setBookings(bkRes.data || []);
+    });
+  }, [monthStr, daysInMonth]);
+
+  const getBookingsForDay = (day: number) => {
+    const dateStr = `${monthStr}-${String(day).padStart(2, "0")}`;
+    return bookings.filter((b) => b.check_in <= dateStr && b.check_out > dateStr && visibleProps.has(b.property_id));
+  };
+
+  const getAvailForDay = (day: number) => {
+    const dateStr = `${monthStr}-${String(day).padStart(2, "0")}`;
+    return availability.filter((a) => a.date === dateStr && visibleProps.has(a.property_id));
+  };
+
+  const statusColor = (status: string | null) => {
+    if (status === "confirmed" || status === "completed") return "bg-[hsl(120,40%,50%)]";
+    if (status === "pending") return "bg-[hsl(45,80%,50%)]";
+    return "bg-muted-foreground";
+  };
+
+  const handleDayClick = (day: number) => {
+    const dateStr = `${monthStr}-${String(day).padStart(2, "0")}`;
+    setSelectedDate(dateStr);
+    setSelectedPropId(properties[0]?.id || null);
+    const avail = availability.find((a) => a.date === dateStr && a.property_id === properties[0]?.id);
+    setPriceOverride(avail?.price_override?.toString() || "");
+  };
+
+  const currentAvail = useMemo(() => {
+    if (!selectedDate || !selectedPropId) return null;
+    return availability.find((a) => a.date === selectedDate && a.property_id === selectedPropId) || null;
+  }, [selectedDate, selectedPropId, availability]);
+
+  const isBlocked = currentAvail?.available === false;
+
+  const toggleBlock = async () => {
+    if (!selectedDate || !selectedPropId) return;
+    setDialogLoading(true);
+    const newAvailable = isBlocked ? true : false;
+    const { error } = await supabase.from("availability").upsert(
+      { property_id: selectedPropId, date: selectedDate, available: newAvailable, source: "manual" },
+      { onConflict: "property_id,date" }
+    );
+    setDialogLoading(false);
+    if (error) { toast.error(error.message); return; }
+    setAvailability((prev) => {
+      const filtered = prev.filter((a) => !(a.date === selectedDate && a.property_id === selectedPropId));
+      return [...filtered, { property_id: selectedPropId, date: selectedDate, available: newAvailable, price_override: currentAvail?.price_override ?? null, source: "manual", booking_id: null, min_nights_override: null, airbnb_uid: null } as any];
+    });
+    toast.success(newAvailable ? "Date unblocked" : "Date blocked");
+  };
+
+  const savePriceOverride = async () => {
+    if (!selectedDate || !selectedPropId) return;
+    setDialogLoading(true);
+    const val = priceOverride ? parseFloat(priceOverride) : null;
+    const { error } = await supabase.from("availability").upsert(
+      { property_id: selectedPropId, date: selectedDate, price_override: val, source: "manual", available: currentAvail?.available ?? true },
+      { onConflict: "property_id,date" }
+    );
+    setDialogLoading(false);
+    if (error) { toast.error(error.message); return; }
+    setAvailability((prev) => {
+      const filtered = prev.filter((a) => !(a.date === selectedDate && a.property_id === selectedPropId));
+      return [...filtered, { property_id: selectedPropId, date: selectedDate, available: currentAvail?.available ?? true, price_override: val, source: "manual", booking_id: null } as any];
+    });
+    toast.success(val ? `Price set to €${val}` : "Price reset to default");
+  };
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  return (
+    <AdminLayout>
+      <h1 className="font-display text-2xl mb-6">Calendar</h1>
+
+      {/* Property toggles */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {properties.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setVisibleProps((prev) => {
+              const next = new Set(prev);
+              next.has(p.id) ? next.delete(p.id) : next.add(p.id);
+              return next;
+            })}
+            className={`px-3 py-1 text-xs border transition-colors ${visibleProps.has(p.id) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border"}`}
+          >
+            {p.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Month nav */}
+      <div className="flex items-center gap-4 mb-4">
+        <Button variant="outline" size="icon" onClick={() => setMonth(new Date(year, mo - 1))}>
+          <ChevronLeft size={16} />
+        </Button>
+        <span className="font-display text-lg min-w-[160px] text-center">
+          {month.toLocaleString("en", { month: "long", year: "numeric" })}
+        </span>
+        <Button variant="outline" size="icon" onClick={() => setMonth(new Date(year, mo + 1))}>
+          <ChevronRight size={16} />
+        </Button>
+      </div>
+
+      {/* Calendar grid */}
+      <Card>
+        <CardContent className="p-0 overflow-x-auto">
+          <div className="grid grid-cols-7 min-w-[600px]">
+            {WEEKDAYS.map((d) => (
+              <div key={d} className="p-2 text-center text-xs font-medium text-muted-foreground border-b border-border">{d}</div>
+            ))}
+            {cells.map((day, i) => {
+              if (day === null) return <div key={i} className="border-b border-r border-border p-2 min-h-[80px] bg-muted/20" />;
+              const dayBookings = getBookingsForDay(day);
+              const dayAvail = getAvailForDay(day);
+              const blocked = dayAvail.filter((a) => a.available === false && !a.booking_id);
+              const airbnbBlocked = dayAvail.filter((a) => a.source === "airbnb" && a.available === false);
+
+              return (
+                <div
+                  key={i}
+                  className="border-b border-r border-border p-1.5 min-h-[80px] cursor-pointer hover:bg-muted/30 transition-colors"
+                  onClick={() => handleDayClick(day)}
+                >
+                  <span className="text-xs text-muted-foreground">{day}</span>
+                  <div className="space-y-0.5 mt-1">
+                    {dayBookings.map((b) => (
+                      <div key={b.id} className={`${statusColor(b.status)} text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5 truncate`} title={b.guest_name}>
+                        {b.guest_name}
+                      </div>
+                    ))}
+                    {blocked.length > 0 && !dayBookings.length && (
+                      <div className="bg-muted-foreground/40 text-[0.55rem] text-foreground px-1 py-0.5">Blocked</div>
+                    )}
+                    {airbnbBlocked.length > 0 && (
+                      <div className="bg-[hsl(210,70%,55%)] text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5">Airbnb</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Date detail dialog */}
+      <Dialog open={!!selectedDate} onOpenChange={(o) => { if (!o) setSelectedDate(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">{selectedDate}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Property</label>
+              <select
+                className="w-full px-3 py-2 border border-border bg-background text-foreground text-sm"
+                value={selectedPropId || ""}
+                onChange={(e) => {
+                  setSelectedPropId(e.target.value);
+                  const avail = availability.find((a) => a.date === selectedDate && a.property_id === e.target.value);
+                  setPriceOverride(avail?.price_override?.toString() || "");
+                }}
+              >
+                {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm">{isBlocked ? "Blocked" : "Available"}</span>
+              <Button size="sm" variant={isBlocked ? "default" : "outline"} onClick={toggleBlock} disabled={dialogLoading}>
+                {isBlocked ? "Unblock" : "Block"}
+              </Button>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Price override (€)</label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  value={priceOverride}
+                  onChange={(e) => setPriceOverride(e.target.value)}
+                  placeholder="Default"
+                  className="flex-1"
+                />
+                <Button size="sm" onClick={savePriceOverride} disabled={dialogLoading}>Save</Button>
+                <Button size="sm" variant="outline" onClick={() => { setPriceOverride(""); savePriceOverride(); }} disabled={dialogLoading}>Reset</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
+  );
+};
+
+export default AdminCalendarPage;
