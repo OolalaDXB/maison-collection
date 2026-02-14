@@ -131,7 +131,7 @@ export const properties: Property[] = [
     airbnbRating: 5.0,
     airbnbReviewsCount: null,
     status: "active",
-    tags: ["Architecture 2023", "Pool"],
+    tags: ["Architecture 2023", "Pool", "Superhost"],
     architectureCredits: {
       architect: "Anthropie Architecture",
       location: "Vannes",
