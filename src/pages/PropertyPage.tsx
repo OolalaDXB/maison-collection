@@ -130,7 +130,7 @@ const PropertyPage = () => {
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Sofa bed 160×200</li>
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Equipped kitchen</li>
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Wood fireplace</li>
-                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bathroom with bathtub</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bathroom with bathtub & WC</li>
                       </ul>
                     </div>
                     {/* Level 2 */}
@@ -142,7 +142,7 @@ const PropertyPage = () => {
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bedroom 1 — Queen 160×200</li>
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bedroom 2 — Two singles 90×200</li>
-                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />2 private bathrooms</li>
+                        <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />2 private bathrooms with WC</li>
                       </ul>
                     </div>
                   </div>
