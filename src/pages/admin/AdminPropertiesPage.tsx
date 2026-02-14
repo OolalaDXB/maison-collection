@@ -2,7 +2,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download, RotateCcw } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
 import { seedAtlantiqueImages } from "@/utils/seedAtlantiqueImages";
 
@@ -33,6 +33,9 @@ const AdminPropertiesPage = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
+  const [originalImages, setOriginalImages] = useState<PropertyImage[]>([]);
+  const [originalHero, setOriginalHero] = useState<string | null>(null);
+  const [imagesDirty, setImagesDirty] = useState(false);
   const [managingReviews, setManagingReviews] = useState<string | null>(null);
   const [reviewsList, setReviewsList] = useState<ReviewRow[]>([]);
   const [editingReview, setEditingReview] = useState<ReviewRow | null>(null);
@@ -53,7 +56,12 @@ const AdminPropertiesPage = () => {
 
   const fetchImages = async (propertyId: string) => {
     const { data } = await supabase.from("property_images").select("*").eq("property_id", propertyId).order("display_order");
-    setImages((data as any[]) || []);
+    const imgs = (data as any[]) || [];
+    setImages(imgs);
+    setOriginalImages(imgs);
+    const prop = properties.find(p => p.id === propertyId);
+    setOriginalHero(prop?.hero_image || null);
+    setImagesDirty(false);
   };
   const fetchReviews = async (propertyId: string) => {
     const { data } = await supabase.from("reviews").select("*").eq("property_id", propertyId).order("stay_date", { ascending: false });
@@ -107,7 +115,7 @@ const AdminPropertiesPage = () => {
     toast.success("Image deleted");
   };
 
-  const handleReorderImages = async (dragId: string, dropId: string) => {
+  const handleReorderImages = (dragId: string, dropId: string) => {
     if (dragId === dropId) return;
     const oldList = [...images];
     const dragIdx = oldList.findIndex((i) => i.id === dragId);
@@ -117,14 +125,37 @@ const AdminPropertiesPage = () => {
     oldList.splice(dropIdx, 0, moved);
     const reordered = oldList.map((img, idx) => ({ ...img, display_order: idx }));
     setImages(reordered);
-    await Promise.all(reordered.map((img) => supabase.from("property_images").update({ display_order: img.display_order } as any).eq("id", img.id)));
-    toast.success("Order updated");
+    setImagesDirty(true);
   };
 
-  const handleSetHero = async (propertyId: string, imageUrl: string) => {
-    await supabase.from("properties").update({ hero_image: imageUrl } as any).eq("id", propertyId);
-    toast.success("Hero image updated");
-    fetchProperties();
+  const handleSetHero = (propertyId: string, imageUrl: string) => {
+    setProperties(prev => prev.map(p => p.id === propertyId ? { ...p, hero_image: imageUrl } : p));
+    setImagesDirty(true);
+  };
+
+  const handleSaveImages = async () => {
+    if (!managingImages) return;
+    setSaving(true);
+    // Save reordered images
+    await Promise.all(images.map((img) => supabase.from("property_images").update({ display_order: img.display_order } as any).eq("id", img.id)));
+    // Save hero
+    const prop = properties.find(p => p.id === managingImages);
+    if (prop) {
+      await supabase.from("properties").update({ hero_image: prop.hero_image } as any).eq("id", managingImages);
+    }
+    setOriginalImages([...images]);
+    setOriginalHero(prop?.hero_image || null);
+    setImagesDirty(false);
+    setSaving(false);
+    toast.success("Images saved");
+  };
+
+  const handleRollbackImages = () => {
+    if (!managingImages) return;
+    setImages([...originalImages]);
+    setProperties(prev => prev.map(p => p.id === managingImages ? { ...p, hero_image: originalHero } : p));
+    setImagesDirty(false);
+    toast.info("Changes reverted");
   };
 
   const handleSaveReview = async () => {
@@ -316,6 +347,17 @@ const AdminPropertiesPage = () => {
                 </button>
               )}
             </div>
+            {/* Sticky Save / Rollback bar */}
+            {imagesDirty && (
+              <div className="sticky bottom-0 left-0 right-0 bg-background border-t border-border pt-4 pb-2 mt-6 flex gap-3 justify-end">
+                <button onClick={handleRollbackImages} className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-destructive hover:text-destructive transition-colors">
+                  <RotateCcw size={14} /> Rollback
+                </button>
+                <button onClick={handleSaveImages} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2">
+                  <Save size={14} /> {saving ? "Saving…" : "Save Changes"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
