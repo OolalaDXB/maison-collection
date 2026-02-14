@@ -27,8 +27,8 @@ const Header = () => {
     setMenuOpen(false);
   }, [location]);
 
-  // On homepage, header is transparent over hero when not scrolled
-  const transparentMode = isHomepage && !scrolled;
+  // On homepage, header is transparent over hero when not scrolled and menu is closed
+  const transparentMode = isHomepage && !scrolled && !menuOpen;
 
   return (
     <>
