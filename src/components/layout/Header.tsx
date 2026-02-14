@@ -53,7 +53,7 @@ const Header = () => {
           {/* Logo */}
           <Link
             to="/"
-            className={`font-display tracking-wider font-normal text-lg transition-colors duration-300 ${
+            className={`font-display tracking-[0.15em] font-semibold text-xl md:text-2xl transition-colors duration-300 ${
               transparentMode ? "text-white" : "text-[#1a1a1a]"
             }`}
           >
