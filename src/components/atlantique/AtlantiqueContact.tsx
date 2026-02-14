@@ -9,7 +9,7 @@ const AtlantiqueContact = () => {
         Reach out and we'll get back to you within 24 hours.
       </p>
       <a
-        href="mailto:contact@maisons.co?subject=Question about Maison Atlantique"
+        href="mailto:chez@maisons.co?subject=Question about Maison Atlantique"
         className="inline-block bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] px-6 py-3 hover:opacity-90 transition-opacity"
       >
         Contact us
