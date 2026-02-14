@@ -90,7 +90,7 @@ export const properties: Property[] = [
     status: "active",
     tags: ["Ski Season", "Superhost", "Guest Favourite"],
     heroImage: georgia10,
-    galleryImages: [property2, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14, property1, property3, property4],
+    galleryImages: [georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14, property1, property3, property4, property2],
   },
   {
     name: "Maison Atlantique",
