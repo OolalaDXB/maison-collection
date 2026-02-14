@@ -19,7 +19,7 @@ import georgia14 from "@/assets/georgia-14.jpg";
 
 export const propertyImages = {
   georgia: [property1, property2, property3, property4, georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14],
-  atlantique: [property5, property6, property7, property8],
+  atlantique: [],
 };
 
 export interface Property {
@@ -90,7 +90,7 @@ export const properties: Property[] = [
     status: "active",
     tags: ["Ski Season", "Superhost", "Guest Favourite"],
     heroImage: georgia10,
-    galleryImages: [georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14, property1, property3, property4, property2],
+    galleryImages: [georgia5, georgia6, georgia7, georgia8, georgia9, georgia10, georgia11, georgia12, georgia13, georgia14, property1, property3, property4, property2, property5, property6, property7, property8],
   },
   {
     name: "Maison Atlantique",
@@ -141,7 +141,7 @@ export const properties: Property[] = [
       ],
     },
     heroImage: property5,
-    galleryImages: [property5, property6, property7, property8],
+    galleryImages: [],
   },
   {
     name: "Maison Arabia",

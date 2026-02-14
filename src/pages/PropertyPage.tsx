@@ -36,6 +36,7 @@ const PropertyPage = () => {
   const [dbPropertyId, setDbPropertyId] = useState<string | null>(null);
   const [dbLat, setDbLat] = useState<number | null>(null);
   const [dbLng, setDbLng] = useState<number | null>(null);
+  const [dbImages, setDbImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!property) return;
@@ -51,12 +52,14 @@ const PropertyPage = () => {
         setDbLat(props[0].latitude);
         setDbLng(props[0].longitude);
 
-        const [reviewsRes, poisRes] = await Promise.all([
+        const [reviewsRes, poisRes, imagesRes] = await Promise.all([
           supabase.from("reviews").select("*").eq("property_id", propId).order("stay_date", { ascending: false }),
           supabase.from("property_pois").select("*").eq("property_id", propId).order("display_order"),
+          supabase.from("property_images").select("image_url").eq("property_id", propId).order("display_order"),
         ]);
         if (reviewsRes.data && reviewsRes.data.length > 0) setDbReviews(reviewsRes.data as DbReview[]);
         if (poisRes.data) setDbPois(poisRes.data as DbPoi[]);
+        if (imagesRes.data && imagesRes.data.length > 0) setDbImages(imagesRes.data.map((i: any) => i.image_url));
       }
     };
     loadData();
@@ -65,6 +68,9 @@ const PropertyPage = () => {
   if (!property || property.status === "coming_soon") {
     return null;
   }
+
+  // Use DB images if available, otherwise static
+  const galleryImages = dbImages.length > 0 ? dbImages : property.galleryImages;
 
   // Use DB reviews if available, otherwise static
   const displayReviews = dbReviews.length > 0
@@ -125,7 +131,7 @@ const PropertyPage = () => {
       <section className="section-padding">
         <div className="max-container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {property.galleryImages.map((img, i) => (
+            {galleryImages.map((img, i) => (
               <div
                 key={i}
                 className={`overflow-hidden cursor-pointer ${
@@ -158,7 +164,7 @@ const PropertyPage = () => {
             <X size={32} />
           </button>
           <img
-            src={property.galleryImages[lightboxIndex]}
+            src={galleryImages[lightboxIndex]}
             alt=""
             className="max-w-[90vw] max-h-[85vh] object-contain"
             onClick={(e) => e.stopPropagation()}
