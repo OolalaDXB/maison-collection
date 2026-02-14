@@ -52,17 +52,20 @@ const ArabiaPage = () => {
   const [disabledDates, setDisabledDates] = useState<Date[]>([]);
   const [images, setImages] = useState<{ image_url: string; alt_text: string | null }[]>([]);
   const [reviews, setReviews] = useState<any[]>(hardcodedReviews);
+  const [heroImage, setHeroImage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const [availRes, imgRes, revRes] = await Promise.all([
+      const [availRes, imgRes, revRes, propRes] = await Promise.all([
         supabase.from("availability").select("date").eq("property_id", PROPERTY_ID).eq("available", false),
         supabase.from("property_images").select("image_url, alt_text, display_order").eq("property_id", PROPERTY_ID).order("display_order"),
         supabase.from("reviews").select("*").eq("property_id", PROPERTY_ID).order("created_at", { ascending: false }),
+        supabase.from("properties").select("hero_image").eq("id", PROPERTY_ID).single(),
       ]);
       if (availRes.data) setDisabledDates(availRes.data.map(d => new Date(d.date)));
       if (imgRes.data) setImages(imgRes.data);
       if (revRes.data && revRes.data.length > 0) setReviews(revRes.data);
+      if (propRes.data?.hero_image) setHeroImage(propRes.data.hero_image);
     };
     loadData();
   }, []);
@@ -75,7 +78,7 @@ const ArabiaPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <ArabiaHero />
+      <ArabiaHero heroImage={heroImage} imageCount={images.length} />
 
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
