@@ -9,8 +9,8 @@ const GeorgiaSurroundings = () => {
       <p className="font-body font-light text-sm text-muted-foreground mb-6">Gudauri, Greater Caucasus</p>
 
       <PropertyMap
-        center={[44.4731, 42.4614]}
-        zoom={13}
+        center={[44.4735, 42.4575]}
+        zoom={14}
         propertyName="Maison Georgia"
       />
 
@@ -21,10 +21,9 @@ const GeorgiaSurroundings = () => {
           </h4>
           <div className="space-y-2">
             {[
-              "New Gudauri complex — modern infrastructure",
-              "Altitude 2,200m",
-              "200m from gondola lift",
-              "Ski rental 50m away",
+              "Ski resort — New Gudauri",
+              "2,200m altitude",
+              "Greater Caucasus range",
             ].map((s) => (
               <p key={s} className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s}</p>
             ))}
@@ -36,13 +35,12 @@ const GeorgiaSurroundings = () => {
           </h4>
           <div className="space-y-2">
             {[
-              "Restaurants & bars — 2 min walk",
-              "Supermarket — 5 min walk",
+              "Gondola — 200m (4 min walk)",
+              "Ski rental — 50m",
+              "Restaurants — 2 min walk",
+              "Supermarket — 3 min walk",
               "Tbilisi — 2h by car",
-              "Tbilisi Airport — 2h by car",
-              "Cross Pass — 30 min",
-              "Ananuri Fortress — 1h",
-              "Kazbegi — 2h",
+              "Tbilisi Airport — 2h",
             ].map((s) => (
               <p key={s} className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s}</p>
             ))}

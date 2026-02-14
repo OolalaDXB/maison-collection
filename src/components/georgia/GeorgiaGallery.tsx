@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Fallback to local assets if no DB images
 import g5 from "@/assets/georgia-5.jpg";
 import g6 from "@/assets/georgia-6.png";
 import g7 from "@/assets/georgia-7.png";
@@ -34,7 +33,7 @@ const GeorgiaGallery = ({ images }: Props) => {
   return (
     <div id="georgia-gallery" className="border-t border-border pt-10 mb-10">
       <h3 className="font-body uppercase tracking-[0.1em] text-sm text-foreground font-medium mb-6">
-        Overview of the Loft
+        Overview of the Property
       </h3>
 
       {/* Mosaic layout */}

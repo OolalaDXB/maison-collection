@@ -9,24 +9,24 @@ interface Room {
 
 const rooms: Room[] = [
   {
-    name: "Master Bedroom",
-    description: "Queen bed (160×200), private en-suite bathroom, direct mountain views. Room-darkening blinds.",
-    tags: ["Upper floor", "Mountain view", "En-suite"],
-  },
-  {
-    name: "Second Bedroom",
-    description: "Two single beds (90×200), private en-suite bathroom, mountain views.",
-    tags: ["Upper floor", "Mountain view", "En-suite"],
-  },
-  {
     name: "Open Living Space",
-    description: "Double-height ceiling with panoramic bay windows, sofa bed (160×200), fully equipped kitchen, wood-burning fireplace, Hi-Fi system, Smart TV.",
-    tags: ["Ground floor", "Fireplace", "Hi-Fi", "Bay windows"],
+    description: "Double-height ceiling, open studio with sofa bed (160×200), fully equipped kitchen, wood-burning fireplace, bathroom with bathtub & WC. Panoramic bay windows.",
+    tags: ["Ground floor", "Fireplace", "Mountain view", "Bathtub"],
   },
   {
-    name: "Bathroom with Tub",
-    description: "Ground floor bathroom with full bathtub, perfect for warming up after a day on the slopes.",
-    tags: ["Ground floor", "Bathtub"],
+    name: "Master Bedroom",
+    description: "Queen bed (160×200), private en-suite bathroom with shower & WC. Quiet and separate from living area.",
+    tags: ["Upper floor", "En-suite", "Queen bed"],
+  },
+  {
+    name: "Twin Bedroom",
+    description: "Two single beds (90×200), private en-suite bathroom with shower & WC. Ideal for children or friends.",
+    tags: ["Upper floor", "En-suite", "Twin beds"],
+  },
+  {
+    name: "Balcony & Outdoor",
+    description: "Private balcony with Caucasus panorama. Ski lockers in basement. SPA (sauna, hammam, pool) accessible for a fee in the building.",
+    tags: ["Mountain view", "SPA access", "Ski lockers"],
   },
 ];
 
