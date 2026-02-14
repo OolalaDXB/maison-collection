@@ -16,6 +16,7 @@ import AtlantiqueSurroundings from "@/components/atlantique/AtlantiqueSurroundin
 import AtlantiqueArchitecture from "@/components/atlantique/AtlantiqueArchitecture";
 import AtlantiqueReviews from "@/components/atlantique/AtlantiqueReviews";
 import AtlantiqueCrossSell from "@/components/atlantique/AtlantiqueCrossSell";
+import AtlantiqueCommunity from "@/components/atlantique/AtlantiqueCommunity";
 import AtlantiqueMobileBookingBar from "@/components/atlantique/AtlantiqueMobileBookingBar";
 
 const PROPERTY_ID = "e514d218-0cdc-43cd-a97b-061132976bfb";
@@ -116,6 +117,8 @@ const AtlantiquePage = () => {
           </div>
         </div>
       </div>
+
+      <AtlantiqueCommunity />
 
       <FadeIn>
         <AtlantiqueCrossSell />

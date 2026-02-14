@@ -14,6 +14,7 @@ import GeorgiaContact from "@/components/georgia/GeorgiaContact";
 import GeorgiaInfo from "@/components/georgia/GeorgiaInfo";
 import GeorgiaSurroundings from "@/components/georgia/GeorgiaSurroundings";
 import GeorgiaCrossSell from "@/components/georgia/GeorgiaCrossSell";
+import GeorgiaCommunity from "@/components/georgia/GeorgiaCommunity";
 import GeorgiaMobileBookingBar from "@/components/georgia/GeorgiaMobileBookingBar";
 // Reuse the generic reviews component
 import AtlantiqueReviews from "@/components/atlantique/AtlantiqueReviews";
@@ -112,6 +113,8 @@ const GeorgiaPage = () => {
           </div>
         </div>
       </div>
+
+      <GeorgiaCommunity />
 
       <FadeIn>
         <GeorgiaCrossSell />

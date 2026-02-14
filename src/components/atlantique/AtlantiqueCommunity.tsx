@@ -1,51 +1,51 @@
-import { Leaf, Baby, TreePine } from "lucide-react";
+import { Waves, TreePine, Landmark } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
 const cards = [
   {
-    icon: Leaf,
-    title: "Net-Zero Energy",
-    text: "Solar panels generate as much energy as the community consumes. Average water use: 162L/capita vs Dubai's 278L.",
-  },
-  {
-    icon: Baby,
-    title: "Family-First Design",
-    text: "Car-free residential streets. 4 playgrounds, equestrian center, farm with animals. Children run free.",
-  },
-  {
     icon: TreePine,
-    title: "Living Green",
-    text: "11 bio-dome greenhouses, urban farms, 10,000 trees. Residents grow their own produce.",
+    title: "Deep Brittany",
+    text: "Quistinic sits in the heart of the Morbihan, surrounded by bocage countryside, ancient forests, and the Blavet river valley. Absolute tranquility, 30 minutes from the coast.",
+  },
+  {
+    icon: Waves,
+    title: "The Morbihan Coast",
+    text: "The Gulf of Morbihan, Quiberon peninsula, Belle-Île, Carnac's megaliths — all within an hour. Some of Brittany's most beautiful beaches are 30 minutes away.",
+  },
+  {
+    icon: Landmark,
+    title: "Heritage & Culture",
+    text: "The medieval village of Poul Fétan (5 min), the historic city of Vannes, Lorient's maritime heritage, and the standing stones of Carnac — 5,000 years of history.",
   },
 ];
 
 const links = [
-  { label: "The Sustainable City", url: "https://thesustainablecity.com/cities/dubai/" },
-  { label: "Instagram", url: "https://www.instagram.com/thesustainablecity" },
-  { label: "SEE Institute", url: "https://www.seeinstitute.ae/" },
+  { label: "Morbihan Tourisme", url: "https://www.morbihan.com/" },
+  { label: "Golfe du Morbihan", url: "https://www.golfedumorbihan.bzh/" },
+  { label: "Poul Fétan", url: "https://www.poulfetan.com/" },
 ];
 
-const ArabiaCommunity = () => {
+const AtlantiqueCommunity = () => {
   return (
     <section className="bg-[#0a1628] py-16 md:py-20 px-[5%]">
       <div className="max-w-[1200px] mx-auto">
         <FadeIn>
           <p className="font-body uppercase tracking-wider text-[0.7rem] text-white/60 mb-3">
-            The Community
+            The Region
           </p>
           <h3 className="font-display font-normal text-3xl text-white mb-2">
-            The Sustainable City
+            Quistinic & the Morbihan
           </h3>
           <p className="font-body font-light text-lg text-white/70 mb-8">
-            The first net-zero energy community in the Middle East.
+            Deep Brittany — where the land meets the Atlantic.
           </p>
 
           <div className="max-w-2xl mb-10">
             <p className="font-body font-light text-white/80 leading-relaxed mb-4">
-              Built by Diamond Developers in 2015, this 113-acre community of 500 homes was designed around one idea: prove that sustainable living doesn't mean sacrifice. Car-free streets, solar-powered homes, urban farms, a 30-metre tree belt, and a community where neighbours actually know each other.
+              Maison Atlantique sits outside the village of Quistinic, in the Morbihan department of Brittany. This is inland Brittany at its purest — rolling countryside, ancient stone walls, oak forests, and a stillness you won't find on the coast. The Blavet river valley runs nearby, offering kayaking, cycling, and long walks through unspoiled nature.
             </p>
             <p className="font-body font-light text-white/80 leading-relaxed">
-              Awarded "Happiest Community" by the Gulf Real Estate Awards and recognised by the SEE Institute as a model for sustainable urban development. Over 60% of the city is dedicated to green spaces. 8,000+ tons of CO₂ avoided annually.
+              But the coast is never far. The Gulf of Morbihan — one of the most beautiful bays in the world — is 30 minutes south. The wild beaches of the Quiberon peninsula, the standing stones of Carnac (the largest megalithic site in Europe), and the islands of Belle-Île and Houat are all within easy reach.
             </p>
           </div>
         </FadeIn>
@@ -82,4 +82,4 @@ const ArabiaCommunity = () => {
   );
 };
 
-export default ArabiaCommunity;
+export default AtlantiqueCommunity;
