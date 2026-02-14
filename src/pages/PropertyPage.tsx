@@ -3,19 +3,69 @@ import { properties, reviews } from "@/data/properties";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Clock, Car, MapPin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface DbReview {
+  id: string;
+  guest_name: string;
+  guest_location: string | null;
+  rating: number;
+  review_text: string;
+  stay_date: string | null;
+}
 
 const PropertyPage = () => {
   const location = useLocation();
   const slug = location.pathname.replace("/", "");
   const property = properties.find((p) => p.slug === slug);
-  const propertyReviews = reviews.filter((r) => r.propertySlug === slug);
+  const staticReviews = reviews.filter((r) => r.propertySlug === slug);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [dbReviews, setDbReviews] = useState<DbReview[]>([]);
+
+  // Try to load reviews from DB, fallback to static
+  useEffect(() => {
+    if (!property) return;
+    const loadReviews = async () => {
+      // Get property ID from DB by slug
+      const { data: props } = await supabase
+        .from("properties")
+        .select("id")
+        .eq("slug", slug)
+        .limit(1);
+      if (props && props.length > 0) {
+        const { data } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("property_id", props[0].id)
+          .order("stay_date", { ascending: false });
+        if (data && data.length > 0) {
+          setDbReviews(data as DbReview[]);
+        }
+      }
+    };
+    loadReviews();
+  }, [slug, property]);
 
   if (!property || property.status === "coming_soon") {
     return null;
   }
+
+  // Use DB reviews if available, otherwise static
+  const displayReviews = dbReviews.length > 0
+    ? dbReviews.map((r) => ({
+        guestName: r.guest_name,
+        guestLocation: r.guest_location,
+        text: r.review_text,
+        rating: r.rating,
+      }))
+    : staticReviews.map((r) => ({
+        guestName: r.guestName,
+        guestLocation: r.guestLocation,
+        text: r.text,
+        rating: r.rating,
+      }));
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,7 +169,6 @@ const PropertyPage = () => {
                 <div className="border-t border-border pt-8 mt-8">
                   <p className="section-label mb-6">Layout</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Level 1 */}
                     <div className="border border-border p-6">
                       <div className="flex items-center gap-3 mb-4">
                         <span className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground text-sm font-display rounded-full">1</span>
@@ -133,7 +182,6 @@ const PropertyPage = () => {
                         <li className="flex items-center gap-2"><span className="w-1 h-1 bg-primary rounded-full" />Bathroom with bathtub & WC</li>
                       </ul>
                     </div>
-                    {/* Level 2 */}
                     <div className="border border-border p-6">
                       <div className="flex items-center gap-3 mb-4">
                         <span className="w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground text-sm font-display rounded-full">2</span>
@@ -149,6 +197,39 @@ const PropertyPage = () => {
                 </div>
               </FadeIn>
             )}
+
+            {/* Practical Info */}
+            <FadeIn delay={0.08}>
+              <div className="border-t border-border pt-8 mt-8">
+                <p className="section-label mb-6">Practical Information</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex items-start gap-3">
+                    <Clock size={20} className="text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Check-in</p>
+                      <p className="text-sm text-muted-foreground">From 3:00 PM</p>
+                      <p className="text-xs text-muted-foreground mt-1">Free early check-in if available</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Clock size={20} className="text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Check-out</p>
+                      <p className="text-sm text-muted-foreground">Before 11:00 AM</p>
+                      <p className="text-xs text-muted-foreground mt-1">Late checkout possible on request</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Car size={20} className="text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Parking</p>
+                      <p className="text-sm text-muted-foreground">Free parking in front of building</p>
+                      <p className="text-xs text-muted-foreground mt-1">Non-reserved</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
 
             {/* Architecture credits */}
             {property.architectureCredits && (
@@ -230,31 +311,51 @@ const PropertyPage = () => {
         </div>
       </section>
 
+      {/* Map placeholder */}
+      <section className="section-padding pt-0">
+        <div className="max-container">
+          <FadeIn>
+            <div className="border border-border p-12 flex flex-col items-center justify-center text-center bg-muted/30">
+              <MapPin size={32} className="text-primary mb-4" />
+              <p className="font-display text-xl text-foreground mb-2">Location</p>
+              <p className="text-sm text-muted-foreground">{property.location}, {property.country}</p>
+              <p className="text-xs text-muted-foreground mt-2">Interactive map coming soon</p>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* Reviews */}
-      {propertyReviews.length > 0 && (
+      {displayReviews.length > 0 && (
         <section className="warm-section section-padding">
           <div className="max-container">
             <FadeIn>
               <p className="section-label">Guest Reviews</p>
-              <h2 className="font-display text-3xl mb-12">What our guests say</h2>
+              <h2 className="font-display text-3xl mb-12">
+                What our guests say
+                <span className="text-lg text-muted-foreground font-body ml-3">
+                  ({displayReviews.length} reviews)
+                </span>
+              </h2>
             </FadeIn>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {propertyReviews.map((review, i) => (
-                <FadeIn key={i} delay={i * 0.1}>
-                  <div className="p-8 bg-background border border-border">
-                    <p className="text-muted-foreground leading-relaxed mb-6 font-light italic">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayReviews.map((review, i) => (
+                <FadeIn key={i} delay={i * 0.05}>
+                  <div className="p-6 bg-background border border-border flex flex-col h-full">
+                    <p className="text-muted-foreground leading-relaxed font-light italic flex-1 mb-6 line-clamp-5">
                       "{review.text}"
                     </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-foreground">
-                        {review.guestName}
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          {review.guestName}
+                        </p>
                         {review.guestLocation && (
-                          <span className="text-muted-foreground font-normal">
-                            {" "}
-                            — {review.guestLocation}
-                          </span>
+                          <p className="text-xs text-muted-foreground">
+                            {review.guestLocation}
+                          </p>
                         )}
-                      </p>
+                      </div>
                       <span className="text-sm text-primary">★★★★★</span>
                     </div>
                   </div>

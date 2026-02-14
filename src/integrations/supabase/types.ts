@@ -28,6 +28,8 @@ export type Database = {
           bathrooms: number | null
           bedrooms: number | null
           capacity: number | null
+          check_in_time: string | null
+          check_out_time: string | null
           country: string
           created_at: string
           currency: string
@@ -35,9 +37,12 @@ export type Database = {
           display_order: number
           hero_image: string | null
           id: string
+          latitude: number | null
           location: string
           long_description: string | null
+          longitude: number | null
           name: string
+          parking_info: string | null
           price_per_night: number | null
           region: string
           slug: string
@@ -58,6 +63,8 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           capacity?: number | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           country?: string
           created_at?: string
           currency?: string
@@ -65,9 +72,12 @@ export type Database = {
           display_order?: number
           hero_image?: string | null
           id?: string
+          latitude?: number | null
           location?: string
           long_description?: string | null
+          longitude?: number | null
           name: string
+          parking_info?: string | null
           price_per_night?: number | null
           region?: string
           slug: string
@@ -88,6 +98,8 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           capacity?: number | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           country?: string
           created_at?: string
           currency?: string
@@ -95,9 +107,12 @@ export type Database = {
           display_order?: number
           hero_image?: string | null
           id?: string
+          latitude?: number | null
           location?: string
           long_description?: string | null
+          longitude?: number | null
           name?: string
+          parking_info?: string | null
           price_per_night?: number | null
           region?: string
           slug?: string
@@ -135,6 +150,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_images_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          guest_location: string | null
+          guest_name: string
+          id: string
+          property_id: string
+          rating: number
+          review_text: string
+          stay_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          guest_location?: string | null
+          guest_name: string
+          id?: string
+          property_id: string
+          rating?: number
+          review_text: string
+          stay_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          guest_location?: string | null
+          guest_name?: string
+          id?: string
+          property_id?: string
+          rating?: number
+          review_text?: string
+          stay_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
