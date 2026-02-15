@@ -22,44 +22,88 @@ interface ContentEntry {
 }
 
 const CONTENT_SCHEMA: Omit<ContentEntry, "content_en" | "content_fr" | "content_ru" | "id">[] = [
-  // Homepage
+  // Homepage — Hero
   { page: "home", section: "hero_title", default_value: "Houses with a point of view", label: "Hero Title", type: "text" },
   { page: "home", section: "hero_subtitle", default_value: "A collection of distinctive homes across Europe and beyond.", label: "Hero Subtitle", type: "textarea" },
-  { page: "home", section: "philosophy_title", default_value: "Not rentals. Residences.", label: "Philosophy Title", type: "text" },
-  { page: "home", section: "philosophy_text", default_value: "Every Maison is a place we'd live in ourselves.", label: "Philosophy Text", type: "textarea" },
-  { page: "home", section: "services_label", default_value: "Services", label: "Services Section Label", type: "text" },
-  { page: "home", section: "s1_title", default_value: "Selection & Positioning", label: "Service 1 Title", type: "text" },
-  { page: "home", section: "s1_desc", default_value: "", label: "Service 1 Description", type: "textarea" },
-  { page: "home", section: "s2_title", default_value: "Management", label: "Service 2 Title", type: "text" },
-  { page: "home", section: "s2_desc", default_value: "", label: "Service 2 Description", type: "textarea" },
-  { page: "home", section: "s3_title", default_value: "Revenue", label: "Service 3 Title", type: "text" },
-  { page: "home", section: "s3_desc", default_value: "", label: "Service 3 Description", type: "textarea" },
+  // Homepage — Collection
   { page: "home", section: "collection_label", default_value: "The Collection", label: "Collection Section Label", type: "text" },
-  { page: "home", section: "collection_title", default_value: "Our Properties", label: "Collection Title", type: "text" },
-  { page: "home", section: "cta_discover", default_value: "Discover the Collection", label: "CTA Discover", type: "text" },
-  { page: "home", section: "cta_entrust", default_value: "Entrust your property", label: "CTA Entrust", type: "text" },
+  { page: "home", section: "collection_title", default_value: "Each maison is selected for its character, its relationship to place.", label: "Collection Title", type: "text" },
+  // Homepage — Social Proof
+  { page: "home", section: "social_proof", default_value: "across all properties · Superhost · Guest Favourite · 30+ five-star reviews", label: "Social Proof Text", type: "text" },
+  // Homepage — Philosophy
+  { page: "home", section: "philosophy_label", default_value: "Philosophy", label: "Philosophy Label", type: "text" },
+  { page: "home", section: "philosophy_title", default_value: "Not rentals. Residences.", label: "Philosophy Title", type: "text" },
+  { page: "home", section: "philosophy_text", default_value: "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.", label: "Philosophy Text", type: "textarea" },
+  { page: "home", section: "philosophy_quote", default_value: "Where houses become places.", label: "Philosophy Quote", type: "text" },
+  // Homepage — Services
+  { page: "home", section: "services_label", default_value: "Services", label: "Services Section Label", type: "text" },
+  { page: "home", section: "services_title", default_value: "Beyond hospitality", label: "Services Title", type: "text" },
+  { page: "home", section: "services_desc", default_value: "We also partner with select property owners to bring their vision to life.", label: "Services Description", type: "textarea" },
+  { page: "home", section: "s1_title", default_value: "Selection & Positioning", label: "Service 1 Title", type: "text" },
+  { page: "home", section: "s1_desc", default_value: "We identify properties with character and potential, transforming them into memorable destinations with narrative positioning and editorial storytelling.", label: "Service 1 Description", type: "textarea" },
+  { page: "home", section: "s2_title", default_value: "Management", label: "Service 2 Title", type: "text" },
+  { page: "home", section: "s2_desc", default_value: "Complete operational management: welcome, maintenance, guest screening, multilingual support in French, English, and Russian. Same-day response.", label: "Service 2 Description", type: "textarea" },
+  { page: "home", section: "s3_title", default_value: "Revenue", label: "Service 3 Title", type: "text" },
+  { page: "home", section: "s3_desc", default_value: "Intelligent pricing strategy, occupancy optimization focused on quality over volume. We position your property above the ordinary.", label: "Service 3 Description", type: "textarea" },
+  { page: "home", section: "services_link", default_value: "Learn about our management services →", label: "Services Link Text", type: "text" },
+  // Homepage — About Preview
+  { page: "home", section: "about_desc", default_value: "Expatriate proprietors who returned to their roots to restore properties in places they know intimately. Not an agency. Not endless scaling. Just houses cared for properly.", label: "About Preview Text", type: "textarea" },
+  { page: "home", section: "about_link", default_value: "Read our story →", label: "About Link Text", type: "text" },
+  // Homepage — CTA
+  { page: "home", section: "cta_discover", default_value: "Discover the Collection", label: "Hero CTA Discover", type: "text" },
+  { page: "home", section: "cta_entrust", default_value: "Entrust your property", label: "Hero CTA Entrust", type: "text" },
+  { page: "home", section: "travelers_label", default_value: "For Travelers", label: "Travelers Label", type: "text" },
+  { page: "home", section: "travelers_title", default_value: "Stay in homes with a point of view.", label: "Travelers Title", type: "text" },
+  { page: "home", section: "travelers_desc", default_value: "Few properties, high standards, real people behind every stay.", label: "Travelers Description", type: "textarea" },
+  { page: "home", section: "travelers_cta", default_value: "Browse the collection", label: "Travelers CTA", type: "text" },
+  { page: "home", section: "owners_label", default_value: "For Owners", label: "Owners Label", type: "text" },
+  { page: "home", section: "owners_title", default_value: "We don't manage every property.", label: "Owners Title", type: "text" },
+  { page: "home", section: "owners_desc", default_value: "Just the ones worth it. And if yours isn't ready yet — we'll get it there.", label: "Owners Description", type: "textarea" },
+  { page: "home", section: "owners_cta", default_value: "Talk to us", label: "Owners CTA", type: "text" },
+
   // About
   { page: "about", section: "title", default_value: "Darya & Mickaël", label: "Page Title", type: "text" },
   { page: "about", section: "subtitle", default_value: "About", label: "Page Subtitle", type: "text" },
-  { page: "about", section: "darya_bio", default_value: "", label: "Darya Bio", type: "textarea" },
-  { page: "about", section: "philosophy_text", default_value: "", label: "Philosophy Text", type: "textarea" },
+  { page: "about", section: "darya_p1", default_value: "Darya is Franco-Russian, with deep local knowledge of both Brittany and the Caucasus. She brings trilingual fluency in French, English, and Russian — and with it, natural access to three distinct markets.", label: "Darya Bio Paragraph 1", type: "textarea" },
+  { page: "about", section: "darya_p2", default_value: "She handles the daily operations: welcome, maintenance, listening. Same-day response, always before 10am. Guests don't interact with a platform. They interact with a person.", label: "Darya Bio Paragraph 2", type: "textarea" },
+  { page: "about", section: "philosophy_title", default_value: "Philosophy", label: "Philosophy Title", type: "text" },
+  { page: "about", section: "philosophy_p1", default_value: "Not an agency. Not endless scaling. Just houses cared for properly.", label: "Philosophy Paragraph 1", type: "textarea" },
+  { page: "about", section: "philosophy_p2", default_value: "We are expatriate proprietors who returned to our roots to restore properties in places we know intimately. Every maison in our collection reflects a place we've lived, a landscape we've walked, a community we belong to.", label: "Philosophy Paragraph 2", type: "textarea" },
+  { page: "about", section: "locations_label", default_value: "Where we are", label: "Locations Label", type: "text" },
   { page: "about", section: "signature", default_value: "— Darya & Mickaël", label: "Signature", type: "text" },
+
   // Management
-  { page: "management", section: "title", default_value: "Property Management", label: "Page Title", type: "text" },
-  { page: "management", section: "subtitle", default_value: "", label: "Page Subtitle", type: "textarea" },
-  { page: "management", section: "intro_title", default_value: "", label: "Intro Title", type: "text" },
-  { page: "management", section: "intro_text", default_value: "", label: "Intro Text", type: "textarea" },
+  { page: "management", section: "hero_title", default_value: "We started with our own homes.", label: "Hero Title", type: "text" },
+  { page: "management", section: "hero_p1", default_value: "A mountain duplex in the Caucasus. A stone house reimagined by architects in Brittany. A family townhouse in Dubai's only net-zero community.", label: "Hero Paragraph 1", type: "textarea" },
+  { page: "management", section: "hero_p2", default_value: "We didn't start as managers — we started as owners. We learned what it takes to earn five stars every time: the right photos, the right words, the right pricing, the right welcome. Now we bring that to a handful of other properties. Not an agency. Not a platform. Just us, doing for your home what we do for ours.", label: "Hero Paragraph 2", type: "textarea" },
+  { page: "management", section: "whatwedo_title", default_value: "What we do.", label: "What We Do Title", type: "text" },
+  { page: "management", section: "step_1", default_value: "We visit your property. We assess it honestly. Not every home makes it into the collection. We look for character, location, and something worth building on. If it's not ready, we'll tell you what it needs.", label: "Step 1", type: "textarea" },
+  { page: "management", section: "step_2", default_value: "We get it to the level. Styling, photography direction, the listing narrative, amenity upgrades if needed. We work with architects, designers, and photographers we trust. We don't just put your property online — we make it the version of itself that guests remember.", label: "Step 2", type: "textarea" },
+  { page: "management", section: "step_3", default_value: "We handle everything. Pricing that adapts to demand, guest vetting, multilingual communication in French, English and Russian, check-in coordination, cleaning, maintenance, quality checks. You get a monthly report and peace of mind. Same-day response before 10am.", label: "Step 3", type: "textarea" },
+  { page: "management", section: "proof_title", default_value: "Our own track record.", label: "Track Record Title", type: "text" },
+  { page: "management", section: "notready_title", default_value: "Your property isn't there yet?", label: "Not Ready Title", type: "text" },
+  { page: "management", section: "notready_subtitle", default_value: "That's why we're here.", label: "Not Ready Subtitle", type: "text" },
+  { page: "management", section: "notready_p1", default_value: "Not every home is ready on day one. Some need styling. Some need better photography. Some need a complete rethink of how guests experience the space.", label: "Not Ready Paragraph 1", type: "textarea" },
+  { page: "management", section: "notready_p2", default_value: "We work with architects, interior designers, and photographers to bring properties up to the standard. From a weekend of staging to a full renovation — we scope it, manage it, and deliver it.", label: "Not Ready Paragraph 2", type: "textarea" },
+  { page: "management", section: "contact_title", default_value: "Let's talk about your property.", label: "Contact Title", type: "text" },
+  { page: "management", section: "contact_desc", default_value: "Tell us where it is and what you're thinking. We'll get back to you within 24 hours.", label: "Contact Description", type: "textarea" },
+  { page: "management", section: "contact_thanks", default_value: "Thank you — we'll be in touch within 24 hours.", label: "Contact Thank You", type: "text" },
+  { page: "management", section: "faq_title", default_value: "Questions.", label: "FAQ Title", type: "text" },
+
   // Contact
   { page: "contact", section: "title", default_value: "Get in Touch", label: "Page Title", type: "text" },
   { page: "contact", section: "intro_text", default_value: "", label: "Intro Text", type: "textarea" },
+
   // Georgia
   { page: "georgia", section: "hero_subtitle", default_value: "Gudauri, Greater Caucasus — 2,200m", label: "Hero Subtitle", type: "text" },
   { page: "georgia", section: "intro_title", default_value: "A Mountain Home", label: "Intro Title", type: "text" },
   { page: "georgia", section: "intro_text", default_value: "", label: "Intro Text", type: "textarea" },
+
   // Atlantique
   { page: "atlantique", section: "hero_subtitle", default_value: "Quistinic, Brittany", label: "Hero Subtitle", type: "text" },
   { page: "atlantique", section: "intro_title", default_value: "", label: "Intro Title", type: "text" },
   { page: "atlantique", section: "intro_text", default_value: "", label: "Intro Text", type: "textarea" },
+
   // Arabia
   { page: "arabia", section: "hero_subtitle", default_value: "The Sustainable City, Dubai", label: "Hero Subtitle", type: "text" },
   { page: "arabia", section: "intro_title", default_value: "", label: "Intro Title", type: "text" },
@@ -196,7 +240,7 @@ const AdminContentPage = () => {
       </div>
 
       <Tabs defaultValue="home">
-        <TabsList>
+        <TabsList className="flex-wrap">
           {PAGES.map((p) => (
             <TabsTrigger key={p.key} value={p.key}>
               {p.label}

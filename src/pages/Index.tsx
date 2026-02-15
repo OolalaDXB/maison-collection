@@ -34,21 +34,38 @@ const Index = () => {
     heroImage: p.heroImage || heroOverrides[p.slug] || "",
   }));
 
+  // All editorial content from DB
   const heroTitle = useSiteContent("home", "hero_title", "Houses with a point of view");
   const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe, the Caucasus, and the Gulf.");
+  const collectionLabel = useSiteContent("home", "collection_label", "The Collection");
+  const collectionTitle = useSiteContent("home", "collection_title", "Each maison is selected for its character, its relationship to place.");
+  const socialProof = useSiteContent("home", "social_proof", "across all properties · Superhost · Guest Favourite · 30+ five-star reviews");
+  const philosophyLabel = useSiteContent("home", "philosophy_label", "Philosophy");
   const philosophyTitle = useSiteContent("home", "philosophy_title", "Not rentals. Residences.");
   const philosophyText = useSiteContent("home", "philosophy_text", "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.");
+  const philosophyQuote = useSiteContent("home", "philosophy_quote", "Where houses become places.");
   const servicesLabel = useSiteContent("home", "services_label", "Services");
+  const servicesTitle = useSiteContent("home", "services_title", "Beyond hospitality");
+  const servicesDesc = useSiteContent("home", "services_desc", "We also partner with select property owners to bring their vision to life.");
   const s1Title = useSiteContent("home", "s1_title", "Selection & Positioning");
   const s1Desc = useSiteContent("home", "s1_desc", "We identify properties with character and potential, transforming them into memorable destinations with narrative positioning and editorial storytelling.");
   const s2Title = useSiteContent("home", "s2_title", "Management");
   const s2Desc = useSiteContent("home", "s2_desc", "Complete operational management: welcome, maintenance, guest screening, multilingual support in French, English, and Russian. Same-day response.");
   const s3Title = useSiteContent("home", "s3_title", "Revenue");
   const s3Desc = useSiteContent("home", "s3_desc", "Intelligent pricing strategy, occupancy optimization focused on quality over volume. We position your property above the ordinary.");
-  const collectionLabel = useSiteContent("home", "collection_label", "The Collection");
-  const collectionTitle = useSiteContent("home", "collection_title", "Each maison is selected for its character, its relationship to place.");
+  const servicesLink = useSiteContent("home", "services_link", "Learn about our management services →");
+  const aboutDesc = useSiteContent("home", "about_desc", "Expatriate proprietors who returned to their roots to restore properties in places they know intimately. Not an agency. Not endless scaling. Just houses cared for properly.");
+  const aboutLink = useSiteContent("home", "about_link", "Read our story →");
   const ctaDiscover = useSiteContent("home", "cta_discover", "Discover the Collection");
   const ctaEntrust = useSiteContent("home", "cta_entrust", "Entrust your property");
+  const travelersLabel = useSiteContent("home", "travelers_label", "For Travelers");
+  const travelersTitle = useSiteContent("home", "travelers_title", "Stay in homes with a point of view.");
+  const travelersDesc = useSiteContent("home", "travelers_desc", "Few properties, high standards, real people behind every stay.");
+  const travelersCta = useSiteContent("home", "travelers_cta", "Browse the collection");
+  const ownersLabel = useSiteContent("home", "owners_label", "For Owners");
+  const ownersTitle = useSiteContent("home", "owners_title", "We don't manage every property.");
+  const ownersDesc = useSiteContent("home", "owners_desc", "Just the ones worth it. And if yours isn't ready yet — we'll get it there.");
+  const ownersCta = useSiteContent("home", "owners_cta", "Talk to us");
 
   const services = [
     { num: "01", title: s1Title, description: s1Desc },
@@ -127,7 +144,7 @@ const Index = () => {
               <Star size={28} className="text-primary fill-primary" />
               <span className="font-display text-4xl md:text-5xl text-foreground">5.0</span>
               <span className="font-body text-lg md:text-xl text-[hsl(0,0%,33%)]">
-                across all properties · Superhost · Guest Favourite · 30+ five-star reviews
+                {socialProof}
               </span>
             </div>
           </FadeIn>
@@ -139,7 +156,7 @@ const Index = () => {
         <div className="max-container">
           <div className="border-t-2 border-[hsl(0,0%,88%)] mb-8 md:mb-10" />
           <FadeIn>
-            <p className="section-label">Philosophy</p>
+            <p className="section-label">{philosophyLabel}</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
               {philosophyTitle}
             </h2>
@@ -151,7 +168,7 @@ const Index = () => {
           </FadeIn>
           <FadeIn delay={0.25}>
             <blockquote className="font-display italic text-2xl text-primary max-w-lg">
-              "Where houses become places."
+              "{philosophyQuote}"
             </blockquote>
           </FadeIn>
         </div>
@@ -164,10 +181,10 @@ const Index = () => {
           <FadeIn>
             <p className="section-label">{servicesLabel}</p>
             <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4 max-w-2xl">
-              Beyond hospitality
+              {servicesTitle}
             </h2>
             <p className="font-light text-muted-foreground leading-[1.75] max-w-xl mb-8">
-              We also partner with select property owners to bring their vision to life.
+              {servicesDesc}
             </p>
           </FadeIn>
 
@@ -192,7 +209,7 @@ const Index = () => {
               to="/management"
               className="inline-block text-sm text-primary hover:underline underline-offset-4 transition-all"
             >
-              Learn about our management services →
+              {servicesLink}
             </Link>
           </FadeIn>
         </div>
@@ -210,9 +227,7 @@ const Index = () => {
           </FadeIn>
           <FadeIn delay={0.15}>
             <p className="font-light text-muted-foreground leading-[1.75] max-w-2xl mb-6">
-              Expatriate proprietors who returned to their roots to restore
-              properties in places they know intimately. Not an agency. Not
-              endless scaling. Just houses cared for properly.
+              {aboutDesc}
             </p>
           </FadeIn>
           <FadeIn delay={0.2}>
@@ -220,7 +235,7 @@ const Index = () => {
               to="/about"
               className="inline-block text-sm text-primary hover:underline underline-offset-4 transition-all"
             >
-              Read our story →
+              {aboutLink}
             </Link>
           </FadeIn>
         </div>
@@ -233,35 +248,35 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2">
             <FadeIn>
               <div className="py-4 pr-4 md:pr-16">
-                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">For Travelers</p>
+                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">{travelersLabel}</p>
                 <h3 className="font-display text-2xl md:text-3xl text-foreground mb-3">
-                  Stay in homes with a point of view.
+                  {travelersTitle}
                 </h3>
                 <p className="font-body font-light text-muted-foreground leading-relaxed mb-6">
-                  Few properties, high standards, real people behind every stay.
+                  {travelersDesc}
                 </p>
                 <a
                   href="#collection"
                   className="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity"
                 >
-                  Browse the collection
+                  {travelersCta}
                 </a>
               </div>
             </FadeIn>
             <FadeIn delay={0.15}>
               <div className="py-4 pl-4 md:pl-16 border-t md:border-t-0 md:border-l border-border mt-8 md:mt-0 pt-8 md:pt-4">
-                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">For Owners</p>
+                <p className="font-body uppercase tracking-[0.15em] text-[0.7rem] text-muted-foreground mb-3">{ownersLabel}</p>
                 <h3 className="font-display text-2xl md:text-3xl text-foreground mb-3">
-                  We don't manage every property.
+                  {ownersTitle}
                 </h3>
                 <p className="font-body font-light text-muted-foreground leading-relaxed mb-6">
-                  Just the ones worth it. And if yours isn't ready yet — we'll get it there.
+                  {ownersDesc}
                 </p>
                 <Link
                   to="/management"
                   className="inline-block px-8 py-3 border border-primary text-primary text-sm uppercase tracking-[0.1em] hover:bg-primary hover:text-primary-foreground transition-all"
                 >
-                  Talk to us
+                  {ownersCta}
                 </Link>
               </div>
             </FadeIn>
