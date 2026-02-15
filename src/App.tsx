@@ -27,6 +27,7 @@ import AdminContentPage from "./pages/admin/AdminContentPage";
 import AdminInquiriesPage from "./pages/admin/AdminInquiriesPage";
 import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import AdminImportPage from "./pages/admin/AdminImportPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
 import BookingPage from "./pages/BookingPage";
 import NotFound from "./pages/NotFound";
@@ -78,6 +79,7 @@ const AppContent = () => {
           <Route path="/admin/inquiries" element={<AdminInquiriesPage />} />
           <Route path="/admin/payments" element={<AdminPaymentsPage />} />
           <Route path="/admin/settings" element={<AdminSettingsPage />} />
+          <Route path="/admin/import" element={<AdminImportPage />} />
           <Route path="/admin/profile" element={<AdminProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

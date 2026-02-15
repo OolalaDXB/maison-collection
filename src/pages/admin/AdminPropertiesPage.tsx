@@ -19,6 +19,7 @@ interface PropertyRow {
   latitude: number | null; longitude: number | null;
   cleaning_fee: number | null; tourist_tax_per_person: number | null; weekend_price: number | null;
   min_nights: number | null; airbnb_ical_url: string | null; seo_title: string | null; seo_description: string | null;
+  ical_export_token: string | null;
 }
 
 interface PropertyImage { id: string; property_id: string; image_url: string; display_order: number; alt_text: string | null; }
@@ -303,6 +304,7 @@ const AdminPropertiesPage = () => {
     parking_info: "Free parking in front of building (non-reserved)",
     latitude: null, longitude: null, cleaning_fee: null, tourist_tax_per_person: null,
     weekend_price: null, min_nights: null, airbnb_ical_url: null, seo_title: null, seo_description: null,
+    ical_export_token: null,
   });
 
   const newReview = (propertyId: string): ReviewRow => ({ id: crypto.randomUUID(), property_id: propertyId, guest_name: "", guest_location: null, rating: 5, review_text: "", stay_date: null });
@@ -681,6 +683,30 @@ const AdminPropertiesPage = () => {
             <div className="mt-4 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground mb-3">Integrations</p>
               <Field label="Airbnb iCal URL" value={editing.airbnb_ical_url || ""} onChange={(v) => setEditing({ ...editing, airbnb_ical_url: v || null })} />
+              <p className="text-xs text-muted-foreground mt-1 mb-3">
+                Find this in Airbnb → Calendar → Pricing & availability → Export calendar.
+              </p>
+              {editing.slug && (
+                <div className="mt-3 p-3 bg-muted/50 border border-border">
+                  <p className="text-xs font-medium text-foreground mb-1">iCal Export URL (paste into Airbnb → Import calendar):</p>
+                  <div className="flex gap-2 items-center">
+                    <code className="text-[0.65rem] text-muted-foreground break-all flex-1">
+                      {`https://gugduludshezdsplkkxu.supabase.co/functions/v1/ical-export?property=${editing.slug}&token=${(editing as any).ical_export_token || "..."}`}
+                    </code>
+                    <button
+                      className="text-xs text-primary hover:underline shrink-0"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `https://gugduludshezdsplkkxu.supabase.co/functions/v1/ical-export?property=${editing.slug}&token=${(editing as any).ical_export_token || ""}`
+                        );
+                        toast.success("Copied to clipboard");
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground mb-3">SEO</p>

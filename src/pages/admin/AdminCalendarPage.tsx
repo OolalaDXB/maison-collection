@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface PropertyOption {
   id: string;
@@ -44,6 +45,7 @@ const AdminCalendarPage = () => {
   const [selectedPropId, setSelectedPropId] = useState<string | null>(null);
   const [priceOverride, setPriceOverride] = useState("");
   const [dialogLoading, setDialogLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     supabase.from("properties").select("id, name, slug").order("display_order").then(({ data }) => {
@@ -60,7 +62,7 @@ const AdminCalendarPage = () => {
   const firstDow = (new Date(year, mo, 1).getDay() + 6) % 7; // Mon=0
   const monthStr = `${year}-${String(mo + 1).padStart(2, "0")}`;
 
-  useEffect(() => {
+  const fetchCalendarData = () => {
     const start = `${monthStr}-01`;
     const end = `${monthStr}-${daysInMonth}`;
     Promise.all([
@@ -70,7 +72,38 @@ const AdminCalendarPage = () => {
       setAvailability(avRes.data || []);
       setBookings(bkRes.data || []);
     });
-  }, [monthStr, daysInMonth]);
+  };
+
+  useEffect(() => { fetchCalendarData(); }, [monthStr, daysInMonth]);
+
+  const { data: lastSync, refetch: refetchSync } = useQuery({
+    queryKey: ["ical-last-sync"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("ical_sync_log")
+        .select("*")
+        .order("synced_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const handleSyncNow = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-ical");
+      if (error) throw error;
+      const summary = data?.results?.map((r: any) => `${r.property}: ${r.events_found} events, ${r.events_created} new`).join("; ");
+      toast.success(`Sync done — ${summary || "No properties configured"}`);
+      fetchCalendarData();
+      refetchSync();
+    } catch (err: any) {
+      toast.error(`Sync error: ${err.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const getBookingsForDay = (day: number) => {
     const dateStr = `${monthStr}-${String(day).padStart(2, "0")}`;
@@ -144,7 +177,23 @@ const AdminCalendarPage = () => {
 
   return (
     <AdminLayout>
-      <h1 className="font-display text-2xl mb-6">Calendar</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl">Calendar</h1>
+        <div className="flex items-center gap-3">
+          {lastSync && (
+            <span className="text-xs text-muted-foreground hidden md:inline">
+              Last sync: {new Date(lastSync.synced_at).toLocaleString()} —
+              {lastSync.status === "success"
+                ? ` ${lastSync.events_found} events, ${lastSync.events_created} new`
+                : ` Error: ${lastSync.error_message}`}
+            </span>
+          )}
+          <Button variant="outline" size="sm" onClick={handleSyncNow} disabled={syncing}>
+            {syncing ? <Loader2 className="animate-spin mr-2" size={14} /> : <RefreshCw size={14} className="mr-2" />}
+            Sync Airbnb
+          </Button>
+        </div>
+      </div>
 
       {/* Property toggles */}
       <div className="flex flex-wrap gap-2 mb-4">

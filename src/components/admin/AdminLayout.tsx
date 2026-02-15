@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Home, CalendarDays, DollarSign, ClipboardList,
-  Users, Star, FileText, Mail, CreditCard, Settings, LogOut, Menu, X
+  Users, Star, FileText, Mail, CreditCard, Settings, Upload, LogOut, Menu, X
 } from "lucide-react";
 
 const navItems = [
@@ -19,6 +19,7 @@ const navItems = [
   { title: "Inquiries", path: "/admin/inquiries", icon: Mail },
   { title: "Payments", path: "/admin/payments", icon: CreditCard },
   { title: "Settings", path: "/admin/settings", icon: Settings },
+  { title: "Import", path: "/admin/import", icon: Upload },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
