@@ -84,7 +84,7 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
-            <LanguageSwitcher transparent={transparentMode} />
+            {/* <LanguageSwitcher transparent={transparentMode} /> */}
             <Link
               to="/contact"
               className={`text-xs font-body font-normal uppercase tracking-wider px-4 py-1.5 border transition-colors duration-300 ${
@@ -151,9 +151,9 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                <div className="py-4 border-b border-[#f0f0f0]">
+                {/* <div className="py-4 border-b border-[#f0f0f0]">
                   <LanguageSwitcher />
-                </div>
+                </div> */}
                 <Link
                   to="/contact"
                   onClick={() => setMenuOpen(false)}
