@@ -236,8 +236,10 @@ const AdminCalendarPage = () => {
               if (day === null) return <div key={i} className="border-b border-r border-border p-2 min-h-[80px] bg-muted/20" />;
               const dayBookings = getBookingsForDay(day);
               const dayAvail = getAvailForDay(day);
-              const blocked = dayAvail.filter((a) => a.available === false && !a.booking_id);
-              const airbnbBlocked = dayAvail.filter((a) => a.source === "airbnb" && a.available === false);
+              // Property IDs that already have a booking bar shown — skip their availability blocks
+              const bookedPropIds = new Set(dayBookings.map((b) => b.property_id));
+              const blocked = dayAvail.filter((a) => a.available === false && !a.booking_id && !bookedPropIds.has(a.property_id));
+              const airbnbBlocked = dayAvail.filter((a) => a.source?.startsWith("airbnb") && a.available === false && !bookedPropIds.has(a.property_id));
 
               return (
                 <div
