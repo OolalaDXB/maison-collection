@@ -82,8 +82,8 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
-            <a
-              href="mailto:chez@maisons.co"
+            <Link
+              to="/contact"
               className={`text-xs font-body font-normal uppercase tracking-wider px-4 py-1.5 border transition-colors duration-300 ${
                 transparentMode
                   ? "border-white text-white hover:bg-[rgba(255,255,255,0.15)]"
@@ -91,7 +91,7 @@ const Header = () => {
               }`}
             >
               Contact
-            </a>
+            </Link>
           </nav>
 
           {/* Mobile hamburger */}
@@ -158,13 +158,13 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                <a
-                  href="mailto:chez@maisons.co"
+                <Link
+                  to="/contact"
                   onClick={() => setMenuOpen(false)}
                   className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4"
                 >
                   Contact
-                </a>
+                </Link>
               </nav>
 
               {/* Bottom info */}

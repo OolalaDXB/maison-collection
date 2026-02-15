@@ -13,6 +13,7 @@ import AtlantiquePage from "./pages/AtlantiquePage";
 import ManagementPage from "./pages/ManagementPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import BookingConfirmationPage from "./pages/BookingConfirmationPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
@@ -63,6 +64,7 @@ const AppContent = () => {
           <Route path="/georgia" element={<GeorgiaPage />} />
           <Route path="/atlantique" element={<AtlantiquePage />} />
           <Route path="/book/:slug" element={<BookingPage />} />
+          <Route path="/book/:slug/confirmation" element={<BookingConfirmationPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/properties" element={<AdminPropertiesPage />} />

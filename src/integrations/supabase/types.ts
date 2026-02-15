@@ -62,6 +62,39 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          bank_name: string
+          bic: string
+          created_at: string | null
+          currency: string | null
+          iban: string
+          id: string
+          is_default: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          bank_name: string
+          bic: string
+          created_at?: string | null
+          currency?: string | null
+          iban: string
+          id?: string
+          is_default?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          bank_name?: string
+          bic?: string
+          created_at?: string | null
+          currency?: string | null
+          iban?: string
+          id?: string
+          is_default?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       booking_contracts: {
         Row: {
           accepted_at: string | null
@@ -115,6 +148,8 @@ export type Database = {
           internal_notes: string | null
           nights: number | null
           paid_at: string | null
+          payment_method: string | null
+          payment_status: string | null
           property_id: string
           source: string | null
           special_requests: string | null
@@ -142,6 +177,8 @@ export type Database = {
           internal_notes?: string | null
           nights?: number | null
           paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           property_id: string
           source?: string | null
           special_requests?: string | null
@@ -169,6 +206,8 @@ export type Database = {
           internal_notes?: string | null
           nights?: number | null
           paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           property_id?: string
           source?: string | null
           special_requests?: string | null
@@ -335,6 +374,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_methods: {
+        Row: {
+          active: boolean | null
+          code: string
+          config: Json | null
+          created_at: string | null
+          currencies: string[] | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          config?: Json | null
+          created_at?: string | null
+          currencies?: string[] | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          config?: Json | null
+          created_at?: string | null
+          currencies?: string[] | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       payment_settings: {
         Row: {
