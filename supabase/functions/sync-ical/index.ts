@@ -121,20 +121,33 @@ Deno.serve(async (req) => {
           const dates = dateRange(checkIn, checkOut);
           if (dates.length === 0) continue;
 
-          const isReservation =
-            event.summary?.toLowerCase().includes("reserved") ||
-            event.summary?.toLowerCase().includes("airbnb") ||
-            (event.description && event.description.length > 5);
+          // Detect if this is a real reservation or just a blocked/unavailable period
+          const summaryLower = (event.summary || "").toLowerCase().trim();
+          const isBlocked =
+            summaryLower.includes("not available") ||
+            summaryLower === "blocked" ||
+            summaryLower === "" ||
+            summaryLower.startsWith("airbnb (not available");
+
+          // Real reservations have a guest name or "Reserved" summary
+          const isReservation = !isBlocked && (
+            summaryLower.includes("reserved") ||
+            summaryLower.includes("airbnb") ||
+            (event.description && event.description.length > 5) ||
+            (!["reserved", "blocked", "not available", "airbnb"].includes(summaryLower) && summaryLower.length > 0)
+          );
 
           let guestName = "Airbnb Guest";
           if (
             event.summary &&
-            !["reserved", "not available", "blocked", "airbnb"].includes(
-              event.summary.toLowerCase().trim()
-            )
+            !["reserved", "not available", "blocked", "airbnb"].includes(summaryLower) &&
+            !summaryLower.startsWith("airbnb (not available")
           ) {
             guestName = event.summary.trim();
           }
+
+          // Determine source tag for availability
+          const availSource = isBlocked ? "airbnb_block" : "airbnb";
 
           // Block availability dates
           for (const date of dates) {
@@ -143,37 +156,40 @@ Deno.serve(async (req) => {
                 property_id: prop.id,
                 date,
                 available: false,
-                source: "airbnb",
+                source: availSource,
                 airbnb_uid: event.uid,
               },
               { onConflict: "property_id,date" }
             );
           }
 
-          // Create booking record for reservations
+          // Only create booking records for actual reservations (not blocks)
           if (isReservation) {
-            const { data: existingBooking } = await supabase
+            // Deduplicate by UID first (most reliable)
+            const { data: existingByUid } = await supabase
               .from("bookings")
               .select("id")
               .eq("property_id", prop.id)
-              .eq("check_in", checkIn)
-              .eq("check_out", checkOut)
               .eq("source", "airbnb")
+              .ilike("internal_notes", `%${event.uid}%`)
               .maybeSingle();
 
-            if (existingBooking) {
+            if (existingByUid) {
               eventsUpdated++;
             } else {
-              const { data: csvBooking } = await supabase
+              // Fallback: check by dates
+              const { data: existingByDates } = await supabase
                 .from("bookings")
                 .select("id")
                 .eq("property_id", prop.id)
                 .eq("check_in", checkIn)
                 .eq("check_out", checkOut)
-                .eq("source", "airbnb_csv")
+                .in("source", ["airbnb", "airbnb_csv"])
                 .maybeSingle();
 
-              if (!csvBooking) {
+              if (existingByDates) {
+                eventsUpdated++;
+              } else {
                 const { error: bookError } = await supabase.from("bookings").insert({
                   property_id: prop.id,
                   guest_name: guestName,
@@ -188,8 +204,6 @@ Deno.serve(async (req) => {
                 });
 
                 if (!bookError) eventsCreated++;
-              } else {
-                eventsUpdated++;
               }
             }
           }
