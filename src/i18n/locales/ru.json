@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "collection": "Коллекция",
+    "management": "Управление",
+    "about": "О нас",
+    "contact": "Контакт"
+  },
+  "property_card": {
+    "from": "От",
+    "per_night": "/ночь",
+    "guests": "гостей",
+    "coming_soon": "Скоро",
+    "opening_2026": "Открытие 2026"
+  },
+  "footer": {
+    "destinations": "Направления",
+    "maisons": "Maisons",
+    "contact_us": "Связаться с нами",
+    "newsletter_title": "Присоединяйтесь к семье Maisons",
+    "newsletter_placeholder": "Ваш email",
+    "newsletter_thanks": "Спасибо — вы с нами.",
+    "newsletter_desc": "Истории путешествий, новые объекты и советы. Несколько писем в год.",
+    "subscribe": "Подписаться",
+    "our_collection": "Наша коллекция",
+    "about_us": "О нас",
+    "send_message": "Отправить сообщение",
+    "copyright": "Все права защищены.",
+    "privacy": "Политика конфиденциальности",
+    "terms": "Условия использования"
+  },
+  "booking": {
+    "book_now": "Забронировать",
+    "book_property": "Забронировать",
+    "check_in": "Заезд",
+    "check_out": "Выезд",
+    "guests": "Гости",
+    "total": "Итого",
+    "nights": "ночей",
+    "confirm": "Подтвердить бронирование",
+    "summary": "Итог бронирования",
+    "your_details": "Ваши данные",
+    "full_name": "Полное имя",
+    "email": "Email",
+    "phone": "Телефон",
+    "special_requests": "Особые пожелания",
+    "continue": "Продолжить",
+    "back": "Назад",
+    "rental_agreement": "Договор аренды",
+    "accept_agreement": "Я прочитал и принимаю договор аренды",
+    "payment_method": "Способ оплаты",
+    "payment_method_desc": "Выберите способ оплаты. Принимаются все методы.",
+    "submitting": "Отправка…"
+  },
+  "contact_page": {
+    "label": "Контакт",
+    "title": "Свяжитесь с нами",
+    "subtitle": "Хотите забронировать проживание или обсудить управление вашей недвижимостью.",
+    "name": "Ваше имя",
+    "email": "Ваш email",
+    "phone": "Телефон (необязательно)",
+    "message": "Сообщение",
+    "send": "Отправить",
+    "sending": "Отправка…",
+    "thanks": "Спасибо за обращение.",
+    "managed_by": "Управляет Дарья — ответ в течение 24 часов.",
+    "booking_inquiry": "Запрос на бронирование",
+    "collaboration": "Сотрудничество с владельцами",
+    "select_property": "Выберите объект",
+    "preferred_dates": "Предпочтительные даты",
+    "num_guests": "Количество гостей",
+    "special_requests": "Особые пожелания",
+    "property_location": "Расположение объекта",
+    "property_type": "Тип объекта",
+    "tell_us": "Расскажите о вашем объекте"
+  },
+  "lang": {
+    "en": "EN",
+    "fr": "FR",
+    "ru": "RU"
+  }
+}

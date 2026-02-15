@@ -2,19 +2,22 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-
-const navLinks = [
-  { label: "Collection", href: "/#collection" },
-  { label: "Management", href: "/management" },
-  { label: "About", href: "/about" },
-];
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation();
 
   const isHomepage = location.pathname === "/";
+
+  const navLinks = [
+    { label: t("nav.collection"), href: "/#collection" },
+    { label: t("nav.management"), href: "/management" },
+    { label: t("nav.about"), href: "/about" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 100);
@@ -26,7 +29,6 @@ const Header = () => {
     setMenuOpen(false);
   }, [location]);
 
-  // Lock body scroll when menu open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
@@ -71,7 +73,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 to={link.href}
                 className={`text-sm font-body font-normal uppercase tracking-wider transition-colors duration-300 ${
                   transparentMode
@@ -82,6 +84,7 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+            <LanguageSwitcher transparent={transparentMode} />
             <Link
               to="/contact"
               className={`text-xs font-body font-normal uppercase tracking-wider px-4 py-1.5 border transition-colors duration-300 ${
@@ -90,7 +93,7 @@ const Header = () => {
                   : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white"
               }`}
             >
-              Contact
+              {t("nav.contact")}
             </Link>
           </nav>
 
@@ -111,7 +114,6 @@ const Header = () => {
       <AnimatePresence>
         {menuOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -120,8 +122,6 @@ const Header = () => {
               className="fixed inset-0 z-[60] bg-[rgba(0,0,0,0.4)]"
               onClick={() => setMenuOpen(false)}
             />
-
-            {/* Panel */}
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -129,7 +129,6 @@ const Header = () => {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="fixed top-0 left-0 bottom-0 z-[70] bg-white w-[85vw] max-w-[380px] flex flex-col"
             >
-              {/* Close button */}
               <div className="flex justify-end p-5">
                 <button
                   onClick={() => setMenuOpen(false)}
@@ -139,16 +138,10 @@ const Header = () => {
                   <X size={24} />
                 </button>
               </div>
-
-              {/* Menu items */}
               <nav className="flex flex-col px-8 mt-4">
-              {[
-                  { label: "Collection", href: "/#collection" },
-                  { label: "Management", href: "/management" },
-                  { label: "About", href: "/about" },
-                ].map((link) => (
+                {navLinks.map((link) => (
                   <Link
-                    key={link.label}
+                    key={link.href}
                     to={link.href}
                     onClick={() => setMenuOpen(false)}
                     className={`font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] py-4 border-b border-[#f0f0f0] ${
@@ -158,16 +151,17 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
+                <div className="py-4 border-b border-[#f0f0f0]">
+                  <LanguageSwitcher />
+                </div>
                 <Link
                   to="/contact"
                   onClick={() => setMenuOpen(false)}
                   className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4"
                 >
-                  Contact
+                  {t("nav.contact")}
                 </Link>
               </nav>
-
-              {/* Bottom info */}
               <div className="mt-auto px-8 pb-10">
                 <div className="border-t border-[#eee] pt-6">
                   <a

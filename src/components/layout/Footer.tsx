@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, MessageCircle, Send, Instagram, Facebook, Linkedin } from "lucide-react";
+import { Mail, Send, Instagram, Facebook, Linkedin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -38,16 +40,15 @@ const Footer = () => {
   return (
     <footer className="bg-white border-t border-[#eeeeee] pt-16 pb-8 px-[5%]">
       <div className="max-container">
-        {/* 5-column grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-y-10 gap-x-8">
-          {/* Column 1: Newsletter (wider) */}
+          {/* Column 1: Newsletter */}
           <div className="lg:col-span-2">
             <p className="font-body font-normal uppercase tracking-wider text-xs text-[#1a1a1a] mb-6">
-              Join the Maisons family
+              {t("footer.newsletter_title")}
             </p>
             {status === "success" ? (
               <p className="font-body font-light text-sm text-[#444444]">
-                Thank you — you're in.
+                {t("footer.newsletter_thanks")}
               </p>
             ) : (
               <>
@@ -57,7 +58,7 @@ const Footer = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Your email"
+                    placeholder={t("footer.newsletter_placeholder")}
                     required
                     className="flex-1 border border-[#dddddd] bg-white text-[#1a1a1a] placeholder:text-[#999999] font-body font-light text-sm px-4 py-2.5 outline-none focus:border-[#999999] transition-colors"
                   />
@@ -66,14 +67,14 @@ const Footer = () => {
                     disabled={status === "loading" || (!!turnstileSiteKey && !turnstileToken)}
                     className="bg-[#1a1a1a] text-white font-body font-normal uppercase text-xs tracking-wider px-5 py-2.5 hover:bg-[#333333] transition-colors disabled:opacity-50"
                   >
-                    Subscribe
+                    {t("footer.subscribe")}
                   </button>
                 </form>
                 {turnstileSiteKey && (
                   <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'compact' }} />
                 )}
                 <p className="font-body font-light text-xs text-[#999999] leading-relaxed">
-                  Travel stories, new properties, and insider tips. A few emails a year.
+                  {t("footer.newsletter_desc")}
                 </p>
               </>
             )}
@@ -82,7 +83,7 @@ const Footer = () => {
           {/* Column 2: Destinations */}
           <div>
             <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
-              Destinations
+              {t("footer.destinations")}
             </p>
             <nav className="flex flex-col gap-2">
               <Link to="/georgia" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Georgia</Link>
@@ -94,19 +95,19 @@ const Footer = () => {
           {/* Column 3: Maisons */}
           <div>
             <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
-              Maisons
+              {t("footer.maisons")}
             </p>
             <nav className="flex flex-col gap-2">
-              <a href="/#collection" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Our collection</a>
-              <Link to="/management" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">Management</Link>
-              <Link to="/about" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">About us</Link>
+              <a href="/#collection" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">{t("footer.our_collection")}</a>
+              <Link to="/management" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">{t("nav.management")}</Link>
+              <Link to="/about" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors">{t("footer.about_us")}</Link>
             </nav>
           </div>
 
           {/* Column 4: Contact Us */}
           <div>
             <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
-              Contact us
+              {t("footer.contact_us")}
             </p>
             <nav className="flex flex-col gap-2">
               <a href="mailto:chez@maisons.co" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2">
@@ -115,7 +116,7 @@ const Footer = () => {
               </a>
               <a href="mailto:chez@maisons.co" className="font-body font-light text-sm text-[#444444] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2">
                 <Send size={14} className="text-[#666666]" />
-                Send a message
+                {t("footer.send_message")}
               </a>
             </nav>
           </div>
@@ -123,7 +124,6 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-[#eeeeee] mt-12 pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          {/* Left: copyright */}
           <p className="font-body font-light text-xs text-[#bbbbbb]">
             <Link
               to="/admin/login"
@@ -132,27 +132,17 @@ const Footer = () => {
             >
               &copy;
             </Link>{" "}
-            2026 Maisons. All rights reserved.
+            2026 Maisons. {t("footer.copyright")}
           </p>
-
-          {/* Center: legal */}
           <div className="flex items-center gap-1 text-xs">
-            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">Privacy policy</a>
+            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">{t("footer.privacy")}</a>
             <span className="text-[#bbbbbb]">·</span>
-            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">Terms of use</a>
+            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">{t("footer.terms")}</a>
           </div>
-
-          {/* Right: social icons */}
           <div className="flex items-center gap-4">
-            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
-              <Instagram size={18} />
-            </a>
-            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
-              <Facebook size={18} />
-            </a>
-            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors">
-              <Linkedin size={18} />
-            </a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Instagram size={18} /></a>
+            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Facebook size={18} /></a>
+            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Linkedin size={18} /></a>
           </div>
         </div>
       </div>
