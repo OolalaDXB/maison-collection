@@ -258,9 +258,11 @@ const AdminPaymentsPage = () => {
                   <Input placeholder="BIC / SWIFT" value={bankForm.bic} onChange={(e) => setBankForm({ ...bankForm, bic: e.target.value })} className="font-mono text-xs" />
                   <div className="flex gap-3 items-center">
                     <select className="px-3 py-2 border border-border bg-background text-sm" value={bankForm.currency} onChange={(e) => setBankForm({ ...bankForm, currency: e.target.value })}>
-                      <option value="EUR">EUR</option>
-                      <option value="USD">USD</option>
-                      <option value="GBP">GBP</option>
+                      <option value="EUR">EUR — Euro (€)</option>
+                      <option value="USD">USD — US Dollar ($)</option>
+                      <option value="GEL">GEL — Georgian Lari (₾)</option>
+                      <option value="AED">AED — UAE Dirham (د.إ)</option>
+                      <option value="GBP">GBP — British Pound (£)</option>
                     </select>
                     <label className="flex items-center gap-2 text-sm cursor-pointer">
                       <input type="checkbox" checked={bankForm.is_default} onChange={(e) => setBankForm({ ...bankForm, is_default: e.target.checked })} />

@@ -2,7 +2,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download, RotateCcw } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download, RotateCcw, Sparkles, Globe } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
 import { seedAtlantiqueImages } from "@/utils/seedAtlantiqueImages";
 import { seedGeorgiaImages } from "@/utils/seedGeorgiaImages";
@@ -24,6 +24,10 @@ interface PropertyRow {
 interface PropertyImage { id: string; property_id: string; image_url: string; display_order: number; alt_text: string | null; }
 interface ReviewRow { id: string; property_id: string; guest_name: string; guest_location: string | null; rating: number; review_text: string; stay_date: string | null; }
 interface PoiRow { id: string; property_id: string; label: string; emoji: string; latitude: number; longitude: number; display_order: number; }
+interface ServiceRow { id: string; property_id: string; category: string; label: string; description: string | null; icon: string | null; display_order: number; active: boolean; }
+interface RegionContentRow { id: string; property_id: string; subtitle: string | null; title: string; tagline: string | null; intro_text: string | null; }
+interface RegionCardRow { id: string; property_id: string; icon: string; title: string; text: string; display_order: number; }
+interface RegionLinkRow { id: string; property_id: string; label: string; url: string; display_order: number; }
 
 const AdminPropertiesPage = () => {
   const [properties, setProperties] = useState<PropertyRow[]>([]);
@@ -43,6 +47,15 @@ const AdminPropertiesPage = () => {
   const [managingPois, setManagingPois] = useState<string | null>(null);
   const [poisList, setPoisList] = useState<PoiRow[]>([]);
   const [editingPoi, setEditingPoi] = useState<PoiRow | null>(null);
+  const [managingServices, setManagingServices] = useState<string | null>(null);
+  const [servicesList, setServicesList] = useState<ServiceRow[]>([]);
+  const [editingService, setEditingService] = useState<ServiceRow | null>(null);
+  const [managingRegion, setManagingRegion] = useState<string | null>(null);
+  const [regionContent, setRegionContent] = useState<RegionContentRow | null>(null);
+  const [regionCards, setRegionCards] = useState<RegionCardRow[]>([]);
+  const [regionLinks, setRegionLinks] = useState<RegionLinkRow[]>([]);
+  const [editingCard, setEditingCard] = useState<RegionCardRow | null>(null);
+  const [editingLink, setEditingLink] = useState<RegionLinkRow | null>(null);
   const { rates, isLoading: fxLoading, lastUpdated, formatPrice } = useFxRates();
   const [refreshingFx, setRefreshingFx] = useState(false);
 
@@ -71,6 +84,20 @@ const AdminPropertiesPage = () => {
   const fetchPois = async (propertyId: string) => {
     const { data } = await supabase.from("property_pois").select("*").eq("property_id", propertyId).order("display_order");
     setPoisList((data as any[]) || []);
+  };
+  const fetchServices = async (propertyId: string) => {
+    const { data } = await supabase.from("property_services" as any).select("*").eq("property_id", propertyId).order("display_order");
+    setServicesList((data as any[]) || []);
+  };
+  const fetchRegion = async (propertyId: string) => {
+    const [cRes, cardRes, linkRes] = await Promise.all([
+      supabase.from("property_region_content" as any).select("*").eq("property_id", propertyId).maybeSingle(),
+      supabase.from("property_region_cards" as any).select("*").eq("property_id", propertyId).order("display_order"),
+      supabase.from("property_region_links" as any).select("*").eq("property_id", propertyId).order("display_order"),
+    ]);
+    setRegionContent((cRes.data as any) || null);
+    setRegionCards((cardRes.data as any[]) || []);
+    setRegionLinks((linkRes.data as any[]) || []);
   };
 
   const handleSave = async () => {
@@ -196,6 +223,75 @@ const AdminPropertiesPage = () => {
     else { toast.success("POI deleted"); if (managingPois) fetchPois(managingPois); }
   };
 
+  // Services CRUD
+  const handleSaveService = async () => {
+    if (!editingService || !managingServices) return;
+    setSaving(true);
+    const { id, ...rest } = editingService;
+    const isNew = !servicesList.find((s) => s.id === id);
+    let error;
+    if (isNew) ({ error } = await supabase.from("property_services" as any).insert({ ...rest } as any));
+    else ({ error } = await supabase.from("property_services" as any).update(rest as any).eq("id", id));
+    if (error) toast.error(error.message);
+    else { toast.success("Service saved"); setEditingService(null); fetchServices(managingServices); }
+    setSaving(false);
+  };
+  const handleDeleteService = async (id: string) => {
+    if (!confirm("Delete this service?")) return;
+    const { error } = await supabase.from("property_services" as any).delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Deleted"); if (managingServices) fetchServices(managingServices); }
+  };
+
+  // Region CRUD
+  const handleSaveRegionContent = async () => {
+    if (!regionContent || !managingRegion) return;
+    setSaving(true);
+    const { id, ...rest } = regionContent;
+    let error;
+    if (id) ({ error } = await supabase.from("property_region_content" as any).update(rest as any).eq("id", id));
+    else ({ error } = await supabase.from("property_region_content" as any).insert({ ...rest, property_id: managingRegion } as any));
+    if (error) toast.error(error.message);
+    else { toast.success("Region content saved"); fetchRegion(managingRegion); }
+    setSaving(false);
+  };
+  const handleSaveCard = async () => {
+    if (!editingCard || !managingRegion) return;
+    setSaving(true);
+    const { id, ...rest } = editingCard;
+    const isNew = !regionCards.find((c) => c.id === id);
+    let error;
+    if (isNew) ({ error } = await supabase.from("property_region_cards" as any).insert({ ...rest } as any));
+    else ({ error } = await supabase.from("property_region_cards" as any).update(rest as any).eq("id", id));
+    if (error) toast.error(error.message);
+    else { toast.success("Card saved"); setEditingCard(null); fetchRegion(managingRegion); }
+    setSaving(false);
+  };
+  const handleDeleteCard = async (id: string) => {
+    if (!confirm("Delete this card?")) return;
+    const { error } = await supabase.from("property_region_cards" as any).delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Deleted"); if (managingRegion) fetchRegion(managingRegion); }
+  };
+  const handleSaveLink = async () => {
+    if (!editingLink || !managingRegion) return;
+    setSaving(true);
+    const { id, ...rest } = editingLink;
+    const isNew = !regionLinks.find((l) => l.id === id);
+    let error;
+    if (isNew) ({ error } = await supabase.from("property_region_links" as any).insert({ ...rest } as any));
+    else ({ error } = await supabase.from("property_region_links" as any).update(rest as any).eq("id", id));
+    if (error) toast.error(error.message);
+    else { toast.success("Link saved"); setEditingLink(null); fetchRegion(managingRegion); }
+    setSaving(false);
+  };
+  const handleDeleteLink = async (id: string) => {
+    if (!confirm("Delete this link?")) return;
+    const { error } = await supabase.from("property_region_links" as any).delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Deleted"); if (managingRegion) fetchRegion(managingRegion); }
+  };
+
   const newProperty = (): PropertyRow => ({
     id: crypto.randomUUID(), slug: "", name: "", location: "", region: "", country: "",
     description: "", long_description: null, price_per_night: null, currency: "EUR",
@@ -211,11 +307,162 @@ const AdminPropertiesPage = () => {
 
   const newReview = (propertyId: string): ReviewRow => ({ id: crypto.randomUUID(), property_id: propertyId, guest_name: "", guest_location: null, rating: 5, review_text: "", stay_date: null });
   const newPoi = (propertyId: string): PoiRow => ({ id: crypto.randomUUID(), property_id: propertyId, label: "", emoji: "📍", latitude: 0, longitude: 0, display_order: poisList.length });
+  const newService = (propertyId: string, category: string): ServiceRow => ({ id: crypto.randomUUID(), property_id: propertyId, category, label: "", description: null, icon: null, display_order: servicesList.filter(s => s.category === category).length, active: true });
+  const newCard = (propertyId: string): RegionCardRow => ({ id: crypto.randomUUID(), property_id: propertyId, icon: "MapPin", title: "", text: "", display_order: regionCards.length });
+  const newLink = (propertyId: string): RegionLinkRow => ({ id: crypto.randomUUID(), property_id: propertyId, label: "", url: "", display_order: regionLinks.length });
 
   if (loading) return <AdminLayout><p className="text-muted-foreground">Loading…</p></AdminLayout>;
 
   return (
     <AdminLayout>
+      {/* Services modal */}
+      {managingServices && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-background border border-border max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-display text-xl">Services — {properties.find((p) => p.id === managingServices)?.name}</h2>
+              <button onClick={() => { setManagingServices(null); setEditingService(null); }}><X size={20} /></button>
+            </div>
+            {editingService && (
+              <div className="border border-border p-6 mb-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Field label="Label" value={editingService.label} onChange={(v) => setEditingService({ ...editingService, label: v })} className="md:col-span-2" />
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1">Category</label>
+                    <select className="w-full px-3 py-2 border border-border bg-background text-sm" value={editingService.category} onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}>
+                      <option value="included">Included</option>
+                      <option value="a_la_carte">À la Carte</option>
+                    </select>
+                  </div>
+                </div>
+                <AreaField label="Description (optional)" value={editingService.description || ""} onChange={(v) => setEditingService({ ...editingService, description: v || null })} />
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" checked={editingService.active} onChange={(e) => setEditingService({ ...editingService, active: e.target.checked })} />
+                    Active
+                  </label>
+                  <Field label="Order" value={editingService.display_order.toString()} onChange={(v) => setEditingService({ ...editingService, display_order: parseInt(v) || 0 })} type="number" />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={handleSaveService} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save"}</button>
+                  <button onClick={() => setEditingService(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
+                </div>
+              </div>
+            )}
+            {/* Included */}
+            <h3 className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-3">Included Services</h3>
+            <div className="space-y-2 mb-6">
+              {servicesList.filter(s => s.category === "included").map((s) => (
+                <div key={s.id} className="flex items-center gap-3 p-3 border border-border">
+                  <span className={`w-2 h-2 rounded-full ${s.active ? "bg-primary" : "bg-muted"}`} />
+                  <span className="flex-1 text-sm">{s.label}</span>
+                  <span className="text-xs text-muted-foreground">#{s.display_order}</span>
+                  <button onClick={() => setEditingService(s)} className="p-1 hover:bg-secondary"><Pencil size={14} /></button>
+                  <button onClick={() => handleDeleteService(s.id)} className="p-1 hover:bg-secondary text-destructive"><Trash2 size={14} /></button>
+                </div>
+              ))}
+              <button onClick={() => setEditingService(newService(managingServices, "included"))} className="px-3 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary"><Plus size={14} /> Add Included</button>
+            </div>
+            {/* A la carte */}
+            <h3 className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-3">À la Carte Services</h3>
+            <div className="space-y-2 mb-6">
+              {servicesList.filter(s => s.category === "a_la_carte").map((s) => (
+                <div key={s.id} className="flex items-center gap-3 p-3 border border-border">
+                  <span className={`w-2 h-2 rounded-full ${s.active ? "bg-primary" : "bg-muted"}`} />
+                  <span className="flex-1 text-sm">{s.label}</span>
+                  <span className="text-xs text-muted-foreground">#{s.display_order}</span>
+                  <button onClick={() => setEditingService(s)} className="p-1 hover:bg-secondary"><Pencil size={14} /></button>
+                  <button onClick={() => handleDeleteService(s.id)} className="p-1 hover:bg-secondary text-destructive"><Trash2 size={14} /></button>
+                </div>
+              ))}
+              <button onClick={() => setEditingService(newService(managingServices, "a_la_carte"))} className="px-3 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary"><Plus size={14} /> Add À la Carte</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Region modal */}
+      {managingRegion && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-background border border-border max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-display text-xl">Region — {properties.find((p) => p.id === managingRegion)?.name}</h2>
+              <button onClick={() => { setManagingRegion(null); setEditingCard(null); setEditingLink(null); }}><X size={20} /></button>
+            </div>
+
+            {/* Region intro text */}
+            <div className="border border-border p-6 mb-6 space-y-4">
+              <h3 className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground">Introduction Text</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field label="Subtitle" value={regionContent?.subtitle || ""} onChange={(v) => setRegionContent(prev => prev ? { ...prev, subtitle: v || null } : { id: "", property_id: managingRegion, subtitle: v || null, title: "", tagline: null, intro_text: null })} />
+                <Field label="Title" value={regionContent?.title || ""} onChange={(v) => setRegionContent(prev => prev ? { ...prev, title: v } : { id: "", property_id: managingRegion, subtitle: null, title: v, tagline: null, intro_text: null })} />
+              </div>
+              <Field label="Tagline" value={regionContent?.tagline || ""} onChange={(v) => setRegionContent(prev => prev ? { ...prev, tagline: v || null } : { id: "", property_id: managingRegion, subtitle: null, title: "", tagline: v || null, intro_text: null })} />
+              <AreaField label="Intro Text (separate paragraphs with blank lines)" value={regionContent?.intro_text || ""} onChange={(v) => setRegionContent(prev => prev ? { ...prev, intro_text: v || null } : { id: "", property_id: managingRegion, subtitle: null, title: "", tagline: null, intro_text: v || null })} />
+              <button onClick={handleSaveRegionContent} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save Text"}</button>
+            </div>
+
+            {/* Region cards */}
+            <h3 className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-3">Highlight Cards</h3>
+            {editingCard && (
+              <div className="border border-border p-6 mb-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1">Icon (Lucide name)</label>
+                    <select className="w-full px-3 py-2 border border-border bg-background text-sm" value={editingCard.icon} onChange={(e) => setEditingCard({ ...editingCard, icon: e.target.value })}>
+                      {["Mountain","Snowflake","Church","Waves","TreePine","Landmark","Footprints","Compass","Sun","Leaf","Baby","MapPin","Home","Star","Heart"].map(i => <option key={i} value={i}>{i}</option>)}
+                    </select>
+                  </div>
+                  <Field label="Title" value={editingCard.title} onChange={(v) => setEditingCard({ ...editingCard, title: v })} className="md:col-span-2" />
+                </div>
+                <AreaField label="Text" value={editingCard.text} onChange={(v) => setEditingCard({ ...editingCard, text: v })} />
+                <div className="flex gap-3">
+                  <button onClick={handleSaveCard} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save Card"}</button>
+                  <button onClick={() => setEditingCard(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
+                </div>
+              </div>
+            )}
+            <div className="space-y-2 mb-6">
+              {regionCards.map((card) => (
+                <div key={card.id} className="flex items-center gap-3 p-3 border border-border">
+                  <span className="text-sm text-muted-foreground">{card.icon}</span>
+                  <span className="flex-1 text-sm font-medium">{card.title}</span>
+                  <button onClick={() => setEditingCard(card)} className="p-1 hover:bg-secondary"><Pencil size={14} /></button>
+                  <button onClick={() => handleDeleteCard(card.id)} className="p-1 hover:bg-secondary text-destructive"><Trash2 size={14} /></button>
+                </div>
+              ))}
+              <button onClick={() => setEditingCard(newCard(managingRegion))} className="px-3 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary"><Plus size={14} /> Add Card</button>
+            </div>
+
+            {/* Region links */}
+            <h3 className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-3">External Links</h3>
+            {editingLink && (
+              <div className="border border-border p-6 mb-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field label="Label" value={editingLink.label} onChange={(v) => setEditingLink({ ...editingLink, label: v })} />
+                  <Field label="URL" value={editingLink.url} onChange={(v) => setEditingLink({ ...editingLink, url: v })} />
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={handleSaveLink} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save Link"}</button>
+                  <button onClick={() => setEditingLink(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
+                </div>
+              </div>
+            )}
+            <div className="space-y-2">
+              {regionLinks.map((link) => (
+                <div key={link.id} className="flex items-center gap-3 p-3 border border-border">
+                  <span className="flex-1 text-sm">{link.label}</span>
+                  <span className="text-xs text-muted-foreground truncate max-w-[200px]">{link.url}</span>
+                  <button onClick={() => setEditingLink(link)} className="p-1 hover:bg-secondary"><Pencil size={14} /></button>
+                  <button onClick={() => handleDeleteLink(link.id)} className="p-1 hover:bg-secondary text-destructive"><Trash2 size={14} /></button>
+                </div>
+              ))}
+              <button onClick={() => setEditingLink(newLink(managingRegion))} className="px-3 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary"><Plus size={14} /> Add Link</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* POIs modal */}
       {managingPois && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -473,6 +720,8 @@ const AdminPropertiesPage = () => {
               <p className="text-sm text-muted-foreground">{prop.location} · {prop.status}</p>
             </div>
             {prop.price_per_night && <span className="text-sm text-muted-foreground">€{prop.price_per_night}/night</span>}
+            <button onClick={() => { setManagingServices(prop.id); fetchServices(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage services"><Sparkles size={16} /></button>
+            <button onClick={() => { setManagingRegion(prop.id); fetchRegion(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage region"><Globe size={16} /></button>
             <button onClick={() => { setManagingPois(prop.id); fetchPois(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage POIs"><MapPin size={16} /></button>
             <button onClick={() => { setManagingReviews(prop.id); fetchReviews(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage reviews"><MessageSquare size={16} /></button>
             <button onClick={() => { setManagingImages(prop.id); fetchImages(prop.id); }} className="p-2 hover:bg-secondary transition-colors" title="Manage images"><Image size={16} /></button>

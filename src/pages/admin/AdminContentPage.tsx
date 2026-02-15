@@ -32,6 +32,18 @@ const CONTENT_SCHEMA: ContentEntry[] = [
   { page: "management", section: "intro_text", content_fr: "", default_value: "", label: "Intro Text", type: "textarea" },
   // Contact
   { page: "contact", section: "intro_text", content_fr: "", default_value: "", label: "Intro Text", type: "textarea" },
+  // Georgia
+  { page: "georgia", section: "hero_subtitle", content_fr: "", default_value: "Gudauri, Greater Caucasus — 2,200m", label: "Hero Subtitle", type: "text" },
+  { page: "georgia", section: "intro_title", content_fr: "", default_value: "A Mountain Home", label: "Intro Title", type: "text" },
+  { page: "georgia", section: "intro_text", content_fr: "", default_value: "", label: "Intro Text", type: "textarea" },
+  // Atlantique
+  { page: "atlantique", section: "hero_subtitle", content_fr: "", default_value: "Quistinic, Brittany", label: "Hero Subtitle", type: "text" },
+  { page: "atlantique", section: "intro_title", content_fr: "", default_value: "", label: "Intro Title", type: "text" },
+  { page: "atlantique", section: "intro_text", content_fr: "", default_value: "", label: "Intro Text", type: "textarea" },
+  // Arabia
+  { page: "arabia", section: "hero_subtitle", content_fr: "", default_value: "The Sustainable City, Dubai", label: "Hero Subtitle", type: "text" },
+  { page: "arabia", section: "intro_title", content_fr: "", default_value: "", label: "Intro Title", type: "text" },
+  { page: "arabia", section: "intro_text", content_fr: "", default_value: "", label: "Intro Text", type: "textarea" },
 ];
 
 const PAGES = [
@@ -39,6 +51,9 @@ const PAGES = [
   { key: "about", label: "About" },
   { key: "management", label: "Management" },
   { key: "contact", label: "Contact" },
+  { key: "georgia", label: "Maison Georgia" },
+  { key: "atlantique", label: "Maison Atlantique" },
+  { key: "arabia", label: "Maison Arabia" },
 ];
 
 const AdminContentPage = () => {

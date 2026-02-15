@@ -9,7 +9,7 @@ import AtlantiqueHero from "@/components/atlantique/AtlantiqueHero";
 import AtlantiqueContent from "@/components/atlantique/AtlantiqueContent";
 import AtlantiqueBookingSidebar from "@/components/atlantique/AtlantiqueBookingSidebar";
 import AtlantiqueRooms from "@/components/atlantique/AtlantiqueRooms";
-import AtlantiqueServices from "@/components/atlantique/AtlantiqueServices";
+import PropertyServices from "@/components/PropertyServices";
 import AtlantiqueGoodToKnow from "@/components/atlantique/AtlantiqueGoodToKnow";
 import AtlantiqueGallery from "@/components/atlantique/AtlantiqueGallery";
 import AtlantiqueContact from "@/components/atlantique/AtlantiqueContact";
@@ -18,7 +18,18 @@ import AtlantiqueSurroundings from "@/components/atlantique/AtlantiqueSurroundin
 import AtlantiqueArchitecture from "@/components/atlantique/AtlantiqueArchitecture";
 import AtlantiqueReviews from "@/components/atlantique/AtlantiqueReviews";
 import AtlantiqueCrossSell from "@/components/atlantique/AtlantiqueCrossSell";
-import AtlantiqueCommunity from "@/components/atlantique/AtlantiqueCommunity";
+import PropertyCommunity from "@/components/PropertyCommunity";
+import regionGolfe from "@/assets/region-golfe-morbihan.jpg";
+import regionCarnac from "@/assets/region-carnac.jpg";
+import regionPoulfetan from "@/assets/region-poulfetan.jpg";
+import regionBlavet from "@/assets/region-blavet.jpg";
+
+const regionPhotos = [
+  { src: regionGolfe, alt: "Golfe du Morbihan — turquoise waters and islands seen from above", caption: "Gulf of Morbihan — 30 min" },
+  { src: regionCarnac, alt: "Carnac megalithic alignments — thousands of standing stones at sunset", caption: "Carnac Alignments — 50 min" },
+  { src: regionPoulfetan, alt: "Poul Fétan — restored medieval Breton village with thatched stone houses", caption: "Poul Fétan — 5 min" },
+  { src: regionBlavet, alt: "Blavet river valley — lush green hills and calm water winding through the Morbihan countryside", caption: "Blavet Valley — 5 min" },
+];
 import AtlantiqueMobileBookingBar from "@/components/atlantique/AtlantiqueMobileBookingBar";
 
 const PROPERTY_ID = "e514d218-0cdc-43cd-a97b-061132976bfb";
@@ -84,7 +95,7 @@ const AtlantiquePage = () => {
             </FadeIn>
 
             <FadeIn>
-              <AtlantiqueServices />
+              <PropertyServices propertyId={PROPERTY_ID} />
             </FadeIn>
 
             <FadeIn>
@@ -138,7 +149,7 @@ const AtlantiquePage = () => {
         </div>
       </div>
 
-      <AtlantiqueCommunity />
+      <PropertyCommunity propertyId={PROPERTY_ID} photos={regionPhotos} />
 
       <FadeIn>
         <AtlantiqueCrossSell />
