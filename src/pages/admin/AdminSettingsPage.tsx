@@ -44,14 +44,17 @@ const AdminSettingsPage = () => {
     else toast.success("iCal URL saved");
   };
 
-  const testIcalUrl = async (url: string) => {
-    if (!url) { toast.error("No URL to test"); return; }
+  const testIcalUrl = async (_url: string) => {
+    if (!_url) { toast.error("No URL to test"); return; }
     try {
-      const res = await fetch(url);
-      if (res.ok) toast.success("iCal URL is reachable");
-      else toast.error(`HTTP ${res.status}`);
-    } catch {
-      toast.error("Could not reach URL (CORS may block this test)");
+      toast.info("Running sync via Edge Function…");
+      const { data, error } = await supabase.functions.invoke("sync-ical");
+      if (error) throw error;
+      const results = data?.results || [];
+      const summary = results.map((r: any) => `${r.property}: ${r.events_found} events, ${r.events_created} new${r.error ? ` ⚠ ${r.error}` : ""}`).join("\n");
+      toast.success(summary || "Sync completed");
+    } catch (err: any) {
+      toast.error(`Sync error: ${err.message}`);
     }
   };
 
