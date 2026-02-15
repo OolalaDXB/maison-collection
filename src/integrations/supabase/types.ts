@@ -384,6 +384,87 @@ export type Database = {
           },
         ]
       }
+      ledger_entries: {
+        Row: {
+          amount: number
+          amount_eur: number | null
+          booking_id: string | null
+          category: string
+          counterparty: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string
+          description: string
+          entry_date: string
+          entry_type: string
+          fx_rate: number | null
+          id: string
+          property_id: string
+          receipt_url: string | null
+          reference: string | null
+          source: string
+          subcategory: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          amount_eur?: number | null
+          booking_id?: string | null
+          category: string
+          counterparty?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string
+          description: string
+          entry_date?: string
+          entry_type: string
+          fx_rate?: number | null
+          id?: string
+          property_id: string
+          receipt_url?: string | null
+          reference?: string | null
+          source?: string
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          amount_eur?: number | null
+          booking_id?: string | null
+          category?: string
+          counterparty?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string
+          description?: string
+          entry_date?: string
+          entry_type?: string
+          fx_rate?: number | null
+          id?: string
+          property_id?: string
+          receipt_url?: string | null
+          reference?: string | null
+          source?: string
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_entries_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_entries_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           active: boolean | null
