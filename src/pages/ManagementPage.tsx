@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
+import { Turnstile } from "@marsidev/react-turnstile";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
@@ -63,9 +64,15 @@ const ManagementPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (honeypot) return;
+    if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
     try {
       const { error } = await supabase.from("inquiries").insert({
@@ -293,7 +300,8 @@ const ManagementPage = () => {
                 Thank you — we'll be in touch within 24 hours.
               </p>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
+                <input type="text" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <input
                     type="text"
@@ -325,9 +333,12 @@ const ManagementPage = () => {
                   }
                   className={`${inputClass} resize-none`}
                 />
+                {turnstileSiteKey && (
+                  <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'normal' }} />
+                )}
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || (!!turnstileSiteKey && !turnstileToken)}
                   className="px-8 py-3 bg-primary text-primary-foreground text-xs font-body uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-60"
                 >
                   {submitting ? "Sending…" : "Send"}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 interface PropertyData {
   id: string;
@@ -30,6 +31,10 @@ const BookingPage = () => {
   const [contractAccepted, setContractAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const [form, setForm] = useState({
     guest_name: "",
@@ -87,6 +92,8 @@ const BookingPage = () => {
 
   const handleSubmit = async () => {
     if (!property || !price) return;
+    if (honeypot) return;
+    if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
 
     // Insert booking
@@ -191,6 +198,7 @@ const BookingPage = () => {
           {/* Step 1: Details */}
           {step === 1 && (
             <div className="space-y-4">
+              <input type="text" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
               <h2 className="font-display text-xl mb-4">Your Details</h2>
               <div><label className="text-xs text-muted-foreground mb-1 block">Full Name *</label><Input value={form.guest_name} onChange={(e) => setForm({ ...form, guest_name: e.target.value })} required /></div>
               <div><label className="text-xs text-muted-foreground mb-1 block">Email *</label><Input type="email" value={form.guest_email} onChange={(e) => setForm({ ...form, guest_email: e.target.value })} required /></div>
@@ -246,10 +254,13 @@ const BookingPage = () => {
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
-                <Button className="flex-1" onClick={handleSubmit} disabled={submitting}>
+                <Button className="flex-1" onClick={handleSubmit} disabled={submitting || (!!turnstileSiteKey && !turnstileToken)}>
                   {submitting ? <><Loader2 size={16} className="animate-spin mr-2" /> Submitting…</> : "Confirm Booking"}
                 </Button>
               </div>
+              {turnstileSiteKey && (
+                <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'normal' }} />
+              )}
 
               <p className="text-xs text-muted-foreground text-center">No payment required now. We'll contact you to arrange payment.</p>
             </div>

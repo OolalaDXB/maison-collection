@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +15,15 @@ const ContactPage = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (honeypot) return;
+    if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
     const typeMap: Record<string, string> = {
       general: "general", booking: "booking", management: "management", partnership: "partnership",
@@ -71,6 +78,7 @@ const ContactPage = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                <input type="text" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input type="text" placeholder="Your name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="px-4 py-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-colors" />
                   <input type="email" placeholder="Your email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="px-4 py-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-colors" />
@@ -82,7 +90,10 @@ const ContactPage = () => {
                   <option value="partnership">Partnership</option>
                 </select>
                 <textarea placeholder="Your message" rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full px-4 py-3 border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-colors resize-none" />
-                <button type="submit" disabled={submitting} className="px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-50">
+                {turnstileSiteKey && (
+                  <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'normal' }} />
+                )}
+                <button type="submit" disabled={submitting || (!!turnstileSiteKey && !turnstileToken)} className="px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-[0.1em] hover:opacity-90 transition-opacity disabled:opacity-50">
                   {submitting ? "Sending…" : "Send Message"}
                 </button>
                 <p className="text-xs text-muted-foreground">Managed by Darya — Response within 24 hours.</p>
