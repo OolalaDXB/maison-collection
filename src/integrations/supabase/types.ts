@@ -1083,6 +1083,7 @@ export type Database = {
         Row: {
           content_en: string | null
           content_fr: string | null
+          content_ru: string | null
           content_type: string | null
           id: string
           page: string
@@ -1092,6 +1093,7 @@ export type Database = {
         Insert: {
           content_en?: string | null
           content_fr?: string | null
+          content_ru?: string | null
           content_type?: string | null
           id?: string
           page: string
@@ -1101,6 +1103,7 @@ export type Database = {
         Update: {
           content_en?: string | null
           content_fr?: string | null
+          content_ru?: string | null
           content_type?: string | null
           id?: string
           page?: string
