@@ -6,7 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { useFxRates } from "@/hooks/useFxRates";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, Calendar, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import SEO from "@/components/SEO";
 
 interface Booking {
@@ -113,6 +114,29 @@ const AdminFinancePage = () => {
   const propNames = [...new Set(confirmed.map(b => propMap.get(b.property_id) || "Other"))];
   const COLORS = ["hsl(10,40%,55%)", "hsl(200,50%,50%)", "hsl(45,70%,50%)", "hsl(120,35%,45%)", "hsl(280,40%,55%)"];
 
+  const exportCSV = () => {
+    const rows = [["Propriété", "Réservations", `CA total (${currency})`, `Encaissé (${currency})`, `Frais Airbnb (${currency})`, `Net estimé (${currency})`]];
+    propSummary.forEach(p => {
+      rows.push([p.name, String(p.bookings), String(Math.round(conv(p.revenue))), String(Math.round(conv(p.paid))), String(Math.round(conv(p.airbnbFees))), String(Math.round(conv(p.revenue - p.airbnbFees)))]);
+    });
+    rows.push(["TOTAL", String(confirmed.length), String(Math.round(conv(totalRevenue))), String(Math.round(conv(totalPaid))), String(Math.round(conv(totalAirbnbFees))), String(Math.round(conv(totalRevenue - totalAirbnbFees)))]);
+    rows.push([]);
+    rows.push(["Mois", ...propNames]);
+    monthlyData.forEach(m => {
+      const row = [m.month as string];
+      propNames.forEach(name => row.push(String(m[name] || 0)));
+      rows.push(row);
+    });
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finance-${dateFrom}-${dateTo}-${currency}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <AdminLayout>
       <SEO title="Finance — Admin" description="" path="/admin/finance" noindex />
@@ -127,6 +151,9 @@ const AdminFinancePage = () => {
           <select className="px-3 py-2 border border-border bg-background text-sm h-9" value={currency} onChange={e => setCurrency(e.target.value)}>
             {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
+          <Button variant="outline" size="sm" onClick={exportCSV} disabled={loading}>
+            <Download size={14} className="mr-1" /> Export CSV
+          </Button>
         </div>
       </div>
 
