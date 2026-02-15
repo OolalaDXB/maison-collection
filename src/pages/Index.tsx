@@ -73,17 +73,12 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.40)]" />
         </div>
         <div className="relative z-10 max-container px-[5%] pb-20 md:pb-28 w-full">
-          <FadeIn>
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-white mb-6 max-w-3xl">
               {heroTitle}
             </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
             <p className="text-base md:text-lg text-[rgba(255,255,255,0.8)] max-w-xl mb-8 font-light">
               {heroSubtitle}
             </p>
-          </FadeIn>
-          <FadeIn delay={0.4}>
             <div className="flex flex-wrap gap-4">
               <a
                 href="#collection"
@@ -98,7 +93,6 @@ const Index = () => {
                 Entrust your property
               </Link>
             </div>
-          </FadeIn>
         </div>
       </section>
 
