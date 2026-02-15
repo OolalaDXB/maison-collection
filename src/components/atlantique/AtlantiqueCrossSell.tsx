@@ -40,6 +40,8 @@ const AtlantiqueCrossSell = () => {
                     src={heroSrc}
                     alt={p.name}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground font-body text-sm">

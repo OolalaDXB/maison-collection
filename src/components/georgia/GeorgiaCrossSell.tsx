@@ -15,6 +15,8 @@ const GeorgiaCrossSell = () => {
               src={atlantiqueHero}
               alt="Maison Atlantique"
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <p className="font-body uppercase tracking-[0.1em] text-xs text-muted-foreground mb-1">

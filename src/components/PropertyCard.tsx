@@ -50,6 +50,8 @@ const PropertyCard = ({ property, index }: PropertyCardProps) => {
                 src={property.heroImage}
                 alt={property.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
               />
             )}
             {/* Tags */}
