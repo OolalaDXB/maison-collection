@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import useHashScroll from "@/hooks/useHashScroll";
 import Index from "./pages/Index";
 import PropertyPage from "./pages/PropertyPage";
 import GeorgiaPage from "./pages/GeorgiaPage";
@@ -34,6 +35,11 @@ const pageVariants = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
+};
+
+const ScrollManager = () => {
+  useHashScroll();
+  return null;
 };
 
 const AppContent = () => {
@@ -83,6 +89,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollManager />
         <AppContent />
       </BrowserRouter>
     </TooltipProvider>
