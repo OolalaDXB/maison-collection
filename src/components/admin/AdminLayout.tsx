@@ -19,7 +19,7 @@ const navItems = [
   { title: "Inquiries", path: "/admin/inquiries", icon: Mail },
   { title: "Payments", path: "/admin/payments", icon: CreditCard },
   { title: "Settings", path: "/admin/settings", icon: Settings },
-  { title: "Import", path: "/admin/import", icon: Upload },
+  { title: "Import / Export", path: "/admin/import", icon: Upload },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
