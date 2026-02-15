@@ -1,10 +1,9 @@
 import { Mountain, Snowflake, Church } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
-/* TODO: replace with dedicated region photos when available */
-import regionCaucasus from "@/assets/georgia-8.jpg";
-import regionGergeti from "@/assets/georgia-13.jpg";
-import regionHighway from "@/assets/georgia-14.jpg";
+import regionCaucasus from "@/assets/region-caucasus.jpg";
+import regionGergeti from "@/assets/region-gergeti.jpg";
+import regionHighway from "@/assets/region-military-highway.jpg";
 
 const regionPhotos = [
   {
