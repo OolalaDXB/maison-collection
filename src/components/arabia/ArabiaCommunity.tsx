@@ -1,6 +1,29 @@
 import { Leaf, Baby, TreePine } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
+/* TODO: replace with dedicated region photos when available */
+import regionSustainable from "@/assets/arabia-community-1.jpeg";
+import regionBiodomes from "@/assets/arabia-community-3.jpeg";
+import regionEquestrian from "@/assets/arabia-community-5.jpeg";
+
+const regionPhotos = [
+  {
+    src: regionSustainable,
+    alt: "The Sustainable City green corridors and solar panels",
+    caption: "The Sustainable City — net-zero energy",
+  },
+  {
+    src: regionBiodomes,
+    alt: "Bio-dome greenhouses in The Sustainable City",
+    caption: "Bio-domes & urban farms",
+  },
+  {
+    src: regionEquestrian,
+    alt: "Equestrian center and children playing in car-free streets",
+    caption: "Car-free streets — family first",
+  },
+];
+
 const cards = [
   {
     icon: Leaf,
@@ -49,6 +72,28 @@ const ArabiaCommunity = () => {
             </p>
           </div>
         </FadeIn>
+
+        {/* Community photos */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
+          {regionPhotos.map((photo, i) => (
+            <FadeIn key={photo.alt} delay={i * 0.15}>
+              <div className="relative overflow-hidden group">
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full h-[220px] md:h-[260px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {photo.caption && (
+                  <p className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-4 py-3 font-body font-light text-xs text-white/80">
+                    {photo.caption}
+                  </p>
+                )}
+              </div>
+            </FadeIn>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           {cards.map((card, i) => (
