@@ -133,21 +133,27 @@ const Header = () => {
 
               {/* Menu items */}
               <nav className="flex flex-col px-8 mt-4">
-                {[
+              {[
                   { label: "Collection", href: "/#collection" },
                   { label: "Management", href: "/management" },
                   { label: "About", href: "/about" },
-                  { label: "Contact", href: "mailto:chez@maisons.co" },
                 ].map((link) => (
                   <Link
                     key={link.label}
                     to={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4 border-b border-[#f0f0f0] last:border-b-0"
+                    className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4 border-b border-[#f0f0f0]"
                   >
                     {link.label}
                   </Link>
                 ))}
+                <a
+                  href="mailto:chez@maisons.co"
+                  onClick={() => setMenuOpen(false)}
+                  className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4"
+                >
+                  Contact
+                </a>
               </nav>
 
               {/* Bottom info */}
