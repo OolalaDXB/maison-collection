@@ -10,12 +10,12 @@ const regionPhotos = [
   {
     src: regionGolfe,
     alt: "Golfe du Morbihan — turquoise waters and islands seen from above",
-    caption: "Golfe du Morbihan — 30 min",
+    caption: "Gulf of Morbihan — 30 min",
   },
   {
     src: regionCarnac,
     alt: "Carnac megalithic alignments — thousands of standing stones at sunset",
-    caption: "Alignements de Carnac — 50 min",
+    caption: "Carnac Alignments — 50 min",
   },
   {
     src: regionPoulfetan,
@@ -25,7 +25,7 @@ const regionPhotos = [
   {
     src: regionBlavet,
     alt: "Blavet river valley — lush green hills and calm water winding through the Morbihan countryside",
-    caption: "Vallée du Blavet — 5 min",
+    caption: "Blavet Valley — 5 min",
   },
 ];
 
