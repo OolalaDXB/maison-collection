@@ -238,8 +238,10 @@ const AdminCalendarPage = () => {
               const dayAvail = getAvailForDay(day);
               // Property IDs that already have a booking bar shown — skip their availability blocks
               const bookedPropIds = new Set(dayBookings.map((b) => b.property_id));
-              const blocked = dayAvail.filter((a) => a.available === false && !a.booking_id && !bookedPropIds.has(a.property_id));
+              // Separate airbnb blocks from manual blocks — never show both for the same entry
               const airbnbBlocked = dayAvail.filter((a) => a.source?.startsWith("airbnb") && a.available === false && !bookedPropIds.has(a.property_id));
+              const airbnbBlockedPropIds = new Set(airbnbBlocked.map((a) => a.property_id));
+              const manualBlocked = dayAvail.filter((a) => a.available === false && !a.booking_id && !bookedPropIds.has(a.property_id) && !a.source?.startsWith("airbnb"));
 
               return (
                 <div
@@ -254,7 +256,7 @@ const AdminCalendarPage = () => {
                         {b.guest_name}
                       </div>
                     ))}
-                    {blocked.length > 0 && !dayBookings.length && (
+                    {manualBlocked.length > 0 && (
                       <div className="bg-muted-foreground/40 text-[0.55rem] text-foreground px-1 py-0.5">Blocked</div>
                     )}
                     {airbnbBlocked.length > 0 && (
