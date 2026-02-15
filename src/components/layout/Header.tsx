@@ -40,6 +40,13 @@ const Header = () => {
 
   const transparentMode = isHomepage && !scrolled;
 
+  const isActive = (href: string) => {
+    if (href === "/#collection") {
+      return location.pathname === "/" && location.hash === "#collection";
+    }
+    return location.pathname === href;
+  };
+
   return (
     <>
       <header
@@ -67,7 +74,9 @@ const Header = () => {
                 key={link.label}
                 to={link.href}
                 className={`text-sm font-body font-normal uppercase tracking-wider transition-colors duration-300 ${
-                  transparentMode ? "text-[rgba(255,255,255,0.85)] hover:text-white" : "text-[#666666] hover:text-[#1a1a1a]"
+                  transparentMode
+                    ? `text-white hover:text-[rgba(255,255,255,0.6)] ${isActive(link.href) ? "border-b border-white pb-0.5" : ""}`
+                    : `text-[#1a1a1a] hover:text-[#c1695f] ${isActive(link.href) ? "border-b border-[#c1695f] pb-0.5" : ""}`
                 }`}
               >
                 {link.label}
@@ -77,7 +86,7 @@ const Header = () => {
               href="mailto:chez@maisons.co"
               className={`text-xs font-body font-normal uppercase tracking-wider px-4 py-1.5 border transition-colors duration-300 ${
                 transparentMode
-                  ? "border-[rgba(255,255,255,0.5)] text-white hover:bg-[rgba(255,255,255,0.1)]"
+                  ? "border-white text-white hover:bg-[rgba(255,255,255,0.15)]"
                   : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white"
               }`}
             >
@@ -142,7 +151,9 @@ const Header = () => {
                     key={link.label}
                     to={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] text-[#1a1a1a] py-4 border-b border-[#f0f0f0]"
+                    className={`font-body font-normal uppercase tracking-[0.15em] text-[1.1rem] py-4 border-b border-[#f0f0f0] ${
+                      isActive(link.href) ? "text-[#c1695f]" : "text-[#1a1a1a]"
+                    }`}
                   >
                     {link.label}
                   </Link>
