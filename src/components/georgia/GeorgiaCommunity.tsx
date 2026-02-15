@@ -1,6 +1,29 @@
 import { Mountain, Snowflake, Church } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
+/* TODO: replace with dedicated region photos when available */
+import regionCaucasus from "@/assets/georgia-8.jpg";
+import regionGergeti from "@/assets/georgia-13.jpg";
+import regionHighway from "@/assets/georgia-14.jpg";
+
+const regionPhotos = [
+  {
+    src: regionCaucasus,
+    alt: "Greater Caucasus mountain range from Gudauri",
+    caption: "The Greater Caucasus — 2,200m",
+  },
+  {
+    src: regionGergeti,
+    alt: "Gergeti Trinity Church with Mount Kazbek",
+    caption: "Gergeti Trinity Church — Kazbegi",
+  },
+  {
+    src: regionHighway,
+    alt: "Georgian Military Highway winding through mountains",
+    caption: "Georgian Military Highway",
+  },
+];
+
 const cards = [
   {
     icon: Mountain,
@@ -49,6 +72,28 @@ const GeorgiaCommunity = () => {
             </p>
           </div>
         </FadeIn>
+
+        {/* Region photos */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
+          {regionPhotos.map((photo, i) => (
+            <FadeIn key={photo.alt} delay={i * 0.15}>
+              <div className="relative overflow-hidden group">
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full h-[220px] md:h-[260px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {photo.caption && (
+                  <p className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-4 py-3 font-body font-light text-xs text-white/80">
+                    {photo.caption}
+                  </p>
+                )}
+              </div>
+            </FadeIn>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           {cards.map((card, i) => (
