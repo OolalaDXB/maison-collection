@@ -4,6 +4,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Percent, TrendingUp, CalendarDays } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface KpiData {
   revenueMtd: number;
@@ -70,6 +71,7 @@ const AdminDashboardPage = () => {
 
   return (
     <AdminLayout>
+      <SEO title="Admin Dashboard" description="" path="/admin" noindex={true} />
       <h1 className="font-display text-2xl mb-6">Dashboard</h1>
 
       {/* KPIs */}

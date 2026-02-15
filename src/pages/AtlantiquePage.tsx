@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
@@ -49,6 +51,24 @@ const AtlantiquePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Maison Atlantique"
+        description="A restored Breton stone house near the Blavet valley in Quistinic, Brittany. Between the Golfe du Morbihan, Carnac megaliths, and wild Atlantic coast."
+        path="/atlantique"
+        image="https://maisons.co/og-atlantique.jpg"
+      />
+      <VacationRentalSchema
+        name="Maison Atlantique"
+        description="Restored Breton stone house near the Golfe du Morbihan"
+        url="https://maisons.co/atlantique"
+        image="https://maisons.co/og-atlantique.jpg"
+        address={{ locality: "Quistinic", region: "Brittany", country: "FR" }}
+        pricePerNight={110}
+        currency="EUR"
+        maxGuests={6}
+        bedrooms={3}
+        bathrooms={2}
+      />
       <Header />
 
       <AtlantiqueHero imageCount={images.length || 10} />

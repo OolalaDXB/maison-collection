@@ -1,10 +1,16 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
+import SEO from "@/components/SEO";
 
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="About Maisons"
+        description="We started with our own homes. Now we curate a collection of distinctive properties across Europe and beyond, each chosen with intention."
+        path="/about"
+      />
       <Header />
 
       <section className="section-padding pt-32 md:pt-40">

@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
+import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Turnstile } from "@marsidev/react-turnstile";
@@ -73,6 +74,11 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Contact"
+        description="Get in touch for a booking inquiry or to discuss managing your property with Maisons. We respond within 24 hours."
+        path="/contact"
+      />
       <Header />
 
       <section className="section-padding pt-32 md:pt-40">
