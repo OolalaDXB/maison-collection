@@ -9,7 +9,7 @@ import PropertyCard from "@/components/PropertyCard";
 import FadeIn from "@/components/FadeIn";
 import SEO from "@/components/SEO";
 import { OrganizationSchema } from "@/components/StructuredData";
-
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { supabase } from "@/integrations/supabase/client";
 
 const services = [
@@ -53,10 +53,10 @@ const Index = () => {
     heroImage: p.heroImage || heroOverrides[p.slug] || "",
   }));
 
-  const heroTitle = "Houses with a point of view";
-  const heroSubtitle = "A collection of distinctive homes across Europe, the Caucasus, and the Gulf.";
-  const philosophyTitle = "Not rentals. Residences.";
-  const philosophyText = "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.";
+  const heroTitle = useSiteContent("home", "hero_title", "Houses with a point of view");
+  const heroSubtitle = useSiteContent("home", "hero_subtitle", "A collection of distinctive homes across Europe, the Caucasus, and the Gulf.");
+  const philosophyTitle = useSiteContent("home", "philosophy_title", "Not rentals. Residences.");
+  const philosophyText = useSiteContent("home", "philosophy_text", "We don't believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.");
 
   return (
     <div className="min-h-screen bg-background">
