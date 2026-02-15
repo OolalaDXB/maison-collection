@@ -32,6 +32,7 @@ interface RegionLinkRow { id: string; property_id: string; label: string; url: s
 
 const AdminPropertiesPage = () => {
   const [properties, setProperties] = useState<PropertyRow[]>([]);
+  const [firstImages, setFirstImages] = useState<Record<string, string>>({});
   const [images, setImages] = useState<PropertyImage[]>([]);
   const [editing, setEditing] = useState<PropertyRow | null>(null);
   const [managingImages, setManagingImages] = useState<string | null>(null);
@@ -63,9 +64,18 @@ const AdminPropertiesPage = () => {
   useEffect(() => { fetchProperties(); }, []);
 
   const fetchProperties = async () => {
-    const { data, error } = await supabase.from("properties").select("*").order("display_order");
+    const [{ data, error }, { data: imgData }] = await Promise.all([
+      supabase.from("properties").select("*").order("display_order"),
+      supabase.from("property_images").select("property_id, image_url").order("display_order").limit(100),
+    ]);
     if (error) toast.error("Error loading properties");
     else setProperties((data as any[]) || []);
+    // Build map of first image per property
+    const map: Record<string, string> = {};
+    (imgData || []).forEach((img: any) => {
+      if (!map[img.property_id]) map[img.property_id] = img.image_url;
+    });
+    setFirstImages(map);
     setLoading(false);
   };
 
@@ -740,7 +750,11 @@ const AdminPropertiesPage = () => {
         {properties.map((prop) => (
           <div key={prop.id} className="flex items-center gap-4 p-4 border border-border">
             <GripVertical size={16} className="text-muted-foreground" />
-            {prop.hero_image && <img src={prop.hero_image} alt="" className="w-16 h-12 object-cover" />}
+            {(prop.hero_image || firstImages[prop.id]) ? (
+              <img src={prop.hero_image || firstImages[prop.id]} alt="" className="w-16 h-12 object-cover" />
+            ) : (
+              <div className="w-16 h-12 bg-muted flex items-center justify-center"><Image size={16} className="text-muted-foreground" /></div>
+            )}
             <div className="flex-1">
               <p className="font-medium text-foreground">{prop.name}</p>
               <p className="text-sm text-muted-foreground">{prop.location} · {prop.status}</p>
