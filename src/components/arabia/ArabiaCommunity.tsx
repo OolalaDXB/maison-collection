@@ -1,10 +1,9 @@
 import { Leaf, Baby, TreePine } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
-/* TODO: replace with dedicated region photos when available */
-import regionSustainable from "@/assets/arabia-community-1.jpeg";
-import regionBiodomes from "@/assets/arabia-community-3.jpeg";
-import regionEquestrian from "@/assets/arabia-community-5.jpeg";
+import regionSustainable from "@/assets/region-sustainable-city.jpg";
+import regionBiodomes from "@/assets/region-biodomes.jpg";
+import regionEquestrian from "@/assets/region-equestrian.jpg";
 
 const regionPhotos = [
   {

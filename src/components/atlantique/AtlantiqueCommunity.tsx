@@ -1,11 +1,10 @@
 import { Waves, TreePine, Landmark, Footprints } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
 
-/* TODO: replace with dedicated region photos when available */
-import regionGolfe from "@/assets/atlantique-3.avif";
-import regionCarnac from "@/assets/atlantique-5.avif";
-import regionPoulfetan from "@/assets/atlantique-7.avif";
-import regionBlavet from "@/assets/atlantique-9.avif";
+import regionGolfe from "@/assets/region-golfe-morbihan.jpg";
+import regionCarnac from "@/assets/region-carnac.jpg";
+import regionPoulfetan from "@/assets/region-poulfetan.jpg";
+import regionBlavet from "@/assets/region-blavet.jpg";
 
 const regionPhotos = [
   {
