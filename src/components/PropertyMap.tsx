@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-mapboxgl.accessToken = "pk.eyJ1IjoibWFpc29uczIwMjYiLCJhIjoiY21sbW04cnA5MGphbzNkczllcDd5YnhheiJ9.4VIr3ZqMH9pI0vb77tByaw";
+const mapToken = import.meta.env.VITE_MAP_TOKEN;
+if (mapToken) mapboxgl.accessToken = mapToken;
 
 interface POI {
   label: string;
@@ -42,7 +43,7 @@ const PropertyMap = ({ center, zoom = 14, propertyName, pois = [] }: PropertyMap
   const map = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!mapToken || !mapContainer.current || map.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -92,6 +93,8 @@ const PropertyMap = ({ center, zoom = 14, propertyName, pois = [] }: PropertyMap
       map.current = null;
     };
   }, [center, zoom, propertyName, pois]);
+
+  if (!mapToken) return null;
 
   return (
     <div
