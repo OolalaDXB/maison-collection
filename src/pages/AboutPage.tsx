@@ -2,8 +2,14 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
 import SEO from "@/components/SEO";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { useTranslation } from "react-i18next";
 
 const AboutPage = () => {
+  const { t } = useTranslation();
+  const title = useSiteContent("about", "title", "Darya & Mickaël");
+  const subtitle = useSiteContent("about", "subtitle", "About");
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -16,9 +22,9 @@ const AboutPage = () => {
       <section className="section-padding pt-32 md:pt-40">
         <div className="max-container max-w-3xl">
           <FadeIn>
-            <p className="section-label">About</p>
+            <p className="section-label">{subtitle}</p>
             <h1 className="font-display text-4xl md:text-5xl text-foreground mb-8">
-              Darya & Micka&euml;l
+              {title}
             </h1>
           </FadeIn>
 
@@ -84,7 +90,7 @@ const AboutPage = () => {
 
           <FadeIn delay={0.4}>
             <p className="font-display italic text-xl text-primary mt-16">
-              — Darya & Micka&euml;l
+              — Darya & Mickaël
             </p>
           </FadeIn>
         </div>

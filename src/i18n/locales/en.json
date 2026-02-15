@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "collection": "Collection",
+    "management": "Management",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "property_card": {
+    "from": "From",
+    "per_night": "/night",
+    "guests": "guests",
+    "coming_soon": "Coming Soon",
+    "opening_2026": "Opening 2026"
+  },
+  "footer": {
+    "destinations": "Destinations",
+    "maisons": "Maisons",
+    "contact_us": "Contact us",
+    "newsletter_title": "Join the Maisons family",
+    "newsletter_placeholder": "Your email",
+    "newsletter_thanks": "Thank you — you're in.",
+    "newsletter_desc": "Travel stories, new properties, and insider tips. A few emails a year.",
+    "subscribe": "Subscribe",
+    "our_collection": "Our collection",
+    "about_us": "About us",
+    "send_message": "Send a message",
+    "copyright": "All rights reserved.",
+    "privacy": "Privacy policy",
+    "terms": "Terms of use"
+  },
+  "booking": {
+    "book_now": "Book Now",
+    "book_property": "Book",
+    "check_in": "Check-in",
+    "check_out": "Check-out",
+    "guests": "Guests",
+    "total": "Total",
+    "nights": "nights",
+    "confirm": "Confirm Booking",
+    "summary": "Summary & Confirm",
+    "your_details": "Your Details",
+    "full_name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "special_requests": "Special Requests",
+    "continue": "Continue",
+    "back": "Back",
+    "rental_agreement": "Rental Agreement",
+    "accept_agreement": "I have read and accept the rental agreement",
+    "payment_method": "Payment Method",
+    "payment_method_desc": "Choose how you'd like to pay. All methods are accepted regardless of amount.",
+    "submitting": "Submitting…"
+  },
+  "contact_page": {
+    "label": "Contact",
+    "title": "Get in touch",
+    "subtitle": "Whether you'd like to book a stay or discuss managing your property with us.",
+    "name": "Your name",
+    "email": "Your email",
+    "phone": "Phone (optional)",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending…",
+    "thanks": "Thank you for reaching out.",
+    "managed_by": "Managed by Darya — Response within 24 hours.",
+    "booking_inquiry": "Booking Inquiry",
+    "collaboration": "Property Collaboration",
+    "select_property": "Select a property",
+    "preferred_dates": "Preferred dates",
+    "num_guests": "Number of guests",
+    "special_requests": "Any special requests or questions",
+    "property_location": "Property location",
+    "property_type": "Property type",
+    "tell_us": "Tell us about your property"
+  },
+  "lang": {
+    "en": "EN",
+    "fr": "FR",
+    "ru": "RU"
+  }
+}

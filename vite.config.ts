@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => ({
           charts: ['recharts'],
           map: ['mapbox-gl'],
           motion: ['framer-motion'],
+          i18n: ['i18next', 'react-i18next'],
         },
       },
     },

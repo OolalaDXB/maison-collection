@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "collection": "Collection",
+    "management": "Gestion",
+    "about": "À propos",
+    "contact": "Contact"
+  },
+  "property_card": {
+    "from": "À partir de",
+    "per_night": "/nuit",
+    "guests": "voyageurs",
+    "coming_soon": "Bientôt",
+    "opening_2026": "Ouverture 2026"
+  },
+  "footer": {
+    "destinations": "Destinations",
+    "maisons": "Maisons",
+    "contact_us": "Nous contacter",
+    "newsletter_title": "Rejoignez la famille Maisons",
+    "newsletter_placeholder": "Votre email",
+    "newsletter_thanks": "Merci — bienvenue parmi nous.",
+    "newsletter_desc": "Récits de voyage, nouvelles propriétés et conseils. Quelques emails par an.",
+    "subscribe": "S'inscrire",
+    "our_collection": "Notre collection",
+    "about_us": "À propos",
+    "send_message": "Envoyer un message",
+    "copyright": "Tous droits réservés.",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation"
+  },
+  "booking": {
+    "book_now": "Réserver",
+    "book_property": "Réserver",
+    "check_in": "Arrivée",
+    "check_out": "Départ",
+    "guests": "Voyageurs",
+    "total": "Total",
+    "nights": "nuits",
+    "confirm": "Confirmer la réservation",
+    "summary": "Récapitulatif",
+    "your_details": "Vos coordonnées",
+    "full_name": "Nom complet",
+    "email": "Email",
+    "phone": "Téléphone",
+    "special_requests": "Demandes particulières",
+    "continue": "Continuer",
+    "back": "Retour",
+    "rental_agreement": "Contrat de location",
+    "accept_agreement": "J'ai lu et j'accepte le contrat de location",
+    "payment_method": "Mode de paiement",
+    "payment_method_desc": "Choisissez votre mode de paiement. Tous les modes sont acceptés.",
+    "submitting": "Envoi en cours…"
+  },
+  "contact_page": {
+    "label": "Contact",
+    "title": "Contactez-nous",
+    "subtitle": "Que vous souhaitiez réserver un séjour ou discuter de la gestion de votre bien.",
+    "name": "Votre nom",
+    "email": "Votre email",
+    "phone": "Téléphone (optionnel)",
+    "message": "Message",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "thanks": "Merci de nous avoir contactés.",
+    "managed_by": "Géré par Darya — Réponse sous 24 heures.",
+    "booking_inquiry": "Demande de réservation",
+    "collaboration": "Collaboration propriétaire",
+    "select_property": "Choisir une propriété",
+    "preferred_dates": "Dates souhaitées",
+    "num_guests": "Nombre de voyageurs",
+    "special_requests": "Demandes particulières",
+    "property_location": "Emplacement du bien",
+    "property_type": "Type de bien",
+    "tell_us": "Parlez-nous de votre bien"
+  },
+  "lang": {
+    "en": "EN",
+    "fr": "FR",
+    "ru": "RU"
+  }
+}
