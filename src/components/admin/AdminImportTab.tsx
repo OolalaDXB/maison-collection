@@ -207,13 +207,63 @@ const AdminImportTab = () => {
 
       if (bErr) { console.error("Import error:", bErr); skipped++; continue; }
 
+      const bookingId = (booking as any).id;
+
+      // Create ledger entries for this booking
+      const ledgerEntries: any[] = [];
+      
+      // Income: platform payout
+      if (res.earnings > 0) {
+        ledgerEntries.push({
+          property_id: res.property_id,
+          booking_id: bookingId,
+          entry_type: "income",
+          category: "platform_payout",
+          amount: res.earnings,
+          currency: "EUR",
+          amount_eur: res.earnings,
+          description: `Airbnb payout — ${res.guest_name} (${res.confirmation_code})`,
+          reference: res.confirmation_code,
+          counterparty: "Airbnb",
+          entry_date: res.check_out || res.check_in,
+          source: "airbnb_csv",
+        });
+      }
+
+      // Expense: platform commission (total_price - payout)
+      const totalPrice = res.earnings; // earnings = payout in Airbnb CSV
+      const basePricePerNight = res.nights > 0 ? Math.round(res.earnings / res.nights) : 0;
+      const estimatedGrossPrice = basePricePerNight * (res.nights || 1) * 1.15; // rough estimate
+      const commission = Math.max(0, estimatedGrossPrice - res.earnings);
+      if (commission > 0) {
+        ledgerEntries.push({
+          property_id: res.property_id,
+          booking_id: bookingId,
+          entry_type: "expense",
+          category: "platform_commission",
+          amount: Math.round(commission * 100) / 100,
+          currency: "EUR",
+          amount_eur: Math.round(commission * 100) / 100,
+          description: `Airbnb commission — ${res.confirmation_code}`,
+          reference: res.confirmation_code,
+          counterparty: "Airbnb",
+          entry_date: res.check_out || res.check_in,
+          source: "airbnb_csv",
+        });
+      }
+
+      // Insert ledger entries (non-blocking)
+      if (ledgerEntries.length > 0) {
+        await supabase.from("ledger_entries" as any).insert(ledgerEntries);
+      }
+
       const checkIn = new Date(res.check_in + "T00:00:00Z");
       const checkOut = new Date(res.check_out + "T00:00:00Z");
       const current = new Date(checkIn);
       while (current < checkOut) {
         const dateStr = current.toISOString().split("T")[0];
         await supabase.from("availability").upsert(
-          { property_id: res.property_id, date: dateStr, available: false, source: "airbnb", booking_id: (booking as any).id },
+          { property_id: res.property_id, date: dateStr, available: false, source: "airbnb", booking_id: bookingId },
           { onConflict: "property_id,date" }
         );
         current.setUTCDate(current.getUTCDate() + 1);
