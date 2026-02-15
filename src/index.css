@@ -144,6 +144,25 @@
   }
 }
 
+/* Admin-specific overrides */
+.admin-table thead th {
+  background: hsl(36, 20%, 97%);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(0, 0%, 40%);
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background: hsl(36, 15%, 99%);
+}
+
+.admin-table tbody tr:hover {
+  background: hsl(36, 20%, 98%);
+  transition: background-color 0.15s;
+}
+
 @keyframes slide-in-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
