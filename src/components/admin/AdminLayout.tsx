@@ -87,10 +87,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Logo */}
       <div className="p-6 pb-2">
         <Link to="/" className="block">
-          <span className="font-display text-lg tracking-[0.15em] text-[hsl(36,20%,85%)]">
+          <span className="font-display text-lg tracking-[0.15em] text-white">
             MAISONS
           </span>
-          <p className="font-body text-[0.6rem] uppercase tracking-[0.2em] text-[hsl(30,5%,45%)] mt-0.5">
+          <p className="font-body text-[0.6rem] uppercase tracking-[0.2em] text-white/40 mt-0.5">
             Administration
           </p>
         </Link>
@@ -100,7 +100,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 overflow-y-auto px-3 pt-2">
         {navSections.map((section) => (
           <div key={section.label}>
-            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-[hsl(30,5%,35%)] mt-5 mb-2 px-3">
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-white/25 mt-5 mb-2 px-3">
               {section.label}
             </p>
             <div className="space-y-0.5">
@@ -110,8 +110,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2 font-body text-[0.8rem] tracking-wide transition-colors ${
                     isActive(item.path)
-                      ? "bg-primary/15 text-primary"
-                      : "text-[hsl(30,5%,55%)] hover:text-[hsl(36,20%,85%)]"
+                      ? "bg-primary/15 text-white font-medium"
+                      : "text-white/70 hover:text-white"
                   }`}
                 >
                   <item.icon size={15} />
@@ -124,11 +124,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* User section */}
-      <div className="p-4 border-t border-[hsl(30,5%,18%)]">
-        <p className="text-[0.65rem] text-[hsl(30,5%,40%)] mb-2 truncate font-body">{user?.email}</p>
+      <div className="p-4 border-t border-white/10">
+        <p className="text-[0.65rem] text-white/50 mb-2 truncate font-body">{user?.email}</p>
         <button
           onClick={signOut}
-          className="flex items-center gap-2 font-body text-[0.8rem] text-[hsl(30,5%,45%)] hover:text-[hsl(36,20%,85%)] transition-colors"
+          className="flex items-center gap-2 font-body text-[0.8rem] text-white/40 hover:text-white transition-colors"
         >
           <LogOut size={14} /> Sign Out
         </button>
@@ -148,16 +148,16 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile header + drawer */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-[hsl(30,5%,8%)] flex items-center px-4">
-        <button onClick={() => setMobileOpen(true)} className="text-[hsl(36,20%,85%)]">
+        <button onClick={() => setMobileOpen(true)} className="text-white">
           <Menu size={20} />
         </button>
-        <span className="ml-3 font-display text-sm tracking-[0.15em] text-[hsl(36,20%,85%)]">MAISONS</span>
+        <span className="ml-3 font-display text-sm tracking-[0.15em] text-white">MAISONS</span>
       </div>
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-[hsl(0,0%,0%,0.5)]" onClick={() => setMobileOpen(false)} />
           <aside className="relative w-60 h-full bg-[hsl(30,5%,8%)]">
-            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-[hsl(36,20%,85%)]">
+            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-white">
               <X size={18} />
             </button>
             {sidebar}
