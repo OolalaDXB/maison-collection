@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Star, X } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -172,28 +173,28 @@ const AtlantiqueBookingSidebar = ({
 
       {/* Actions */}
       <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 space-y-3">
-        <a
-          href={`mailto:chez@maisons.co?subject=${encodeURIComponent(bookSubject)}`}
+        <Link
+          to={`/book/atlantique${checkIn && checkOut ? `?checkin=${format(checkIn, "yyyy-MM-dd")}&checkout=${format(checkOut, "yyyy-MM-dd")}&guests=${guests}` : ""}`}
           className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
         >
           Book with us
-        </a>
-        <div className="flex items-center gap-3">
-          <a
-            href={`mailto:chez@maisons.co?subject=${encodeURIComponent(contactSubject)}`}
-            className="flex-1 border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
-          >
-            Contact us
-          </a>
+        </Link>
+        <Link
+          to={`/contact?type=booking&property=atlantique`}
+          className="block w-full border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
+        >
+          Contact us
+        </Link>
+        <p className="text-center">
           <a
             href={airbnbUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 border border-[hsl(0,0%,88%)] text-muted-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground hover:text-foreground transition-colors"
+            className="font-body font-light text-xs text-muted-foreground underline hover:text-foreground transition-colors"
           >
-            Book on Airbnb
+            or book on Airbnb
           </a>
-        </div>
+        </p>
       </div>
       <p className="font-body font-light text-xs text-muted-foreground mt-3 text-center">
         chez@maisons.co

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Star, X } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -166,13 +167,19 @@ const ArabiaBookingSidebar = ({
       </div>
 
       {/* Actions */}
-      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5">
-        <a
-          href={`mailto:chez@maisons.co?subject=${encodeURIComponent(bookSubject)}`}
-          className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity mb-3"
+      <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 space-y-3">
+        <Link
+          to={`/book/arabia${checkIn && checkOut ? `?checkin=${format(checkIn, "yyyy-MM-dd")}&checkout=${format(checkOut, "yyyy-MM-dd")}&guests=${guests}` : ""}`}
+          className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
         >
           Book with us
-        </a>
+        </Link>
+        <Link
+          to={`/contact?type=booking&property=arabia`}
+          className="block w-full border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
+        >
+          Contact us
+        </Link>
       </div>
       <p className="font-body font-light text-xs text-muted-foreground mt-3 text-center">
         chez@maisons.co

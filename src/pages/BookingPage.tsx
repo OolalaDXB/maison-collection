@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
+import { useActivePaymentMethods } from "@/hooks/usePaymentMethods";
+import { useDefaultBankAccount } from "@/hooks/useBankAccounts";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,7 @@ interface PropertyData {
 const BookingPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [availability, setAvailability] = useState<any[]>([]);
@@ -30,11 +33,14 @@ const BookingPage = () => {
   const [contractHtml, setContractHtml] = useState("");
   const [contractAccepted, setContractAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
+  const { data: paymentMethods = [], isLoading: methodsLoading } = useActivePaymentMethods();
+  const { data: bankAccount } = useDefaultBankAccount("EUR");
 
   const [form, setForm] = useState({
     guest_name: "",
@@ -59,7 +65,6 @@ const BookingPage = () => {
         setAvailability(avRes.data || []);
         setSeasonalPricing(spRes.data || []);
 
-        // Load contract template
         const { data: tmpl } = await supabase.from("contract_templates").select("body_html").eq("active", true).or(`property_id.eq.${data.id},property_id.is.null`).order("property_id", { ascending: false }).limit(1).single();
         if (tmpl) setContractHtml(tmpl.body_html);
       }
@@ -91,7 +96,7 @@ const BookingPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!property || !price) return;
+    if (!property || !price || !paymentMethod) return;
     if (honeypot) return;
     if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
@@ -112,6 +117,8 @@ const BookingPage = () => {
       status: "pending",
       source: "direct",
       special_requests: form.special_requests || null,
+      payment_method: paymentMethod,
+      payment_status: "pending",
     } as any).select().single();
 
     if (bError) { toast.error(bError.message); setSubmitting(false); return; }
@@ -142,11 +149,36 @@ const BookingPage = () => {
       phone: form.guest_phone || null,
       type: "booking",
       property_id: property.id,
-      message: `Booking request: ${form.check_in} → ${form.check_out}, ${price.nights} nights, €${price.total}`,
+      message: `Booking request: ${form.check_in} → ${form.check_out}, ${price.nights} nights, €${price.total}, payment: ${paymentMethod}`,
     });
 
+    // Handle payment method
+    if (paymentMethod === "card") {
+      const { data: session, error: sError } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          booking_id: booking.id,
+          amount: Math.round(price.total * 100),
+          currency: "eur",
+          property_name: property.name,
+          guest_email: form.guest_email,
+          success_url: `${window.location.origin}/book/${slug}/confirmation?booking_id=${booking.id}`,
+          cancel_url: `${window.location.origin}/book/${slug}?step=4`,
+        },
+      });
+
+      if (sError || !session?.url) {
+        toast.error("Payment setup failed. Please try again or choose another method.");
+        setSubmitting(false);
+        return;
+      }
+
+      window.location.href = session.url;
+      return;
+    }
+
+    // For transfer/crypto, redirect to confirmation
     setSubmitting(false);
-    setSubmitted(true);
+    navigate(`/book/${slug}/confirmation?booking_id=${booking.id}`);
   };
 
   if (!property) {
@@ -154,27 +186,6 @@ const BookingPage = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="section-padding"><div className="max-container text-center py-20"><p className="text-muted-foreground">Loading…</p></div></div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="section-padding">
-          <div className="max-container max-w-lg mx-auto text-center py-16">
-            <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <Check size={32} className="text-primary" />
-            </div>
-            <h1 className="font-display text-3xl mb-4">Booking Submitted</h1>
-            <p className="text-muted-foreground mb-8">
-              Your booking request for {property.name} has been submitted. We'll contact you within 24 hours to arrange payment and confirm your reservation.
-            </p>
-            <Link to={`/${slug}`} className="text-primary text-sm hover:underline underline-offset-4">← Back to {property.name}</Link>
-          </div>
-        </div>
         <Footer />
       </div>
     );
@@ -190,7 +201,7 @@ const BookingPage = () => {
 
           {/* Step indicators */}
           <div className="flex gap-1 mb-8">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <div key={s} className={`h-1 flex-1 ${step >= s ? "bg-primary" : "bg-border"}`} />
             ))}
           </div>
@@ -233,8 +244,66 @@ const BookingPage = () => {
             </div>
           )}
 
-          {/* Step 3: Summary */}
-          {step === 3 && price && (
+          {/* Step 3: Payment Method */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <h2 className="font-display text-xl mb-2">Payment Method</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Choose how you'd like to pay. All methods are accepted regardless of amount.
+              </p>
+
+              {methodsLoading ? (
+                <p className="text-sm text-muted-foreground">Loading payment options…</p>
+              ) : paymentMethods.length === 0 ? (
+                <div className="border border-border p-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No payment methods available. Please contact us at chez@maisons.co.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {paymentMethods.map((method) => (
+                    <button
+                      key={method.code}
+                      type="button"
+                      onClick={() => setPaymentMethod(method.code)}
+                      className={`w-full border p-5 text-left transition-colors ${
+                        paymentMethod === method.code
+                          ? "border-foreground bg-[hsl(0,0%,97%)]"
+                          : "border-[hsl(0,0%,88%)] hover:border-[hsl(0,0%,70%)]"
+                      }`}
+                    >
+                      <p className="font-body font-medium text-sm text-foreground">
+                        {method.code === "card" && "💳 "}
+                        {method.code === "bank_transfer" && "🏦 "}
+                        {method.code === "crypto" && "₿ "}
+                        {method.name}
+                      </p>
+                      {method.description && (
+                        <p className="font-body font-light text-xs text-muted-foreground mt-1">
+                          {method.description}
+                        </p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
+                <Button
+                  className="flex-1"
+                  disabled={!paymentMethod}
+                  onClick={() => setStep(4)}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Summary & Confirm */}
+          {step === 4 && price && (
             <div className="space-y-4">
               <h2 className="font-display text-xl mb-4">Summary & Confirm</h2>
 
@@ -252,8 +321,17 @@ const BookingPage = () => {
                 <div className="flex justify-between font-display text-lg border-t border-border pt-2 mt-2"><span>Total</span><span>€{price.total}</span></div>
               </div>
 
+              <div className="border border-border p-4 text-sm">
+                <p className="text-muted-foreground">
+                  Payment method:{" "}
+                  <span className="text-foreground font-medium">
+                    {paymentMethods.find((m) => m.code === paymentMethod)?.name || paymentMethod}
+                  </span>
+                </p>
+              </div>
+
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
+                <Button variant="outline" onClick={() => setStep(3)}>Back</Button>
                 <Button className="flex-1" onClick={handleSubmit} disabled={submitting || (!!turnstileSiteKey && !turnstileToken)}>
                   {submitting ? <><Loader2 size={16} className="animate-spin mr-2" /> Submitting…</> : "Confirm Booking"}
                 </Button>
@@ -261,8 +339,6 @@ const BookingPage = () => {
               {turnstileSiteKey && (
                 <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'normal' }} />
               )}
-
-              <p className="text-xs text-muted-foreground text-center">No payment required now. We'll contact you to arrange payment.</p>
             </div>
           )}
         </div>
