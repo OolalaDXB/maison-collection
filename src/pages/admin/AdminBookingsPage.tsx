@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Search, Save, Trash2 } from "lucide-react";
+import { Plus, Search, Save, Trash2, CreditCard, CheckCircle } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface Booking {
   id: string;
@@ -189,6 +190,7 @@ const AdminBookingsPage = () => {
       airbnb_confirmation_code: editBooking.airbnb_confirmation_code || null,
       special_requests: editBooking.special_requests || null,
       internal_notes: editBooking.internal_notes || null,
+      paid_at: editBooking.paid_at || null,
     }).eq("id", editBooking.id);
     setSaving(false);
 
@@ -324,103 +326,186 @@ const AdminBookingsPage = () => {
                   <span className="text-xs font-mono text-muted-foreground">{editBooking.id.slice(0, 8)}</span>
                 </DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+              <Tabs defaultValue="details" className="mt-2">
+                <TabsList className="w-full">
+                  <TabsTrigger value="details" className="flex-1">Détails</TabsTrigger>
+                  <TabsTrigger value="payments" className="flex-1"><CreditCard size={14} className="mr-1" /> Paiements</TabsTrigger>
+                </TabsList>
 
-                {/* Guest Info */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Guest</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Name"><Input value={editBooking.guest_name} onChange={(e) => setField("guest_name", e.target.value)} /></Field>
-                  <Field label="Email"><Input type="email" value={editBooking.guest_email} onChange={(e) => setField("guest_email", e.target.value)} /></Field>
-                  <Field label="Phone"><Input value={editBooking.guest_phone || ""} onChange={(e) => setField("guest_phone", e.target.value)} /></Field>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Guests count"><Input type="number" min={1} value={editBooking.guests_count || 1} onChange={(e) => setField("guests_count", parseInt(e.target.value) || 1)} /></Field>
-                  <Field label="Property">
-                    <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.property_id} onChange={(e) => setField("property_id", e.target.value)}>
-                      {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="Source">
-                    <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.source || "direct"} onChange={(e) => setField("source", e.target.value)}>
-                      {["direct", "airbnb", "airbnb_csv", "manual"].map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </Field>
-                </div>
+                <TabsContent value="details">
+                  <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+                    {/* Guest Info */}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Guest</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Name"><Input value={editBooking.guest_name} onChange={(e) => setField("guest_name", e.target.value)} /></Field>
+                      <Field label="Email"><Input type="email" value={editBooking.guest_email} onChange={(e) => setField("guest_email", e.target.value)} /></Field>
+                      <Field label="Phone"><Input value={editBooking.guest_phone || ""} onChange={(e) => setField("guest_phone", e.target.value)} /></Field>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Guests count"><Input type="number" min={1} value={editBooking.guests_count || 1} onChange={(e) => setField("guests_count", parseInt(e.target.value) || 1)} /></Field>
+                      <Field label="Property">
+                        <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.property_id} onChange={(e) => setField("property_id", e.target.value)}>
+                          {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                      </Field>
+                      <Field label="Source">
+                        <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.source || "direct"} onChange={(e) => setField("source", e.target.value)}>
+                          {["direct", "airbnb", "airbnb_csv", "manual"].map((s) => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </Field>
+                    </div>
 
-                {/* Dates */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Dates</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Check-in"><Input type="date" value={editBooking.check_in} onChange={(e) => setField("check_in", e.target.value)} /></Field>
-                  <Field label="Check-out"><Input type="date" value={editBooking.check_out} onChange={(e) => setField("check_out", e.target.value)} /></Field>
-                  <Field label="Nights (auto)">
-                    <div className="h-9 flex items-center text-sm font-medium">{editNights}</div>
-                  </Field>
-                </div>
+                    {/* Dates */}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Dates</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Check-in"><Input type="date" value={editBooking.check_in} onChange={(e) => setField("check_in", e.target.value)} /></Field>
+                      <Field label="Check-out"><Input type="date" value={editBooking.check_out} onChange={(e) => setField("check_out", e.target.value)} /></Field>
+                      <Field label="Nights (auto)">
+                        <div className="h-9 flex items-center text-sm font-medium">{editNights}</div>
+                      </Field>
+                    </div>
 
-                {/* Pricing */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Pricing</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Price / night (€)"><Input type="number" step="0.01" value={editBooking.base_price_per_night} onChange={(e) => setField("base_price_per_night", parseFloat(e.target.value) || 0)} /></Field>
-                  <Field label="Cleaning fee (€)"><Input type="number" step="0.01" value={editBooking.cleaning_fee || 0} onChange={(e) => setField("cleaning_fee", parseFloat(e.target.value) || 0)} /></Field>
-                  <Field label="Tourist tax (€)"><Input type="number" step="0.01" value={editBooking.tourist_tax_total || 0} onChange={(e) => setField("tourist_tax_total", parseFloat(e.target.value) || 0)} /></Field>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Discount (€)"><Input type="number" step="0.01" value={editBooking.discount_amount || 0} onChange={(e) => setField("discount_amount", parseFloat(e.target.value) || 0)} /></Field>
-                  <Field label="Discount reason"><Input value={editBooking.discount_reason || ""} onChange={(e) => setField("discount_reason", e.target.value)} /></Field>
-                  <Field label="Total (auto)">
-                    <div className="h-9 flex items-center text-sm font-display font-semibold">€{editTotal.toFixed(2)}</div>
-                  </Field>
-                </div>
+                    {/* Pricing */}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Pricing</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Price / night (€)"><Input type="number" step="0.01" value={editBooking.base_price_per_night} onChange={(e) => setField("base_price_per_night", parseFloat(e.target.value) || 0)} /></Field>
+                      <Field label="Cleaning fee (€)"><Input type="number" step="0.01" value={editBooking.cleaning_fee || 0} onChange={(e) => setField("cleaning_fee", parseFloat(e.target.value) || 0)} /></Field>
+                      <Field label="Tourist tax (€)"><Input type="number" step="0.01" value={editBooking.tourist_tax_total || 0} onChange={(e) => setField("tourist_tax_total", parseFloat(e.target.value) || 0)} /></Field>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Discount (€)"><Input type="number" step="0.01" value={editBooking.discount_amount || 0} onChange={(e) => setField("discount_amount", parseFloat(e.target.value) || 0)} /></Field>
+                      <Field label="Discount reason"><Input value={editBooking.discount_reason || ""} onChange={(e) => setField("discount_reason", e.target.value)} /></Field>
+                      <Field label="Total (auto)">
+                        <div className="h-9 flex items-center text-sm font-display font-semibold">€{editTotal.toFixed(2)}</div>
+                      </Field>
+                    </div>
 
-                {/* Airbnb fields */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Airbnb</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Confirmation code"><Input value={editBooking.airbnb_confirmation_code || ""} onChange={(e) => setField("airbnb_confirmation_code", e.target.value)} /></Field>
-                  <Field label="Payout (€)"><Input type="number" step="0.01" value={editBooking.airbnb_payout || ""} onChange={(e) => setField("airbnb_payout", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
-                  <Field label="Service fee (€)"><Input type="number" step="0.01" value={editBooking.airbnb_service_fee || ""} onChange={(e) => setField("airbnb_service_fee", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
-                </div>
+                    {/* Airbnb fields */}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Airbnb</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Confirmation code"><Input value={editBooking.airbnb_confirmation_code || ""} onChange={(e) => setField("airbnb_confirmation_code", e.target.value)} /></Field>
+                      <Field label="Payout (€)"><Input type="number" step="0.01" value={editBooking.airbnb_payout || ""} onChange={(e) => setField("airbnb_payout", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
+                      <Field label="Service fee (€)"><Input type="number" step="0.01" value={editBooking.airbnb_service_fee || ""} onChange={(e) => setField("airbnb_service_fee", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
+                    </div>
 
-                {/* Payment */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Payment</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Status">
-                    <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.status || "pending"} onChange={(e) => setField("status", e.target.value)}>
-                      {["pending", "confirmed", "cancelled", "completed", "no_show"].map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="Payment status">
-                    <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.payment_status || "pending"} onChange={(e) => setField("payment_status", e.target.value)}>
-                      {["pending", "paid", "partial", "refunded", "failed"].map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="Payment method">
-                    <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.payment_method || "card"} onChange={(e) => setField("payment_method", e.target.value)}>
-                      {["card", "bank_transfer", "crypto", "cash", "airbnb"].map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </Field>
-                </div>
-                {(editBooking.stripe_payment_intent || editBooking.stripe_session_id) && (
-                  <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-                    {editBooking.stripe_payment_intent && <div>Stripe PI: <span className="font-mono">{editBooking.stripe_payment_intent}</span></div>}
-                    {editBooking.stripe_session_id && <div>Stripe Session: <span className="font-mono">{editBooking.stripe_session_id}</span></div>}
+                    {/* Notes */}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Notes</p>
+                    <Field label="Special requests"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={2} value={editBooking.special_requests || ""} onChange={(e) => setField("special_requests", e.target.value)} /></Field>
+                    <Field label="Internal notes"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={3} value={editBooking.internal_notes || ""} onChange={(e) => setField("internal_notes", e.target.value)} /></Field>
+
+                    {editBooking.created_at && (
+                      <p className="text-xs text-muted-foreground">Created: {new Date(editBooking.created_at).toLocaleString()}</p>
+                    )}
                   </div>
-                )}
+                </TabsContent>
 
-                {/* Notes */}
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1">Notes</p>
-                <Field label="Special requests"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={2} value={editBooking.special_requests || ""} onChange={(e) => setField("special_requests", e.target.value)} /></Field>
-                <Field label="Internal notes"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={3} value={editBooking.internal_notes || ""} onChange={(e) => setField("internal_notes", e.target.value)} /></Field>
+                <TabsContent value="payments">
+                  <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+                    {/* Payment Summary */}
+                    <div className="border border-border rounded-md p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Total réservation</span>
+                        <span className="font-display font-semibold">€{editTotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Statut paiement</span>
+                        <span className={`text-xs px-2 py-0.5 uppercase tracking-wider ${
+                          editBooking.payment_status === "paid" ? "bg-[hsl(120,40%,92%)] text-[hsl(120,40%,30%)]" :
+                          editBooking.payment_status === "partial" ? "bg-[hsl(45,80%,92%)] text-[hsl(45,60%,30%)]" :
+                          editBooking.payment_status === "refunded" ? "bg-[hsl(200,50%,92%)] text-[hsl(200,50%,30%)]" :
+                          editBooking.payment_status === "failed" ? "bg-[hsl(0,50%,92%)] text-[hsl(0,50%,35%)]" :
+                          "bg-muted text-muted-foreground"
+                        }`}>{editBooking.payment_status || "pending"}</span>
+                      </div>
+                      {editBooking.paid_at && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Payé le</span>
+                          <span className="text-sm">{new Date(editBooking.paid_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                        </div>
+                      )}
+                    </div>
 
-                {editBooking.created_at && (
-                  <p className="text-xs text-muted-foreground">Created: {new Date(editBooking.created_at).toLocaleString()}</p>
-                )}
+                    {/* Payment method & status controls */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Méthode de paiement">
+                        <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.payment_method || "card"} onChange={(e) => setField("payment_method", e.target.value)}>
+                          {["card", "bank_transfer", "crypto", "cash", "airbnb"].map((s) => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </Field>
+                      <Field label="Statut paiement">
+                        <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.payment_status || "pending"} onChange={(e) => {
+                          setField("payment_status", e.target.value);
+                          if (e.target.value !== "paid") setField("paid_at", null);
+                        }}>
+                          {["pending", "paid", "partial", "refunded", "failed"].map((s) => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </Field>
+                    </div>
 
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-border">
+                    {/* Mark as paid action */}
+                    {editBooking.payment_status !== "paid" ? (
+                      <Button
+                        className="w-full"
+                        variant="default"
+                        onClick={() => {
+                          setField("payment_status", "paid");
+                          setField("paid_at", new Date().toISOString());
+                          setField("status", "confirmed");
+                        }}
+                      >
+                        <CheckCircle size={14} className="mr-2" /> Marquer comme payé (maintenant)
+                      </Button>
+                    ) : (
+                      <div className="space-y-2">
+                        <Field label="Date de paiement">
+                          <Input
+                            type="datetime-local"
+                            value={editBooking.paid_at ? editBooking.paid_at.slice(0, 16) : ""}
+                            onChange={(e) => setField("paid_at", e.target.value ? new Date(e.target.value).toISOString() : null)}
+                          />
+                        </Field>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            setField("payment_status", "pending");
+                            setField("paid_at", null);
+                          }}
+                        >
+                          Annuler le paiement
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Stripe info */}
+                    {(editBooking.stripe_payment_intent || editBooking.stripe_session_id) && (
+                      <div className="border border-border rounded-md p-3 space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stripe</p>
+                        {editBooking.stripe_payment_intent && <div className="text-xs text-muted-foreground">Payment Intent: <span className="font-mono">{editBooking.stripe_payment_intent}</span></div>}
+                        {editBooking.stripe_session_id && <div className="text-xs text-muted-foreground">Session: <span className="font-mono">{editBooking.stripe_session_id}</span></div>}
+                      </div>
+                    )}
+
+                    {/* Airbnb payout info */}
+                    {editBooking.source === "airbnb" && (
+                      <div className="border border-border rounded-md p-3 space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Airbnb Payout</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Field label="Payout reçu (€)"><Input type="number" step="0.01" value={editBooking.airbnb_payout || ""} onChange={(e) => setField("airbnb_payout", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
+                          <Field label="Frais Airbnb (€)"><Input type="number" step="0.01" value={editBooking.airbnb_service_fee || ""} onChange={(e) => setField("airbnb_service_fee", e.target.value ? parseFloat(e.target.value) : null)} /></Field>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                {/* Actions — always visible */}
+                <div className="flex items-center justify-between pt-3 border-t border-border mt-3">
                   <Button variant="destructive" size="sm" onClick={deleteBooking}><Trash2 size={14} className="mr-1" /> Delete</Button>
                   <Button size="sm" onClick={saveBooking} disabled={saving}><Save size={14} className="mr-1" /> {saving ? "Saving…" : "Save Changes"}</Button>
                 </div>
-              </div>
+              </Tabs>
             </>
           )}
         </DialogContent>
