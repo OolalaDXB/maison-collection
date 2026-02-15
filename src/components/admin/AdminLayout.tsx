@@ -7,20 +7,50 @@ import {
   Users, Star, FileText, Mail, CreditCard, Settings, Upload, LogOut, Menu, X, BarChart3
 } from "lucide-react";
 
-const navItems = [
-  { title: "Dashboard", path: "/admin", icon: LayoutDashboard },
-  { title: "Properties", path: "/admin/properties", icon: Home },
-  { title: "Calendar", path: "/admin/calendar", icon: CalendarDays },
-  { title: "Pricing", path: "/admin/pricing", icon: DollarSign },
-  { title: "Bookings", path: "/admin/bookings", icon: ClipboardList },
-  { title: "Guests", path: "/admin/guests", icon: Users },
-  { title: "Reviews", path: "/admin/reviews", icon: Star },
-  { title: "Content", path: "/admin/content", icon: FileText },
-  { title: "Inquiries", path: "/admin/inquiries", icon: Mail },
-  { title: "Payments", path: "/admin/payments", icon: CreditCard },
-  { title: "Finance", path: "/admin/finance", icon: BarChart3 },
-  { title: "Settings", path: "/admin/settings", icon: Settings },
-  { title: "Import / Export", path: "/admin/import", icon: Upload },
+interface NavSection {
+  label: string;
+  items: { title: string; path: string; icon: React.ComponentType<any> }[];
+}
+
+const navSections: NavSection[] = [
+  {
+    label: "Operations",
+    items: [
+      { title: "Dashboard", path: "/admin", icon: LayoutDashboard },
+      { title: "Properties", path: "/admin/properties", icon: Home },
+      { title: "Calendar", path: "/admin/calendar", icon: CalendarDays },
+      { title: "Bookings", path: "/admin/bookings", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Guests",
+    items: [
+      { title: "Guests", path: "/admin/guests", icon: Users },
+      { title: "Reviews", path: "/admin/reviews", icon: Star },
+      { title: "Inquiries", path: "/admin/inquiries", icon: Mail },
+    ],
+  },
+  {
+    label: "Finance",
+    items: [
+      { title: "Pricing", path: "/admin/pricing", icon: DollarSign },
+      { title: "Payments", path: "/admin/payments", icon: CreditCard },
+      { title: "Finance", path: "/admin/finance", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { title: "Content", path: "/admin/content", icon: FileText },
+      { title: "Import / Export", path: "/admin/import", icon: Upload },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { title: "Settings", path: "/admin/settings", icon: Settings },
+    ],
+  },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
@@ -54,33 +84,51 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   const sidebar = (
     <nav className="flex flex-col h-full">
-      <div className="p-6 pb-4">
-        <Link to="/" className="font-body uppercase tracking-[0.05em] font-light text-lg text-[hsl(0,0%,100%)]">
-          MAISONS
+      {/* Logo */}
+      <div className="p-6 pb-2">
+        <Link to="/" className="block">
+          <span className="font-display text-lg tracking-[0.15em] text-[hsl(36,20%,85%)]">
+            MAISONS
+          </span>
+          <p className="font-body text-[0.6rem] uppercase tracking-[0.2em] text-[hsl(30,5%,45%)] mt-0.5">
+            Administration
+          </p>
         </Link>
-        <p className="text-[0.65rem] text-[hsl(0,0%,50%)] mt-1">Admin</p>
       </div>
-      <div className="flex-1 overflow-y-auto px-3 space-y-0.5">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
-              isActive(item.path)
-                ? "bg-[hsl(10,40%,55%)] text-[hsl(0,0%,100%)]"
-                : "text-[hsl(0,0%,70%)] hover:text-[hsl(0,0%,100%)] hover:bg-[hsl(0,0%,15%)]"
-            }`}
-          >
-            <item.icon size={16} />
-            <span>{item.title}</span>
-          </Link>
+
+      {/* Nav sections */}
+      <div className="flex-1 overflow-y-auto px-3 pt-2">
+        {navSections.map((section) => (
+          <div key={section.label}>
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-[hsl(30,5%,35%)] mt-5 mb-2 px-3">
+              {section.label}
+            </p>
+            <div className="space-y-0.5">
+              {section.items.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2 font-body text-[0.8rem] tracking-wide transition-colors ${
+                    isActive(item.path)
+                      ? "bg-primary/15 text-primary"
+                      : "text-[hsl(30,5%,55%)] hover:text-[hsl(36,20%,85%)]"
+                  }`}
+                >
+                  <item.icon size={15} />
+                  <span>{item.title}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
-      <div className="p-4 border-t border-[hsl(0,0%,20%)]">
-        <p className="text-[0.7rem] text-[hsl(0,0%,50%)] mb-2 truncate">{user?.email}</p>
+
+      {/* User section */}
+      <div className="p-4 border-t border-[hsl(30,5%,18%)]">
+        <p className="text-[0.65rem] text-[hsl(30,5%,40%)] mb-2 truncate font-body">{user?.email}</p>
         <button
           onClick={signOut}
-          className="flex items-center gap-2 text-sm text-[hsl(0,0%,60%)] hover:text-[hsl(0,0%,100%)] transition-colors"
+          className="flex items-center gap-2 font-body text-[0.8rem] text-[hsl(30,5%,45%)] hover:text-[hsl(36,20%,85%)] transition-colors"
         >
           <LogOut size={14} /> Sign Out
         </button>
@@ -94,22 +142,22 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       {/* Desktop sidebar */}
-      <aside className="hidden md:block w-60 bg-[hsl(0,0%,10%)] shrink-0 sticky top-0 h-screen">
+      <aside className="hidden md:block w-60 bg-[hsl(30,5%,8%)] shrink-0 sticky top-0 h-screen">
         {sidebar}
       </aside>
 
       {/* Mobile header + drawer */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-[hsl(0,0%,10%)] flex items-center px-4">
-        <button onClick={() => setMobileOpen(true)} className="text-[hsl(0,0%,100%)]">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-[hsl(30,5%,8%)] flex items-center px-4">
+        <button onClick={() => setMobileOpen(true)} className="text-[hsl(36,20%,85%)]">
           <Menu size={20} />
         </button>
-        <span className="ml-3 text-sm text-[hsl(0,0%,100%)] font-body uppercase tracking-wider">Maisons Admin</span>
+        <span className="ml-3 font-display text-sm tracking-[0.15em] text-[hsl(36,20%,85%)]">MAISONS</span>
       </div>
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-[hsl(0,0%,0%,0.5)]" onClick={() => setMobileOpen(false)} />
-          <aside className="relative w-60 h-full bg-[hsl(0,0%,10%)]">
-            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-[hsl(0,0%,100%)]">
+          <aside className="relative w-60 h-full bg-[hsl(30,5%,8%)]">
+            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-[hsl(36,20%,85%)]">
               <X size={18} />
             </button>
             {sidebar}
@@ -119,7 +167,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main content */}
       <main className="flex-1 min-h-screen bg-background">
-        <div className="md:hidden h-12" /> {/* spacer for mobile header */}
+        <div className="md:hidden h-12" />
         <div className="p-6 md:p-8 max-w-6xl">
           {children}
         </div>

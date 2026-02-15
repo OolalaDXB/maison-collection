@@ -69,10 +69,23 @@ const AdminDashboardPage = () => {
     load();
   }, []);
 
+  const timeAgo = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
   return (
     <AdminLayout>
       <SEO title="Admin Dashboard" description="" path="/admin" noindex={true} />
-      <h1 className="font-display text-2xl mb-6">Dashboard</h1>
+      <div className="mb-8">
+        <h1 className="font-display text-2xl">Dashboard</h1>
+        <p className="font-body text-sm text-muted-foreground mt-1">Overview of your properties</p>
+      </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -84,17 +97,17 @@ const AdminDashboardPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming check-ins */}
-        <Card>
+        <Card className="border-[hsl(36,15%,90%)]">
           <CardHeader><CardTitle className="text-base font-display">Upcoming Check-ins</CardTitle></CardHeader>
           <CardContent>
             {loading ? <p className="text-sm text-muted-foreground">Loading…</p> :
               upcoming.length === 0 ? <p className="text-sm text-muted-foreground">No upcoming check-ins</p> : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {upcoming.map((b) => (
-                    <Link key={b.id} to={`/admin/bookings`} className="flex items-center justify-between p-3 border border-border hover:border-primary transition-colors">
+                    <Link key={b.id} to={`/admin/bookings`} className="flex items-center justify-between p-3 border border-[hsl(36,15%,90%)] hover:border-primary/40 transition-colors">
                       <div>
                         <p className="text-sm font-medium text-foreground">{b.guest_name}</p>
-                        <p className="text-xs text-muted-foreground">{b.property_name}</p>
+                        <p className="text-xs text-muted-foreground font-display">{b.property_name}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-foreground">{b.check_in}</p>
@@ -108,17 +121,20 @@ const AdminDashboardPage = () => {
         </Card>
 
         {/* Recent inquiries */}
-        <Card>
+        <Card className="border-[hsl(36,15%,90%)]">
           <CardHeader><CardTitle className="text-base font-display">Recent Inquiries</CardTitle></CardHeader>
           <CardContent>
             {loading ? <p className="text-sm text-muted-foreground">Loading…</p> :
               inquiries.length === 0 ? <p className="text-sm text-muted-foreground">No inquiries yet</p> : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {inquiries.map((inq) => (
-                    <Link key={inq.id} to="/admin/inquiries" className="block p-3 border border-border hover:border-primary transition-colors">
+                    <Link key={inq.id} to="/admin/inquiries" className="block p-3 border border-[hsl(36,15%,90%)] hover:border-primary/40 transition-colors">
                       <div className="flex justify-between items-start">
                         <p className="text-sm font-medium text-foreground">{inq.name}</p>
-                        <span className="text-[0.65rem] px-2 py-0.5 bg-muted text-muted-foreground uppercase tracking-wider">{inq.type}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[0.6rem] text-muted-foreground">{timeAgo(inq.created_at)}</span>
+                          <span className="text-[0.6rem] px-2 py-0.5 bg-[hsl(36,20%,95%)] text-muted-foreground uppercase tracking-wider">{inq.type}</span>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{inq.message || "—"}</p>
                     </Link>
@@ -133,27 +149,21 @@ const AdminDashboardPage = () => {
 };
 
 const KpiCard = ({ icon: Icon, label, value, loading }: { icon: any; label: string; value: string; loading: boolean }) => (
-  <Card>
-    <CardContent className="pt-6">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-primary/10">
-          <Icon size={18} className="text-primary" />
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">{label}</p>
-          <p className="text-xl font-display text-foreground">{loading ? "…" : value}</p>
-        </div>
-      </div>
+  <Card className="border-[hsl(36,15%,90%)] border-l-2 border-l-primary">
+    <CardContent className="pt-6 relative overflow-hidden">
+      <Icon size={32} className="absolute top-4 right-4 text-primary opacity-[0.12]" />
+      <p className="text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground font-body mb-1">{label}</p>
+      <p className="text-3xl font-display text-foreground">{loading ? "…" : value}</p>
     </CardContent>
   </Card>
 );
 
 const StatusBadge = ({ status }: { status: string }) => {
   const colors: Record<string, string> = {
-    confirmed: "bg-[hsl(120,40%,92%)] text-[hsl(120,40%,30%)]",
-    pending: "bg-[hsl(45,80%,92%)] text-[hsl(45,60%,30%)]",
-    cancelled: "bg-[hsl(0,50%,92%)] text-[hsl(0,50%,35%)]",
-    completed: "bg-muted text-muted-foreground",
+    confirmed: "bg-[hsl(120,35%,95%)] text-[hsl(120,40%,30%)]",
+    pending: "bg-[hsl(45,70%,93%)] text-[hsl(45,60%,30%)]",
+    cancelled: "bg-[hsl(0,45%,94%)] text-[hsl(0,50%,35%)]",
+    completed: "bg-[hsl(36,20%,95%)] text-muted-foreground",
   };
   return <span className={`text-[0.6rem] px-2 py-0.5 uppercase tracking-wider ${colors[status] || "bg-muted text-muted-foreground"}`}>{status}</span>;
 };
