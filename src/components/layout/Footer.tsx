@@ -2,13 +2,20 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, MessageCircle, Send, Instagram, Facebook, Linkedin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (honeypot) return;
+    if (turnstileSiteKey && !turnstileToken) return;
     if (!email.trim()) return;
 
     setStatus("loading");
@@ -45,6 +52,7 @@ const Footer = () => {
             ) : (
               <>
                 <form onSubmit={handleSubscribe} className="flex gap-0 mb-3">
+                  <input type="text" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                   <input
                     type="email"
                     value={email}
@@ -55,12 +63,15 @@ const Footer = () => {
                   />
                   <button
                     type="submit"
-                    disabled={status === "loading"}
+                    disabled={status === "loading" || (!!turnstileSiteKey && !turnstileToken)}
                     className="bg-[#1a1a1a] text-white font-body font-normal uppercase text-xs tracking-wider px-5 py-2.5 hover:bg-[#333333] transition-colors disabled:opacity-50"
                   >
                     Subscribe
                   </button>
                 </form>
+                {turnstileSiteKey && (
+                  <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'compact' }} />
+                )}
                 <p className="font-body font-light text-xs text-[#999999] leading-relaxed">
                   Travel stories, new properties, and insider tips. A few emails a year.
                 </p>
