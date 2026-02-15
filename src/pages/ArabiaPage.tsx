@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
@@ -76,6 +78,24 @@ const ArabiaPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Maison Arabia"
+        description="A modern family villa in The Sustainable City, Dubai. Net-zero energy, equestrian center, bio-dome greenhouses, and car-free community living."
+        path="/arabia"
+        image="https://maisons.co/og-arabia.jpg"
+      />
+      <VacationRentalSchema
+        name="Maison Arabia"
+        description="Modern family villa in The Sustainable City, Dubai"
+        url="https://maisons.co/arabia"
+        image="https://maisons.co/og-arabia.jpg"
+        address={{ locality: "The Sustainable City", region: "Dubai", country: "AE" }}
+        pricePerNight={180}
+        currency="EUR"
+        maxGuests={8}
+        bedrooms={4}
+        bathrooms={3}
+      />
       <Header />
 
       <ArabiaHero heroImage={heroImage} imageCount={images.length} />

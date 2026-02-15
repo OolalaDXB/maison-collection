@@ -7,6 +7,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import FadeIn from "@/components/FadeIn";
+import SEO from "@/components/SEO";
+import { OrganizationSchema } from "@/components/StructuredData";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -58,6 +60,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Maisons — Houses with a point of view"
+        description="A collection of distinctive homes in Brittany, the Caucasus, and Dubai. Each property tells a story, shaped by its landscape and chosen with intention."
+        path="/"
+      />
+      <OrganizationSchema
+        name="Maisons"
+        url="https://maisons.co"
+        email="chez@maisons.co"
+      />
       <Header />
 
       {/* Hero */}

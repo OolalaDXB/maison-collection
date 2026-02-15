@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
@@ -49,6 +51,26 @@ const GeorgiaPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Maison Georgia"
+        description="A 5-star mountain retreat in Gudauri, Georgia. Perched at 2,200m in the Greater Caucasus with panoramic views, ski-in access, and year-round adventure."
+        path="/georgia"
+        image="https://maisons.co/og-georgia.jpg"
+      />
+      <VacationRentalSchema
+        name="Maison Georgia"
+        description="5-star mountain retreat in Gudauri, Greater Caucasus"
+        url="https://maisons.co/georgia"
+        image="https://maisons.co/og-georgia.jpg"
+        address={{ locality: "Gudauri", region: "Mtskheta-Mtianeti", country: "GE" }}
+        pricePerNight={120}
+        currency="EUR"
+        rating={5.0}
+        reviewCount={22}
+        maxGuests={6}
+        bedrooms={2}
+        bathrooms={2}
+      />
       <Header />
 
       <GeorgiaHero imageCount={images.length || 10} />

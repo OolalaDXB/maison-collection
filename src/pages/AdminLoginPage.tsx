@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import SEO from "@/components/SEO";
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -25,6 +26,7 @@ const AdminLoginPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <SEO title="Admin Login" description="" path="/admin/login" noindex={true} />
       <div className="w-full max-w-sm">
         <h1 className="font-display text-3xl text-foreground mb-8 text-center">Admin</h1>
         <form onSubmit={handleSubmit} className="space-y-4">

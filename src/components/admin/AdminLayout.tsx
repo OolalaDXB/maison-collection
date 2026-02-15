@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Home, CalendarDays, DollarSign, ClipboardList,
@@ -87,6 +88,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen flex w-full">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Desktop sidebar */}
       <aside className="hidden md:block w-60 bg-[hsl(0,0%,10%)] shrink-0 sticky top-0 h-screen">
         {sidebar}

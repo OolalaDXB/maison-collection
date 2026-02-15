@@ -5,6 +5,7 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
+import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Accordion,
@@ -98,6 +99,11 @@ const ManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Property Management"
+        description="We select, position, and manage distinctive holiday homes. From listing optimization to guest experience, we handle everything while you earn."
+        path="/management"
+      />
       <Header />
 
       {/* S1: Hero */}

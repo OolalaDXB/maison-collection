@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const AdminProfilePage = () => {
   const { user, isAdmin, loading: authLoading } = useAuth();
@@ -67,6 +68,7 @@ const AdminProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Admin Profile" description="" path="/admin/profile" noindex={true} />
       <div className="border-b border-border">
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link to="/admin" className="text-muted-foreground hover:text-foreground">

@@ -6,6 +6,7 @@ import { useActivePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useDefaultBankAccount } from "@/hooks/useBankAccounts";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -193,6 +194,12 @@ const BookingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`Book ${property.name}`}
+        description={`Complete your reservation at ${property.name}. Select dates, choose payment method, and confirm your stay.`}
+        path={`/book/${slug}`}
+        noindex={true}
+      />
       <Header />
       <div className="section-padding">
         <div className="max-container max-w-2xl mx-auto">

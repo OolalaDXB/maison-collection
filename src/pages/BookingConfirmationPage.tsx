@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEO from "@/components/SEO";
 import { Check } from "lucide-react";
 
 interface BookingData {
@@ -79,6 +80,7 @@ const BookingConfirmationPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Booking Confirmation" description="" path={`/book/${slug}/confirmation`} noindex={true} />
       <Header />
       <div className="section-padding">
         <div className="max-container max-w-lg mx-auto text-center py-16">
