@@ -149,8 +149,21 @@ Deno.serve(async (req) => {
           // Determine source tag for availability
           const availSource = isBlocked ? "airbnb_block" : "airbnb";
 
-          // Block availability dates
+          // Block availability dates — but never overwrite manual/direct entries
           for (const date of dates) {
+            // Check if this date already has a manual/direct source
+            const { data: existing } = await supabase
+              .from("availability")
+              .select("source")
+              .eq("property_id", prop.id)
+              .eq("date", date)
+              .maybeSingle();
+
+            // Skip if a manual/booking/direct entry already exists
+            if (existing && existing.source && !existing.source.startsWith("airbnb")) {
+              continue;
+            }
+
             await supabase.from("availability").upsert(
               {
                 property_id: prop.id,
@@ -177,39 +190,54 @@ Deno.serve(async (req) => {
             if (existingByUid) {
               eventsUpdated++;
             } else {
-              // Fallback: check by dates
+              // Fallback: check by dates (any source including manual/direct)
               const { data: existingByDates } = await supabase
                 .from("bookings")
-                .select("id")
+                .select("id, source")
                 .eq("property_id", prop.id)
                 .eq("check_in", checkIn)
                 .eq("check_out", checkOut)
-                .in("source", ["airbnb", "airbnb_csv"])
                 .maybeSingle();
 
               if (existingByDates) {
                 eventsUpdated++;
               } else {
-                const { error: bookError } = await supabase.from("bookings").insert({
-                  property_id: prop.id,
-                  guest_name: guestName,
-                  guest_email: "airbnb@placeholder.com",
-                  check_in: checkIn,
-                  check_out: checkOut,
-                  base_price_per_night: 0,
-                  total_price: 0,
-                  status: "confirmed",
-                  source: "airbnb",
-                  internal_notes: `iCal sync — UID: ${event.uid}`,
-                });
+                // Also check if a manual/direct booking overlaps these dates
+                const { data: manualOverlap } = await supabase
+                  .from("bookings")
+                  .select("id")
+                  .eq("property_id", prop.id)
+                  .in("source", ["manual", "direct"])
+                  .lt("check_in", checkOut)
+                  .gt("check_out", checkIn)
+                  .maybeSingle();
 
-                if (!bookError) eventsCreated++;
+                if (manualOverlap) {
+                  // A manual booking covers this period — skip
+                  eventsUpdated++;
+                } else {
+                  const { error: bookError } = await supabase.from("bookings").insert({
+                    property_id: prop.id,
+                    guest_name: guestName,
+                    guest_email: "airbnb@placeholder.com",
+                    check_in: checkIn,
+                    check_out: checkOut,
+                    base_price_per_night: 0,
+                    total_price: 0,
+                    status: "confirmed",
+                    source: "airbnb",
+                    internal_notes: `iCal sync — UID: ${event.uid}`,
+                  });
+
+                  if (!bookError) eventsCreated++;
+                }
               }
             }
           }
         }
 
         // Clean up expired Airbnb blocks (future dates no longer in feed)
+        // Only touch airbnb/airbnb_block sources — never manual/booking sources
         const activeUids = events.map((e) => e.uid).filter(Boolean);
         if (activeUids.length > 0) {
           const today = new Date().toISOString().split("T")[0];
@@ -218,7 +246,7 @@ Deno.serve(async (req) => {
             .from("availability")
             .update({ available: true, source: "airbnb_expired" })
             .eq("property_id", prop.id)
-            .eq("source", "airbnb")
+            .in("source", ["airbnb", "airbnb_block"])
             .gte("date", today)
             .not("airbnb_uid", "in", `(${quotedUids})`);
         }
