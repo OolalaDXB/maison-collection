@@ -72,7 +72,7 @@ const ArabiaGallery = ({ images }: Props) => {
           if (posInRow === 0) {
             return (
               <div key={i} className="w-full">
-                <img src={photo.src} alt={photo.alt} className="w-full h-[300px] md:h-[450px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i)} loading="lazy" />
+                <img src={photo.src} alt={photo.alt} className="w-full h-[300px] md:h-[450px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i)} loading="lazy" decoding="async" />
               </div>
             );
           }
@@ -80,9 +80,9 @@ const ArabiaGallery = ({ images }: Props) => {
             const nextPhoto = photos[i + 1];
             return (
               <div key={i} className="grid grid-cols-2 gap-3">
-                <img src={photo.src} alt={photo.alt} className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i)} loading="lazy" />
+                <img src={photo.src} alt={photo.alt} className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i)} loading="lazy" decoding="async" />
                 {nextPhoto && (
-                  <img src={nextPhoto.src} alt={nextPhoto.alt} className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i + 1)} loading="lazy" />
+                  <img src={nextPhoto.src} alt={nextPhoto.alt} className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity" onClick={() => openLightbox(i + 1)} loading="lazy" decoding="async" />
                 )}
               </div>
             );
@@ -96,7 +96,7 @@ const ArabiaGallery = ({ images }: Props) => {
           <button className="absolute top-6 right-6 text-white" onClick={closeLightbox}><X size={24} /></button>
           <button className="absolute left-4 text-white p-2" onClick={(e) => { e.stopPropagation(); prev(); }}><ChevronLeft size={32} /></button>
           <button className="absolute right-4 text-white p-2" onClick={(e) => { e.stopPropagation(); next(); }}><ChevronRight size={32} /></button>
-          <img src={photos[lightbox].src} alt={photos[lightbox].alt} className="max-h-[85vh] max-w-[90vw] object-contain" onClick={(e) => e.stopPropagation()} />
+          <img src={photos[lightbox].src} alt={photos[lightbox].alt} className="max-h-[85vh] max-w-[90vw] object-contain" onClick={(e) => e.stopPropagation()} loading="lazy" decoding="async" />
           <p className="absolute bottom-6 text-white/70 font-body text-sm">{lightbox + 1} / {photos.length}</p>
         </div>
       )}

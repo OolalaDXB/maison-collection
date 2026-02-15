@@ -50,6 +50,7 @@ const GeorgiaGallery = ({ images }: Props) => {
                   className="w-full h-[300px] md:h-[450px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
                   onClick={() => openLightbox(i)}
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
             );
@@ -65,6 +66,7 @@ const GeorgiaGallery = ({ images }: Props) => {
                   className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
                   onClick={() => openLightbox(i)}
                   loading="lazy"
+                  decoding="async"
                 />
                 {nextPhoto && (
                   <img
@@ -73,6 +75,7 @@ const GeorgiaGallery = ({ images }: Props) => {
                     className="w-full h-[200px] md:h-[300px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
                     onClick={() => openLightbox(i + 1)}
                     loading="lazy"
+                    decoding="async"
                   />
                 )}
               </div>
@@ -94,6 +97,8 @@ const GeorgiaGallery = ({ images }: Props) => {
             alt={photos[lightbox].alt}
             className="max-h-[85vh] max-w-[90vw] object-contain"
             onClick={(e) => e.stopPropagation()}
+            loading="lazy"
+            decoding="async"
           />
           <p className="absolute bottom-6 text-white/70 font-body text-sm">{lightbox + 1} / {photos.length}</p>
         </div>
