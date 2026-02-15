@@ -1,0 +1,5 @@
+INSERT INTO site_content (page, section, content_en, content_fr) VALUES
+  ('home', 'hero_title', 'Houses with a point of view', 'Des maisons avec un point de vue'),
+  ('home', 'hero_subtitle', 'A collection of distinctive homes across Europe, the Caucasus, and the Gulf.', 'Une collection de maisons de caractère en Europe, dans le Caucase et dans le Golfe.'),
+  ('home', 'philosophy_title', 'Not rentals. Residences.', 'Pas des locations. Des résidences.'),
+  ('home', 'philosophy_text', 'We don''t believe in vacation rentals. We believe in places that change how you see the world — houses that become part of your story, not just your itinerary.', 'Nous ne croyons pas aux locations de vacances. Nous croyons aux lieux qui changent votre regard sur le monde — des maisons qui font partie de votre histoire, pas seulement de votre itinéraire.');
