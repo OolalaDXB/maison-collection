@@ -8,9 +8,18 @@ import FadeIn from "@/components/FadeIn";
 import ArabiaHero from "@/components/arabia/ArabiaHero";
 import ArabiaContent from "@/components/arabia/ArabiaContent";
 import ArabiaBookingSidebar from "@/components/arabia/ArabiaBookingSidebar";
-import ArabiaCommunity from "@/components/arabia/ArabiaCommunity";
+import PropertyCommunity from "@/components/PropertyCommunity";
+import regionSustainable from "@/assets/region-sustainable-city.jpg";
+import regionBiodomes from "@/assets/region-biodomes.jpg";
+import regionEquestrian from "@/assets/region-equestrian.jpg";
+
+const regionPhotos = [
+  { src: regionSustainable, alt: "The Sustainable City green corridors and solar panels", caption: "The Sustainable City — net-zero energy" },
+  { src: regionBiodomes, alt: "Bio-dome greenhouses in The Sustainable City", caption: "Bio-domes & urban farms" },
+  { src: regionEquestrian, alt: "Equestrian center and children playing in car-free streets", caption: "Car-free streets — family first" },
+];
 import ArabiaRooms from "@/components/arabia/ArabiaRooms";
-import ArabiaServices from "@/components/arabia/ArabiaServices";
+import PropertyServices from "@/components/PropertyServices";
 import ArabiaGoodToKnow from "@/components/arabia/ArabiaGoodToKnow";
 import ArabiaGallery from "@/components/arabia/ArabiaGallery";
 import ArabiaContact from "@/components/arabia/ArabiaContact";
@@ -111,7 +120,7 @@ const ArabiaPage = () => {
             </FadeIn>
 
             <FadeIn>
-              <ArabiaServices />
+              <PropertyServices propertyId={PROPERTY_ID} />
             </FadeIn>
 
             <FadeIn>
@@ -162,7 +171,7 @@ const ArabiaPage = () => {
       </div>
 
       {/* Community section — full-bleed */}
-      <ArabiaCommunity />
+      <PropertyCommunity propertyId={PROPERTY_ID} photos={regionPhotos} />
 
       <FadeIn>
         <ArabiaCrossSell />

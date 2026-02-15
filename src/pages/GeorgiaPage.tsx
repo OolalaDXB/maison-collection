@@ -9,14 +9,23 @@ import GeorgiaHero from "@/components/georgia/GeorgiaHero";
 import GeorgiaContent from "@/components/georgia/GeorgiaContent";
 import GeorgiaBookingSidebar from "@/components/georgia/GeorgiaBookingSidebar";
 import GeorgiaRooms from "@/components/georgia/GeorgiaRooms";
-import GeorgiaServices from "@/components/georgia/GeorgiaServices";
+import PropertyServices from "@/components/PropertyServices";
 import GeorgiaGoodToKnow from "@/components/georgia/GeorgiaGoodToKnow";
 import GeorgiaGallery from "@/components/georgia/GeorgiaGallery";
 import GeorgiaContact from "@/components/georgia/GeorgiaContact";
 import GeorgiaInfo from "@/components/georgia/GeorgiaInfo";
 import GeorgiaSurroundings from "@/components/georgia/GeorgiaSurroundings";
 import GeorgiaCrossSell from "@/components/georgia/GeorgiaCrossSell";
-import GeorgiaCommunity from "@/components/georgia/GeorgiaCommunity";
+import PropertyCommunity from "@/components/PropertyCommunity";
+import regionCaucasus from "@/assets/region-caucasus.jpg";
+import regionGergeti from "@/assets/region-gergeti.jpg";
+import regionHighway from "@/assets/region-military-highway.jpg";
+
+const regionPhotos = [
+  { src: regionCaucasus, alt: "Greater Caucasus mountain range from Gudauri", caption: "The Greater Caucasus — 2,200m" },
+  { src: regionGergeti, alt: "Gergeti Trinity Church with Mount Kazbek", caption: "Gergeti Trinity Church — Kazbegi" },
+  { src: regionHighway, alt: "Georgian Military Highway winding through mountains", caption: "Georgian Military Highway" },
+];
 import GeorgiaMobileBookingBar from "@/components/georgia/GeorgiaMobileBookingBar";
 // Reuse the generic reviews component
 import AtlantiqueReviews from "@/components/atlantique/AtlantiqueReviews";
@@ -86,7 +95,7 @@ const GeorgiaPage = () => {
             </FadeIn>
 
             <FadeIn>
-              <GeorgiaServices />
+              <PropertyServices propertyId={PROPERTY_ID} />
             </FadeIn>
 
             <FadeIn>
@@ -136,7 +145,7 @@ const GeorgiaPage = () => {
         </div>
       </div>
 
-      <GeorgiaCommunity />
+      <PropertyCommunity propertyId={PROPERTY_ID} photos={regionPhotos} />
 
       <FadeIn>
         <GeorgiaCrossSell />

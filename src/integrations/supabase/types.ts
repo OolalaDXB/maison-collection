@@ -746,6 +746,164 @@ export type Database = {
           },
         ]
       }
+      property_region_cards: {
+        Row: {
+          created_at: string | null
+          display_order: number
+          icon: string
+          id: string
+          property_id: string
+          text: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          property_id: string
+          text: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          property_id?: string
+          text?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_region_cards_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_region_content: {
+        Row: {
+          created_at: string | null
+          id: string
+          intro_text: string | null
+          property_id: string
+          subtitle: string | null
+          tagline: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          intro_text?: string | null
+          property_id: string
+          subtitle?: string | null
+          tagline?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          intro_text?: string | null
+          property_id?: string
+          subtitle?: string | null
+          tagline?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_region_content_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_region_links: {
+        Row: {
+          created_at: string | null
+          display_order: number
+          id: string
+          label: string
+          property_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          label: string
+          property_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          label?: string
+          property_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_region_links_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_services: {
+        Row: {
+          active: boolean | null
+          category: string
+          created_at: string | null
+          description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          label: string
+          property_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          label: string
+          property_id: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          label?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_services_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           created_at: string
