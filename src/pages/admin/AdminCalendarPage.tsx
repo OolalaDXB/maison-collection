@@ -35,6 +35,15 @@ interface BookingBar {
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// Distinct color palette per property (up to 5)
+const PROP_COLORS = [
+  { bg: "hsl(10,50%,55%)", light: "hsl(10,40%,92%)", border: "hsl(10,40%,75%)" },   // terracotta
+  { bg: "hsl(210,55%,50%)", light: "hsl(210,50%,92%)", border: "hsl(210,40%,75%)" }, // blue
+  { bg: "hsl(160,40%,45%)", light: "hsl(160,35%,90%)", border: "hsl(160,30%,70%)" }, // teal
+  { bg: "hsl(45,70%,50%)", light: "hsl(45,60%,90%)", border: "hsl(45,50%,70%)" },    // gold
+  { bg: "hsl(280,40%,55%)", light: "hsl(280,35%,92%)", border: "hsl(280,30%,75%)" }, // purple
+];
+
 const AdminCalendarPage = () => {
   const [properties, setProperties] = useState<PropertyOption[]>([]);
   const [visibleProps, setVisibleProps] = useState<Set<string>>(new Set());
@@ -115,11 +124,21 @@ const AdminCalendarPage = () => {
     return availability.filter((a) => a.date === dateStr && visibleProps.has(a.property_id));
   };
 
-  const statusColor = (status: string | null) => {
-    if (status === "confirmed" || status === "completed") return "bg-[hsl(120,40%,50%)]";
-    if (status === "pending") return "bg-[hsl(45,80%,50%)]";
-    return "bg-muted-foreground";
-  };
+  const propColorMap = useMemo(() => {
+    const map = new Map<string, typeof PROP_COLORS[0]>();
+    properties.forEach((p, i) => map.set(p.id, PROP_COLORS[i % PROP_COLORS.length]));
+    return map;
+  }, [properties]);
+
+  const propShortName = useMemo(() => {
+    const map = new Map<string, string>();
+    properties.forEach((p) => {
+      // Extract short name: "Maison Georgia" → "Georgia"
+      const parts = p.name.split(" ");
+      map.set(p.id, parts.length > 1 ? parts.slice(1).join(" ") : p.name);
+    });
+    return map;
+  }, [properties]);
 
   const handleDayClick = (day: number) => {
     const dateStr = `${monthStr}-${String(day).padStart(2, "0")}`;
@@ -197,19 +216,23 @@ const AdminCalendarPage = () => {
 
       {/* Property toggles */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {properties.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => setVisibleProps((prev) => {
-              const next = new Set(prev);
-              next.has(p.id) ? next.delete(p.id) : next.add(p.id);
-              return next;
-            })}
-            className={`px-3 py-1 text-xs border transition-colors ${visibleProps.has(p.id) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border"}`}
-          >
-            {p.name}
-          </button>
-        ))}
+        {properties.map((p) => {
+          const color = propColorMap.get(p.id);
+          return (
+            <button
+              key={p.id}
+              onClick={() => setVisibleProps((prev) => {
+                const next = new Set(prev);
+                next.has(p.id) ? next.delete(p.id) : next.add(p.id);
+                return next;
+              })}
+              className="px-3 py-1 text-xs border transition-colors"
+              style={visibleProps.has(p.id) ? { backgroundColor: color?.bg, color: "#fff", borderColor: color?.bg } : {}}
+            >
+              {p.name}
+            </button>
+          );
+        })}
       </div>
 
       {/* Month nav */}
@@ -251,17 +274,30 @@ const AdminCalendarPage = () => {
                 >
                   <span className="text-xs text-muted-foreground">{day}</span>
                   <div className="space-y-0.5 mt-1">
-                    {dayBookings.map((b) => (
-                      <div key={b.id} className={`${statusColor(b.status)} text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5 truncate`} title={b.guest_name}>
-                        {b.guest_name}
-                      </div>
-                    ))}
-                    {manualBlocked.length > 0 && (
-                      <div className="bg-muted-foreground/40 text-[0.55rem] text-foreground px-1 py-0.5">Blocked</div>
-                    )}
-                    {airbnbBlocked.length > 0 && (
-                      <div className="bg-[hsl(210,70%,55%)] text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5">Airbnb</div>
-                    )}
+                    {dayBookings.map((b) => {
+                      const c = propColorMap.get(b.property_id);
+                      return (
+                        <div key={b.id} className="text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5 truncate" style={{ backgroundColor: c?.bg }} title={`${propShortName.get(b.property_id)} — ${b.guest_name}`}>
+                          {b.guest_name}
+                        </div>
+                      );
+                    })}
+                    {manualBlocked.map((a) => {
+                      const c = propColorMap.get(a.property_id);
+                      return (
+                        <div key={`mb-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-60" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}` }}>
+                          {propShortName.get(a.property_id)} · Blocked
+                        </div>
+                      );
+                    })}
+                    {airbnbBlocked.map((a) => {
+                      const c = propColorMap.get(a.property_id);
+                      return (
+                        <div key={`ab-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-70" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}` }}>
+                          {propShortName.get(a.property_id)} · Airbnb
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
