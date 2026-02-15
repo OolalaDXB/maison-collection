@@ -285,7 +285,7 @@ const AdminCalendarPage = () => {
                     {manualBlocked.map((a) => {
                       const c = propColorMap.get(a.property_id);
                       return (
-                        <div key={`mb-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-60" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}` }}>
+                        <div key={`mb-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-70" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}`, backgroundImage: `repeating-linear-gradient(135deg, transparent, transparent 3px, ${c?.border} 3px, ${c?.border} 4.5px)` }}>
                           {propShortName.get(a.property_id)} · Blocked
                         </div>
                       );
@@ -293,7 +293,7 @@ const AdminCalendarPage = () => {
                     {airbnbBlocked.map((a) => {
                       const c = propColorMap.get(a.property_id);
                       return (
-                        <div key={`ab-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-70" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}` }}>
+                        <div key={`ab-${a.property_id}`} className="text-[0.55rem] px-1 py-0.5 opacity-70" style={{ backgroundColor: c?.light, color: c?.bg, borderLeft: `3px solid ${c?.bg}`, backgroundImage: `repeating-linear-gradient(135deg, transparent, transparent 3px, ${c?.border} 3px, ${c?.border} 4.5px)` }}>
                           {propShortName.get(a.property_id)} · Airbnb
                         </div>
                       );
