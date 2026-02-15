@@ -32,8 +32,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const pageVariants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  initial: {},
+  animate: {},
   exit: { opacity: 0 },
 };
 

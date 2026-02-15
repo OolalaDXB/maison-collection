@@ -28,6 +28,7 @@ const FadeIn = ({ children, delay = 0, className }: FadeInProps) => {
         ease: "easeOut",
         delay: shouldReduceMotion ? 0 : delay,
       }}
+      style={{ willChange: "opacity, transform" }}
       className={className}
     >
       {children}
