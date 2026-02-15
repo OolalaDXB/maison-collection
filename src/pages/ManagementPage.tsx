@@ -7,27 +7,13 @@ import Footer from "@/components/layout/Footer";
 import FadeIn from "@/components/FadeIn";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-const steps = [
-  {
-    num: "01",
-    text: "We visit your property. We assess it honestly. Not every home makes it into the collection. We look for character, location, and something worth building on. If it's not ready, we'll tell you what it needs.",
-  },
-  {
-    num: "02",
-    text: "We get it to the level. Styling, photography direction, the listing narrative, amenity upgrades if needed. We work with architects, designers, and photographers we trust. We don't just put your property online — we make it the version of itself that guests remember.",
-  },
-  {
-    num: "03",
-    text: "We handle everything. Pricing that adapts to demand, guest vetting, multilingual communication in French, English and Russian, check-in coordination, cleaning, maintenance, quality checks. You get a monthly report and peace of mind. Same-day response before 10am.",
-  },
-];
 
 const elevationTags = [
   "Interior styling",
@@ -67,8 +53,31 @@ const ManagementPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
+  // DB-driven editorial content
+  const heroTitle = useSiteContent("management", "hero_title", "We started with our own homes.");
+  const heroP1 = useSiteContent("management", "hero_p1", "A mountain duplex in the Caucasus. A stone house reimagined by architects in Brittany. A family townhouse in Dubai's only net-zero community.");
+  const heroP2 = useSiteContent("management", "hero_p2", "We didn't start as managers — we started as owners. We learned what it takes to earn five stars every time: the right photos, the right words, the right pricing, the right welcome. Now we bring that to a handful of other properties. Not an agency. Not a platform. Just us, doing for your home what we do for ours.");
+  const whatWeDoTitle = useSiteContent("management", "whatwedo_title", "What we do.");
+  const step1 = useSiteContent("management", "step_1", "We visit your property. We assess it honestly. Not every home makes it into the collection. We look for character, location, and something worth building on. If it's not ready, we'll tell you what it needs.");
+  const step2 = useSiteContent("management", "step_2", "We get it to the level. Styling, photography direction, the listing narrative, amenity upgrades if needed. We work with architects, designers, and photographers we trust. We don't just put your property online — we make it the version of itself that guests remember.");
+  const step3 = useSiteContent("management", "step_3", "We handle everything. Pricing that adapts to demand, guest vetting, multilingual communication in French, English and Russian, check-in coordination, cleaning, maintenance, quality checks. You get a monthly report and peace of mind. Same-day response before 10am.");
+  const proofTitle = useSiteContent("management", "proof_title", "Our own track record.");
+  const notReadyTitle = useSiteContent("management", "notready_title", "Your property isn't there yet?");
+  const notReadySubtitle = useSiteContent("management", "notready_subtitle", "That's why we're here.");
+  const notReadyP1 = useSiteContent("management", "notready_p1", "Not every home is ready on day one. Some need styling. Some need better photography. Some need a complete rethink of how guests experience the space.");
+  const notReadyP2 = useSiteContent("management", "notready_p2", "We work with architects, interior designers, and photographers to bring properties up to the standard. From a weekend of staging to a full renovation — we scope it, manage it, and deliver it.");
+  const contactTitle = useSiteContent("management", "contact_title", "Let's talk about your property.");
+  const contactDesc = useSiteContent("management", "contact_desc", "Tell us where it is and what you're thinking. We'll get back to you within 24 hours.");
+  const contactThanks = useSiteContent("management", "contact_thanks", "Thank you — we'll be in touch within 24 hours.");
+  const faqTitle = useSiteContent("management", "faq_title", "Questions.");
+
+  const steps = [
+    { num: "01", text: step1 },
+    { num: "02", text: step2 },
+    { num: "03", text: step3 },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,23 +120,13 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1]">
-              We started with our own homes.
+              {heroTitle}
             </h1>
           </FadeIn>
           <FadeIn delay={0.15}>
             <div className="font-body font-light text-lg text-[hsl(0,0%,27%)] leading-relaxed mt-6 space-y-4">
-              <p>
-                A mountain duplex in the Caucasus. A stone house reimagined by
-                architects in Brittany. A family townhouse in Dubai's only
-                net-zero community.
-              </p>
-              <p>
-                We didn't start as managers — we started as owners. We learned
-                what it takes to earn five stars every time: the right photos,
-                the right words, the right pricing, the right welcome. Now we
-                bring that to a handful of other properties. Not an agency. Not a
-                platform. Just us, doing for your home what we do for ours.
-              </p>
+              <p>{heroP1}</p>
+              <p>{heroP2}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.25}>
@@ -146,7 +145,7 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-10">
-              What we do.
+              {whatWeDoTitle}
             </h2>
           </FadeIn>
           <div className="space-y-8">
@@ -174,7 +173,7 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-12">
-              Our own track record.
+              {proofTitle}
             </h2>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -246,27 +245,18 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-2">
-              Your property isn't there yet?
+              {notReadyTitle}
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="font-display italic text-xl text-[hsl(0,0%,40%)] mb-8">
-              That's why we're here.
+              {notReadySubtitle}
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
             <div className="font-body font-light text-base text-[hsl(0,0%,27%)] leading-relaxed max-w-2xl space-y-4 mb-10">
-              <p>
-                Not every home is ready on day one. Some need styling. Some need
-                better photography. Some need a complete rethink of how guests
-                experience the space.
-              </p>
-              <p>
-                We work with architects, interior designers, and photographers
-                to bring properties up to the standard. From a weekend of
-                staging to a full renovation — we scope it, manage it, and
-                deliver it.
-              </p>
+              <p>{notReadyP1}</p>
+              <p>{notReadyP2}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.2}>
@@ -293,17 +283,16 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-3xl text-foreground mb-2">
-              Let's talk about your property.
+              {contactTitle}
             </h2>
             <p className="font-body font-light text-[hsl(0,0%,27%)] mb-8">
-              Tell us where it is and what you're thinking. We'll get back to
-              you within 24 hours.
+              {contactDesc}
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
             {submitted ? (
               <p className="font-display text-lg italic text-primary">
-                Thank you — we'll be in touch within 24 hours.
+                {contactThanks}
               </p>
             ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -364,7 +353,7 @@ const ManagementPage = () => {
         <div className="max-w-[750px] mx-auto">
           <FadeIn>
             <h2 className="font-display text-2xl text-foreground mb-8">
-              Questions.
+              {faqTitle}
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
