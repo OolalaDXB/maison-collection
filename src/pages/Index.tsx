@@ -62,11 +62,13 @@ const Index = () => {
 
       {/* Hero */}
       <section className="relative h-screen flex items-end">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[#2a2a2a]">
           <img
             src={properties[0].heroImage}
             alt="Maison Georgia — Mountain duplex in the Caucasus"
             className="w-full h-full object-cover"
+            fetchPriority="high"
+            decoding="sync"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.40)]" />
         </div>
