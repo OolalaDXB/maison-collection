@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { Plus, Search, Save, Trash2, CreditCard, CheckCircle } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useFxRates } from "@/hooks/useFxRates";
 
 interface Booking {
   id: string;
@@ -50,6 +51,8 @@ const STATUS_COLORS: Record<string, string> = {
   no_show: "bg-muted text-muted-foreground",
 };
 
+const CURRENCIES = ["EUR", "USD", "AED", "GEL"] as const;
+
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>
     <label className="text-xs text-muted-foreground block mb-1">{label}</label>
@@ -65,9 +68,13 @@ const AdminBookingsPage = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterSource, setFilterSource] = useState("");
   const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [currency, setCurrency] = useState<string>("EUR");
   const [newDialog, setNewDialog] = useState(false);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
   const [saving, setSaving] = useState(false);
+  const { convertFromEur, formatPrice } = useFxRates();
 
   // New booking form
   const [nb, setNb] = useState({ property_id: "", guest_name: "", guest_email: "", guest_phone: "", guests_count: 1, check_in: "", check_out: "", base_price_per_night: 0, cleaning_fee: 0, tourist_tax_total: 0, discount_amount: 0, special_requests: "" });
@@ -88,9 +95,14 @@ const AdminBookingsPage = () => {
     if (filterProp && b.property_id !== filterProp) return false;
     if (filterStatus && b.status !== filterStatus) return false;
     if (filterSource && b.source !== filterSource) return false;
+    if (dateFrom && b.check_in < dateFrom) return false;
+    if (dateTo && b.check_in > dateTo) return false;
     if (search && !b.guest_name.toLowerCase().includes(search.toLowerCase()) && !b.guest_email.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
+
+  const conv = (eur: number) => currency === "EUR" ? eur : convertFromEur(eur, currency);
+  const fmt = (amount: number) => formatPrice(Math.round(amount), currency);
 
   const propName = (id: string) => properties.find((p) => p.id === id)?.name || "—";
 
@@ -231,6 +243,11 @@ const AdminBookingsPage = () => {
           <option value="">All Sources</option>
           {["direct", "airbnb", "airbnb_csv", "manual"].map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
+        <Input type="date" className="w-36 text-sm" value={dateFrom} onChange={e => setDateFrom(e.target.value)} placeholder="From" />
+        <Input type="date" className="w-36 text-sm" value={dateTo} onChange={e => setDateTo(e.target.value)} placeholder="To" />
+        <select className="px-3 py-2 border border-border bg-background text-sm" value={currency} onChange={e => setCurrency(e.target.value)}>
+          {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input className="pl-8 pr-3 py-2 border border-border bg-background text-sm w-48" placeholder="Search guest…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -262,7 +279,7 @@ const AdminBookingsPage = () => {
               <TableCell className="text-sm">{b.check_in}</TableCell>
               <TableCell className="text-sm">{b.check_out}</TableCell>
               <TableCell className="text-sm">{b.nights}</TableCell>
-              <TableCell className="text-sm">€{b.total_price}</TableCell>
+              <TableCell className="text-sm">{fmt(conv(b.total_price))}</TableCell>
               <TableCell><span className={`text-[0.65rem] px-2 py-0.5 uppercase tracking-wider ${STATUS_COLORS[b.status || ""] || "bg-muted text-muted-foreground"}`}>{b.status}</span></TableCell>
               <TableCell className="text-sm text-muted-foreground">{b.source}</TableCell>
             </TableRow>
