@@ -60,7 +60,7 @@ const AppContent = () => {
         exit="exit"
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/arabia" element={<ArabiaPage />} />
