@@ -21,22 +21,62 @@ const AdminSettingsPage = () => {
   const [properties, setProperties] = useState<PropertyIntegration[]>([]);
   const [icalUrls, setIcalUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [contactEmail, setContactEmail] = useState("chez@maisons.co");
-  const [defaultLang, setDefaultLang] = useState("FR");
+  const [contactEmail, setContactEmail] = useState("");
+  const [defaultLang, setDefaultLang] = useState("en");
+  const [siteName, setSiteName] = useState("Maisons");
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from("properties").select("id, name, slug, airbnb_ical_url, ical_export_token").order("display_order");
-      if (data) {
-        setProperties(data);
+      const [{ data: props }, { data: content }] = await Promise.all([
+        supabase.from("properties").select("id, name, slug, airbnb_ical_url, ical_export_token").order("display_order"),
+        supabase.from("site_content").select("section, content_en").eq("page", "settings"),
+      ]);
+      if (props) {
+        setProperties(props);
         const urls: Record<string, string> = {};
-        data.forEach((p: any) => { urls[p.id] = p.airbnb_ical_url || ""; });
+        props.forEach((p: any) => { urls[p.id] = p.airbnb_ical_url || ""; });
         setIcalUrls(urls);
+      }
+      if (content) {
+        const emailRow = content.find((c: any) => c.section === "contact_email");
+        const langRow = content.find((c: any) => c.section === "default_language");
+        const nameRow = content.find((c: any) => c.section === "site_name");
+        if (emailRow?.content_en) setContactEmail(emailRow.content_en);
+        else setContactEmail("chez@maisons.co");
+        if (langRow?.content_en) setDefaultLang(langRow.content_en);
+        if (nameRow?.content_en) setSiteName(nameRow.content_en);
       }
       setLoading(false);
     };
     load();
   }, []);
+
+  const saveGeneralSettings = async () => {
+    setSaving(true);
+    const settings = [
+      { page: "settings", section: "contact_email", content_en: contactEmail },
+      { page: "settings", section: "default_language", content_en: defaultLang },
+      { page: "settings", section: "site_name", content_en: siteName },
+    ];
+    for (const s of settings) {
+      const { data: existing } = await supabase.from("site_content").select("id").eq("page", s.page).eq("section", s.section).maybeSingle();
+      if (existing) {
+        await supabase.from("site_content").update({ content_en: s.content_en }).eq("id", existing.id);
+      } else {
+        await supabase.from("site_content").insert(s);
+      }
+    }
+    setSaving(false);
+    setDirty(false);
+    toast.success("Settings saved");
+  };
+
+  const updateField = <T,>(setter: (v: T) => void) => (value: T) => {
+    setter(value);
+    setDirty(true);
+  };
 
   const saveIcalUrl = async (propId: string) => {
     const { error } = await supabase.from("properties").update({ airbnb_ical_url: icalUrls[propId] || null }).eq("id", propId);
@@ -63,6 +103,7 @@ const AdminSettingsPage = () => {
     toast.success("Copied to clipboard");
   };
 
+
   return (
     <AdminLayout>
       <h1 className="font-display text-2xl mb-6">Settings</h1>
@@ -79,19 +120,27 @@ const AdminSettingsPage = () => {
             <CardContent className="space-y-4 max-w-md">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Site Name</label>
-                <Input value="Maisons" disabled />
+                <Input value={siteName} onChange={(e) => updateField(setSiteName)(e.target.value)} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Contact Email</label>
-                <Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+                <Input value={contactEmail} onChange={(e) => updateField(setContactEmail)(e.target.value)} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Default Language</label>
-                <select className="px-3 py-2 border border-border bg-background text-sm" value={defaultLang} onChange={(e) => setDefaultLang(e.target.value)}>
-                  <option value="FR">Français</option>
-                  <option value="EN">English</option>
+                <select
+                  className="px-3 py-2 border border-border bg-background text-sm"
+                  value={defaultLang}
+                  onChange={(e) => updateField(setDefaultLang)(e.target.value)}
+                >
+                  <option value="fr">Français</option>
+                  <option value="en">English</option>
+                  <option value="ru">Русский</option>
                 </select>
               </div>
+              <Button onClick={saveGeneralSettings} disabled={saving || !dirty}>
+                {saving ? "Saving…" : "Save Settings"}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
