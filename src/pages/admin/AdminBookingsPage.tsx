@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Search, Save, Trash2, CreditCard, CheckCircle } from "lucide-react";
+import { Plus, Search, Save, Trash2, CreditCard, CheckCircle, Upload } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useFxRates } from "@/hooks/useFxRates";
+import AirbnbCsvImportDialog from "@/components/admin/AirbnbCsvImportDialog";
 
 interface Booking {
   id: string;
@@ -72,6 +73,7 @@ const AdminBookingsPage = () => {
   const [dateTo, setDateTo] = useState("");
   const [currency, setCurrency] = useState<string>("EUR");
   const [newDialog, setNewDialog] = useState(false);
+  const [importDialog, setImportDialog] = useState(false);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
   const [saving, setSaving] = useState(false);
   const { convertFromEur, formatPrice } = useFxRates();
@@ -226,7 +228,10 @@ const AdminBookingsPage = () => {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl">Bookings</h1>
-        <Button size="sm" onClick={openNewBooking}><Plus size={14} className="mr-1" /> New Booking</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setImportDialog(true)}><Upload size={14} className="mr-1" /> Import Airbnb CSV</Button>
+          <Button size="sm" onClick={openNewBooking}><Plus size={14} className="mr-1" /> New Booking</Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -527,6 +532,13 @@ const AdminBookingsPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AirbnbCsvImportDialog
+        open={importDialog}
+        onOpenChange={setImportDialog}
+        properties={properties}
+        onImported={loadData}
+      />
     </AdminLayout>
   );
 };
