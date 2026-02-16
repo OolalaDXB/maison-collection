@@ -76,7 +76,14 @@ const ArabiaPage = () => {
       if (availRes.data) setDisabledDates(availRes.data.map(d => new Date(d.date)));
       if (imgRes.data) setImages(imgRes.data);
       if (revRes.data && revRes.data.length > 0) setReviews(revRes.data);
-      if (propRes.data?.hero_image) setHeroImage(propRes.data.hero_image);
+      if (propRes.data?.hero_image) {
+        // Add Supabase image transformation parameters for optimization
+        const heroUrl = propRes.data.hero_image;
+        const transformedUrl = heroUrl.includes('supabase')
+          ? `${heroUrl}?width=800&height=800&format=webp&quality=75`
+          : heroUrl;
+        setHeroImage(transformedUrl);
+      }
     };
     loadData();
   }, []);

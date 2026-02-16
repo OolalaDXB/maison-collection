@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { m, useInView, useReducedMotion } from "framer-motion";
 
 interface FadeInProps {
   children: ReactNode;
@@ -13,7 +13,7 @@ const FadeIn = ({ children, delay = 0, className }: FadeInProps) => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
       animate={
@@ -32,7 +32,7 @@ const FadeIn = ({ children, delay = 0, className }: FadeInProps) => {
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 };
 

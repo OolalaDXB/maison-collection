@@ -1,4 +1,4 @@
-import heroImg from "@/assets/atlantique-hero.png";
+import heroImg from "@/assets/atlantique-hero.avif";
 
 interface AtlantiqueHeroProps {
   imageCount: number;

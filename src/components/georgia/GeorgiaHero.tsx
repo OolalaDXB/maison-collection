@@ -1,4 +1,4 @@
-import heroImg from "@/assets/georgia-10.png";
+import heroImg from "@/assets/georgia-10.avif";
 
 interface GeorgiaHeroProps {
   imageCount: number;
