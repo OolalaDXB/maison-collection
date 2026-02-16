@@ -1,5 +1,4 @@
 import heroImg from "@/assets/atlantique-hero.avif";
-import HeroImage from "@/components/HeroImage";
 import type { PropertyData } from "@/hooks/useProperty";
 
 interface AtlantiqueHeroProps {
@@ -20,11 +19,14 @@ const AtlantiqueHero = ({ property, imageCount }: AtlantiqueHeroProps) => {
   };
 
   return (
-    <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] overflow-hidden">
-      <HeroImage
+    <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] bg-[#2a2a2a]">
+      <img
         src={heroImg}
         alt={`${name} — contemporary stone house in Brittany`}
         className="w-full h-full object-cover"
+        fetchPriority="high"
+        decoding="sync"
+        loading="eager"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.45)]" />
 
