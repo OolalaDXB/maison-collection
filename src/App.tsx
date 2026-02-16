@@ -60,7 +60,7 @@ const AppContent = () => {
         exit="exit"
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/arabia" element={<ArabiaPage />} />

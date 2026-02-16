@@ -1,4 +1,5 @@
-import heroImg from "@/assets/georgia-10.png";
+import heroImg from "@/assets/georgia-10.avif";
+import HeroImage from "@/components/HeroImage";
 import type { PropertyData } from "@/hooks/useProperty";
 
 interface GeorgiaHeroProps {
@@ -19,15 +20,11 @@ const GeorgiaHero = ({ property, imageCount }: GeorgiaHeroProps) => {
   };
 
   return (
-    <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] bg-[#2a2a2a]">
-      <img
-        srcSet={`${heroImg} 1200w`}
-        sizes="100vw"
+    <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] overflow-hidden">
+      <HeroImage
         src={heroImg}
         alt={`${name} — ski loft in Gudauri, Caucasus`}
         className="w-full h-full object-cover"
-        fetchPriority="high"
-        decoding="sync"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.45)]" />
 
