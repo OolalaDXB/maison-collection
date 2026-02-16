@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import type { PropertyData } from "@/hooks/useProperty";
 import FadeIn from "@/components/FadeIn";
 import {
   Waves, Building2, Mountain, Bath, Car, Wifi, Flame, LandPlot, CircleDot, Sun, UtensilsCrossed,
@@ -25,8 +26,15 @@ const features = [
   { icon: Wifi, label: "Fibre WiFi" },
 ];
 
-const AtlantiqueContent = () => {
+const AtlantiqueContent = ({ property }: { property: PropertyData | null }) => {
   const [expanded, setExpanded] = useState(false);
+
+  const name = property?.name ?? "Maison Atlantique";
+  const location = property ? `${property.location}, ${property.region}, ${property.country}` : "Quistinic, Brittany, France";
+  const specs = property
+    ? `${property.capacity ?? 6} guests · ${property.bedrooms ?? 2} bedrooms · 3 beds · ${property.bathrooms ?? 2} bathrooms · ${property.area_sqm ?? 120}m² + terraces · 5 000m²`
+    : "6 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²";
+  const desc = property?.description ?? null;
 
   return (
     <div>
@@ -35,16 +43,16 @@ const AtlantiqueContent = () => {
         <nav className="mb-6">
           <p className="font-body font-light text-sm text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">Collection</Link>
-            {" > "}France{" > "}Brittany{" > "}Quistinic
+            {" > "}{property?.country ?? "France"}{" > "}{property?.region ?? "Brittany"}{" > "}{property?.location ?? "Quistinic"}
           </p>
         </nav>
 
         {/* Title block */}
         <div className="mb-8">
-          <h2 className="font-display text-3xl text-foreground mb-1">Maison Atlantique</h2>
-          <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">Quistinic, Brittany, France</p>
+          <h2 className="font-display text-3xl text-foreground mb-1">{name}</h2>
+          <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">{location}</p>
           <p className="font-body font-light text-muted-foreground text-sm">
-            6 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²
+            {specs}
           </p>
         </div>
 
