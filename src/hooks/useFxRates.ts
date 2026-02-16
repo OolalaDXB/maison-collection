@@ -36,6 +36,19 @@ export const useFxRates = () => {
     return Math.round(amountEur * rate.rate);
   };
 
+  const convertToEur = (amount: number, currency: string): number => {
+    if (currency === "EUR") return amount;
+    const rate = query.data?.find((r) => r.target_currency === currency);
+    if (!rate || rate.rate === 0) return 0;
+    return Math.round((amount / rate.rate) * 100) / 100;
+  };
+
+  const getRate = (currency: string): number | null => {
+    if (currency === "EUR") return 1;
+    const rate = query.data?.find((r) => r.target_currency === currency);
+    return rate ? rate.rate : null;
+  };
+
   const formatPrice = (amount: number, currency: string): string => {
     const symbol = CURRENCY_SYMBOLS[currency] || currency;
     if (currency === "EUR") return `${amount}€`;
@@ -64,6 +77,8 @@ export const useFxRates = () => {
     rates: query.data || [],
     isLoading: query.isLoading,
     convertFromEur,
+    convertToEur,
+    getRate,
     formatPrice,
     getMultiCurrencyDisplay,
     lastUpdated: query.data?.[0]?.fetched_at || null,

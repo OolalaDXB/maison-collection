@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useFxRates } from "@/hooks/useFxRates";
+import { Coins } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, Calendar, Download, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -92,7 +93,7 @@ const AdminFinancePage = () => {
   const [filterProp, setFilterProp] = useState("");
   const [filterCat, setFilterCat] = useState("");
   const [currency, setCurrency] = useState<string>("EUR");
-  const { convertFromEur, formatPrice } = useFxRates();
+  const { convertFromEur, convertToEur, getRate, formatPrice } = useFxRates();
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -381,34 +382,46 @@ const AdminFinancePage = () => {
                     <TableHead>Property</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Income</TableHead>
-                    <TableHead className="text-right">Expense</TableHead>
+                    <TableHead className="text-right">Montant original</TableHead>
+                    <TableHead className="text-right">Income (EUR)</TableHead>
+                    <TableHead className="text-right">Expense (EUR)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {loading ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading…</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading…</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No entries</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No entries</TableCell></TableRow>
                   ) : (
-                    filtered.map(e => (
-                      <TableRow key={e.id}>
-                        <TableCell className="text-xs">{e.entry_date}</TableCell>
-                        <TableCell className="text-xs font-display">{propMap.get(e.property_id) || "—"}</TableCell>
-                        <TableCell className="text-xs">
-                          <span className={`px-2 py-0.5 ${e.entry_type === "income" ? "bg-[hsl(120,35%,95%)] text-[hsl(120,40%,30%)]" : "bg-[hsl(0,45%,94%)] text-[hsl(0,50%,35%)]"}`}>
-                            {CATEGORY_LABELS[e.category] || e.category}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-sm max-w-[200px] truncate">{e.description}</TableCell>
-                        <TableCell className="text-sm text-right text-[hsl(120,40%,35%)]">
-                          {e.entry_type === "income" ? fmt(conv(e.amount_eur || e.amount)) : ""}
-                        </TableCell>
-                        <TableCell className="text-sm text-right text-[hsl(0,50%,45%)]">
-                          {e.entry_type === "expense" ? fmt(conv(e.amount_eur || e.amount)) : ""}
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    filtered.map(e => {
+                      const eurAmount = e.amount_eur || e.amount;
+                      const showOriginal = e.currency !== "EUR";
+                      return (
+                        <TableRow key={e.id}>
+                          <TableCell className="text-xs">{e.entry_date}</TableCell>
+                          <TableCell className="text-xs font-display">{propMap.get(e.property_id) || "—"}</TableCell>
+                          <TableCell className="text-xs">
+                            <span className={`px-2 py-0.5 ${e.entry_type === "income" ? "bg-[hsl(120,35%,95%)] text-[hsl(120,40%,30%)]" : "bg-[hsl(0,45%,94%)] text-[hsl(0,50%,35%)]"}`}>
+                              {CATEGORY_LABELS[e.category] || e.category}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm max-w-[200px] truncate">{e.description}</TableCell>
+                          <TableCell className="text-sm text-right">
+                            {showOriginal ? (
+                              <span className="text-muted-foreground">{formatPrice(Math.round(e.amount), e.currency)}</span>
+                            ) : (
+                              <span className="text-muted-foreground/50">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm text-right text-[hsl(120,40%,35%)]">
+                            {e.entry_type === "income" ? fmt(conv(eurAmount)) : ""}
+                          </TableCell>
+                          <TableCell className="text-sm text-right text-[hsl(0,50%,45%)]">
+                            {e.entry_type === "expense" ? fmt(conv(eurAmount)) : ""}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -478,7 +491,13 @@ const AdminFinancePage = () => {
               </div>
               <div>
                 <label className="font-body text-[0.75rem] uppercase tracking-wide text-muted-foreground mb-1 block">Currency</label>
-                <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={form.currency} onChange={e => { setForm(prev => ({ ...prev, currency: e.target.value })); updateAmountEur(form.amount, form.fx_rate); }}>
+                <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={form.currency} onChange={e => {
+                  const newCurrency = e.target.value;
+                  const rate = getRate(newCurrency);
+                  const fxStr = rate && newCurrency !== "EUR" ? String(rate) : "";
+                  setForm(prev => ({ ...prev, currency: newCurrency, fx_rate: fxStr }));
+                  updateAmountEur(form.amount, fxStr);
+                }}>
                   {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
