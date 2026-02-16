@@ -34,7 +34,7 @@ const BookingConfirmationPage = () => {
         .from("bookings")
         .select("*")
         .eq("id", bookingId)
-        .single();
+        .maybeSingle();
 
       if (data) {
         const b = data as any;
@@ -55,7 +55,7 @@ const BookingConfirmationPage = () => {
             .select("*")
             .eq("currency", "EUR")
             .eq("is_default", true)
-            .single();
+            .maybeSingle();
           if (bank) setBankAccount(bank);
         }
 
@@ -66,7 +66,7 @@ const BookingConfirmationPage = () => {
             .select("*")
             .eq("code", "crypto")
             .eq("active", true)
-            .single();
+            .maybeSingle();
           if (pm) setPaymentMethod(pm);
         }
       }
