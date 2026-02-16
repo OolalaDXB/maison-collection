@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import HeroImage from "@/components/HeroImage";
 import { Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -85,12 +84,15 @@ const Index = () => {
       <Header />
 
       {/* Hero */}
-      <section className="relative h-screen flex items-end overflow-hidden">
-        <div className="absolute inset-0">
-          <HeroImage
+      <section className="relative h-screen flex items-end">
+        <div className="absolute inset-0 bg-[#2a2a2a]">
+          <img
             src={properties[0].heroImage}
             alt="Maison Georgia — Mountain duplex in the Caucasus"
             className="w-full h-full object-cover"
+            fetchPriority="high"
+            decoding="sync"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(0,0,0,0.40)]" />
         </div>
