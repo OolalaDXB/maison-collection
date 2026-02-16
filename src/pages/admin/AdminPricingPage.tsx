@@ -52,7 +52,7 @@ const AdminPricingPage = () => {
 
   // Season dialog
   const [seasonDialog, setSeasonDialog] = useState(false);
-  const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>({ property_id: "", name: "", start_date: "", end_date: "", price_per_night: 0, min_nights: 1 });
+  const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>({ property_id: "", name: "", start_date: "", end_date: "", price_per_night: undefined as unknown as number, min_nights: undefined as unknown as number });
 
   // Promo dialog
   const [promoDialog, setPromoDialog] = useState(false);
@@ -95,10 +95,10 @@ const AdminPricingPage = () => {
       toast.error("Fill all required fields"); return;
     }
     if (s.id) {
-      const { error } = await supabase.from("seasonal_pricing").update({ name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: s.price_per_night, min_nights: s.min_nights }).eq("id", s.id);
+      const { error } = await supabase.from("seasonal_pricing").update({ name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: Number(s.price_per_night), min_nights: s.min_nights ? Number(s.min_nights) : null }).eq("id", s.id);
       if (error) { toast.error(error.message); return; }
     } else {
-      const { error } = await supabase.from("seasonal_pricing").insert({ property_id: s.property_id, name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: s.price_per_night, min_nights: s.min_nights || 1 });
+      const { error } = await supabase.from("seasonal_pricing").insert({ property_id: s.property_id, name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: Number(s.price_per_night), min_nights: s.min_nights ? Number(s.min_nights) : null }).select();
       if (error) { toast.error(error.message); return; }
     }
     toast.success("Season saved");
@@ -196,7 +196,7 @@ const AdminPricingPage = () => {
         {/* Seasonal */}
         <TabsContent value="seasonal" className="mt-4">
           <div className="flex justify-end mb-4">
-            <Button size="sm" onClick={() => { setEditSeason({ property_id: properties[0]?.id || "", name: "", start_date: "", end_date: "", price_per_night: 0, min_nights: 1 }); setSeasonDialog(true); }}>
+            <Button size="sm" onClick={() => { setEditSeason({ property_id: properties[0]?.id || "", name: "", start_date: "", end_date: "", price_per_night: undefined as unknown as number, min_nights: undefined as unknown as number }); setSeasonDialog(true); }}>
               <Plus size={14} className="mr-1" /> Add Season
             </Button>
           </div>
@@ -311,8 +311,8 @@ const AdminPricingPage = () => {
               <div><label className="text-xs text-muted-foreground">End</label><Input type="date" value={editSeason.end_date} onChange={(e) => setEditSeason({ ...editSeason, end_date: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-muted-foreground">Price/night (€)</label><Input type="number" value={editSeason.price_per_night} onChange={(e) => setEditSeason({ ...editSeason, price_per_night: parseFloat(e.target.value) || 0 })} /></div>
-              <div><label className="text-xs text-muted-foreground">Min nights</label><Input type="number" value={editSeason.min_nights ?? 1} onChange={(e) => setEditSeason({ ...editSeason, min_nights: parseInt(e.target.value) || 1 })} /></div>
+              <div><label className="text-xs text-muted-foreground">Price/night (€)</label><Input type="number" value={editSeason.price_per_night ?? ""} placeholder="e.g. 250" onChange={(e) => setEditSeason({ ...editSeason, price_per_night: e.target.value ? parseFloat(e.target.value) : undefined as unknown as number })} /></div>
+              <div><label className="text-xs text-muted-foreground">Min nights</label><Input type="number" value={editSeason.min_nights ?? ""} placeholder="e.g. 2" onChange={(e) => setEditSeason({ ...editSeason, min_nights: e.target.value ? parseInt(e.target.value) : undefined as unknown as number })} /></div>
             </div>
             <Button onClick={saveSeason} className="w-full">Save</Button>
           </div>
