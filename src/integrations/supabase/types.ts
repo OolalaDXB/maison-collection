@@ -1043,6 +1043,7 @@ export type Database = {
           created_at: string | null
           end_date: string
           id: string
+          is_recurring: boolean | null
           min_nights: number | null
           name: string
           price_per_night: number
@@ -1053,6 +1054,7 @@ export type Database = {
           created_at?: string | null
           end_date: string
           id?: string
+          is_recurring?: boolean | null
           min_nights?: number | null
           name: string
           price_per_night: number
@@ -1063,6 +1065,7 @@ export type Database = {
           created_at?: string | null
           end_date?: string
           id?: string
+          is_recurring?: boolean | null
           min_nights?: number | null
           name?: string
           price_per_night?: number
