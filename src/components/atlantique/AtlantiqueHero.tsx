@@ -1,10 +1,18 @@
 import heroImg from "@/assets/atlantique-hero.png";
+import type { PropertyData } from "@/hooks/useProperty";
 
 interface AtlantiqueHeroProps {
+  property: PropertyData | null;
   imageCount: number;
 }
 
-const AtlantiqueHero = ({ imageCount }: AtlantiqueHeroProps) => {
+const AtlantiqueHero = ({ property, imageCount }: AtlantiqueHeroProps) => {
+  const name = property?.name ?? "Maison Atlantique";
+  const location = property ? `${property.location} · ${property.region} · ${property.country}` : "Quistinic · Brittany · France";
+  const specs = property
+    ? `${property.capacity ?? 6} guests · ${property.bedrooms ?? 2} bedrooms · ${property.bathrooms ?? 2} bathrooms · ${property.area_sqm ?? 120}m²`
+    : "6 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²";
+
   const handleViewPhotos = () => {
     const el = document.getElementById("atlantique-gallery");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -16,7 +24,7 @@ const AtlantiqueHero = ({ imageCount }: AtlantiqueHeroProps) => {
         srcSet={`${heroImg} 1200w`}
         sizes="100vw"
         src={heroImg}
-        alt="Maison Atlantique — contemporary stone house in Brittany"
+        alt={`${name} — contemporary stone house in Brittany`}
         className="w-full h-full object-cover"
         fetchPriority="high"
         decoding="sync"
@@ -25,13 +33,13 @@ const AtlantiqueHero = ({ imageCount }: AtlantiqueHeroProps) => {
 
       <div className="absolute bottom-8 left-[5%] md:bottom-12 md:left-[5%] max-w-xl">
         <p className="font-body uppercase tracking-[0.15em] text-[0.75rem] text-[rgba(255,255,255,0.7)] mb-2">
-          Quistinic · Brittany · France
+          {location}
         </p>
         <h1 className="font-display font-normal text-4xl md:text-5xl text-white mb-3">
-          Maison Atlantique
+          {name}
         </h1>
         <p className="font-body font-light text-[0.875rem] text-[rgba(255,255,255,0.8)] mb-6">
-          6 guests · 2 bedrooms · 3 beds · 2 bathrooms · 120m² + terraces · 5 000m²
+          {specs}
         </p>
         <button
           onClick={handleViewPhotos}

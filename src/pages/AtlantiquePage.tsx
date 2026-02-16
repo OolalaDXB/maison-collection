@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useProperty } from "@/hooks/useProperty";
 import SEO from "@/components/SEO";
 import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
@@ -35,6 +36,7 @@ import AtlantiqueMobileBookingBar from "@/components/atlantique/AtlantiqueMobile
 const PROPERTY_ID = "e514d218-0cdc-43cd-a97b-061132976bfb";
 
 const AtlantiquePage = () => {
+  const { data: property } = useProperty(PROPERTY_ID);
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
@@ -56,39 +58,38 @@ const AtlantiquePage = () => {
     loadData();
   }, []);
 
-  const pricePerNight = 250;
+  const pricePerNight = property?.price_per_night ?? 250;
   const nights = checkIn && checkOut ? Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
   const total = nights * pricePerNight;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Maison Atlantique"
-        description="A restored Breton stone house near the Blavet valley in Quistinic, Brittany. Between the Golfe du Morbihan, Carnac megaliths, and wild Atlantic coast."
+        title={property?.name ?? "Maison Atlantique"}
+        description={property?.description ?? "A restored Breton stone house near the Blavet valley in Quistinic, Brittany."}
         path="/atlantique"
         image="https://maisons.co/og-atlantique.jpg"
       />
       <VacationRentalSchema
-        name="Maison Atlantique"
-        description="Restored Breton stone house near the Golfe du Morbihan"
+        name={property?.name ?? "Maison Atlantique"}
+        description={property?.description ?? "Restored Breton stone house near the Golfe du Morbihan"}
         url="https://maisons.co/atlantique"
         image="https://maisons.co/og-atlantique.jpg"
-        address={{ locality: "Quistinic", region: "Brittany", country: "FR" }}
-        pricePerNight={110}
+        address={{ locality: property?.location ?? "Quistinic", region: property?.region ?? "Brittany", country: "FR" }}
+        pricePerNight={pricePerNight}
         currency="EUR"
-        maxGuests={6}
-        bedrooms={3}
-        bathrooms={2}
+        maxGuests={property?.capacity ?? 6}
+        bedrooms={property?.bedrooms ?? 3}
+        bathrooms={property?.bathrooms ?? 2}
       />
       <Header />
 
-      <AtlantiqueHero imageCount={images.length || 10} />
+      <AtlantiqueHero property={property ?? null} imageCount={images.length || 10} />
 
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-          {/* Left column */}
           <div className="flex-1 min-w-0">
-            <AtlantiqueContent />
+            <AtlantiqueContent property={property ?? null} />
 
             <FadeIn>
               <AtlantiqueRooms />
@@ -111,7 +112,7 @@ const AtlantiquePage = () => {
             </FadeIn>
 
             <FadeIn>
-              <AtlantiqueInfo />
+              <AtlantiqueInfo property={property ?? null} />
             </FadeIn>
 
             <FadeIn>
@@ -129,10 +130,10 @@ const AtlantiquePage = () => {
             )}
           </div>
 
-          {/* Right column — sticky booking sidebar (desktop only) */}
           <div className="hidden lg:block w-[380px] shrink-0">
             <div className="sticky top-[100px]">
               <AtlantiqueBookingSidebar
+                property={property ?? null}
                 checkIn={checkIn}
                 checkOut={checkOut}
                 setCheckIn={setCheckIn}
@@ -157,8 +158,8 @@ const AtlantiquePage = () => {
 
       <Footer />
 
-      {/* Mobile fixed bottom bar */}
       <AtlantiqueMobileBookingBar
+        property={property ?? null}
         checkIn={checkIn}
         checkOut={checkOut}
         setCheckIn={setCheckIn}

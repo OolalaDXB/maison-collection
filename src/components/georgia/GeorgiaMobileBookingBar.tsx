@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import GeorgiaBookingSidebar from "./GeorgiaBookingSidebar";
+import type { PropertyData } from "@/hooks/useProperty";
 
 interface Props {
+  property: PropertyData | null;
   checkIn?: Date;
   checkOut?: Date;
   setCheckIn: (d: Date | undefined) => void;
