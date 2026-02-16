@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Search, Save, Trash2, CreditCard, CheckCircle, Upload } from "lucide-react";
+import { Plus, Search, Save, Trash2, CreditCard, CheckCircle, Upload, Download, FileText, Loader2 } from "lucide-react";
+import jsPDF from "jspdf";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useFxRates } from "@/hooks/useFxRates";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +77,8 @@ const AdminBookingsPage = () => {
   const [newDialog, setNewDialog] = useState(false);
   const [importDialog, setImportDialog] = useState(false);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
+  const [contractData, setContractData] = useState<{ contract_html: string; signature_url: string | null; accepted_at: string | null } | null>(null);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const [saving, setSaving] = useState(false);
   const { convertFromEur, convertToEur, formatPrice } = useFxRates();
   const { isAdmin } = useAuth();
@@ -93,6 +96,97 @@ const AdminBookingsPage = () => {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  // Load contract when editing a booking
+  useEffect(() => {
+    if (!editBooking) { setContractData(null); return; }
+    supabase
+      .from("booking_contracts")
+      .select("contract_html, signature_url, accepted_at")
+      .eq("booking_id", editBooking.id)
+      .maybeSingle()
+      .then(({ data }) => setContractData(data as any));
+  }, [editBooking?.id]);
+
+  const downloadContractPdf = async () => {
+    if (!contractData || !editBooking) return;
+    setGeneratingPdf(true);
+    try {
+      const refCode = `BOOK-${editBooking.id.slice(0, 8).toUpperCase()}`;
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
+
+      pdf.setFontSize(18);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Contrat de Location Saisonnière", margin, y);
+      y += 10;
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(120, 120, 120);
+      pdf.text(`Réf: ${refCode}`, margin, y);
+      y += 4;
+      if (contractData.accepted_at) {
+        pdf.text(`Signé le: ${new Date(contractData.accepted_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}`, margin, y);
+      }
+      y += 10;
+
+      pdf.setTextColor(30, 30, 30);
+      pdf.setFontSize(10);
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = contractData.contract_html;
+      const textContent = tempDiv.innerText || tempDiv.textContent || "";
+      const lines = pdf.splitTextToSize(textContent, contentWidth);
+      const lineHeight = 4.5;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      for (const line of lines) {
+        if (y + lineHeight > pageHeight - margin) { pdf.addPage(); y = margin; }
+        pdf.text(line, margin, y);
+        y += lineHeight;
+      }
+
+      y += 10;
+      if (y + 60 > pageHeight - margin) { pdf.addPage(); y = margin; }
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 8;
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Signature du locataire", margin, y);
+      y += 6;
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(editBooking.guest_name, margin, y);
+      y += 8;
+
+      if (contractData.signature_url) {
+        try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = reject; img.src = contractData.signature_url!; });
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            const sigWidth = Math.min(80, contentWidth);
+            const sigHeight = (img.height / img.width) * sigWidth;
+            pdf.addImage(canvas.toDataURL("image/png"), "PNG", margin, y, sigWidth, sigHeight);
+          }
+        } catch {}
+      }
+
+      pdf.save(`contrat-${refCode}.pdf`);
+    } catch (e) {
+      console.error("PDF generation failed:", e);
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
 
   const filtered = bookings.filter((b) => {
     if (filterProp && b.property_id !== filterProp) return false;
@@ -514,6 +608,35 @@ const AdminBookingsPage = () => {
                         {editBooking.stripe_session_id && <div className="text-xs text-muted-foreground">Session: <span className="font-mono">{editBooking.stripe_session_id}</span></div>}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Contract section */}
+                {isAdmin && contractData && (
+                  <div className="border border-border rounded-md p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                      <FileText size={14} /> Contrat signé
+                    </p>
+                    <div className="text-sm space-y-1">
+                      {contractData.accepted_at && (
+                        <p className="text-muted-foreground">
+                          Signé le {new Date(contractData.accepted_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      )}
+                      {contractData.signature_url && (
+                        <div className="mt-2">
+                          <p className="text-xs text-muted-foreground mb-1">Signature :</p>
+                          <img src={contractData.signature_url} alt="Signature" className="h-16 border border-border bg-background p-1" />
+                        </div>
+                      )}
+                    </div>
+                    <Button variant="outline" size="sm" onClick={downloadContractPdf} disabled={generatingPdf}>
+                      {generatingPdf ? (
+                        <><Loader2 size={14} className="animate-spin mr-1" /> Génération…</>
+                      ) : (
+                        <><Download size={14} className="mr-1" /> Télécharger le contrat PDF</>
+                      )}
+                    </Button>
                   </div>
                 )}
 
