@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import AtlantiqueBookingSidebar from "./AtlantiqueBookingSidebar";
+import type { PropertyData } from "@/hooks/useProperty";
 
 interface Props {
+  property: PropertyData | null;
   checkIn?: Date;
   checkOut?: Date;
   setCheckIn: (d: Date | undefined) => void;
@@ -20,7 +22,6 @@ const AtlantiqueMobileBookingBar = (props: Props) => {
 
   return (
     <>
-      {/* Fixed bottom bar — mobile only */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border px-4 py-3 flex items-center justify-between">
         <div>
           {props.nights > 0 ? (
@@ -42,7 +43,6 @@ const AtlantiqueMobileBookingBar = (props: Props) => {
         </button>
       </div>
 
-      {/* Bottom sheet / modal */}
       {sheetOpen && (
         <div className="lg:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-[rgba(0,0,0,0.5)]" onClick={() => setSheetOpen(false)} />
@@ -60,7 +60,6 @@ const AtlantiqueMobileBookingBar = (props: Props) => {
         </div>
       )}
 
-      {/* Spacer for mobile bottom bar */}
       <div className="lg:hidden h-16" />
     </>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useProperty } from "@/hooks/useProperty";
 import SEO from "@/components/SEO";
 import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
@@ -57,63 +58,60 @@ const hardcodedReviews = [
 ];
 
 const ArabiaPage = () => {
+  const { data: property } = useProperty(PROPERTY_ID);
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
   const [disabledDates, setDisabledDates] = useState<Date[]>([]);
   const [images, setImages] = useState<{ image_url: string; alt_text: string | null }[]>([]);
   const [reviews, setReviews] = useState<any[]>(hardcodedReviews);
-  const [heroImage, setHeroImage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const [availRes, imgRes, revRes, propRes] = await Promise.all([
+      const [availRes, imgRes, revRes] = await Promise.all([
         supabase.from("availability").select("date").eq("property_id", PROPERTY_ID).eq("available", false),
         supabase.from("property_images").select("image_url, alt_text, display_order").eq("property_id", PROPERTY_ID).order("display_order"),
         supabase.from("reviews").select("*").eq("property_id", PROPERTY_ID).order("created_at", { ascending: false }),
-        supabase.from("properties").select("hero_image").eq("id", PROPERTY_ID).single(),
       ]);
       if (availRes.data) setDisabledDates(availRes.data.map(d => new Date(d.date)));
       if (imgRes.data) setImages(imgRes.data);
       if (revRes.data && revRes.data.length > 0) setReviews(revRes.data);
-      if (propRes.data?.hero_image) setHeroImage(propRes.data.hero_image);
     };
     loadData();
   }, []);
 
-  const pricePerNight = 350;
+  const pricePerNight = property?.price_per_night ?? 350;
   const nights = checkIn && checkOut ? Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
   const total = nights * pricePerNight;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Maison Arabia"
-        description="A modern family villa in The Sustainable City, Dubai. Net-zero energy, equestrian center, bio-dome greenhouses, and car-free community living."
+        title={property?.name ?? "Maison Arabia"}
+        description={property?.description ?? "A modern family villa in The Sustainable City, Dubai."}
         path="/arabia"
         image="https://maisons.co/og-arabia.jpg"
       />
       <VacationRentalSchema
-        name="Maison Arabia"
-        description="Modern family villa in The Sustainable City, Dubai"
+        name={property?.name ?? "Maison Arabia"}
+        description={property?.description ?? "Modern family villa in The Sustainable City, Dubai"}
         url="https://maisons.co/arabia"
         image="https://maisons.co/og-arabia.jpg"
-        address={{ locality: "The Sustainable City", region: "Dubai", country: "AE" }}
-        pricePerNight={180}
+        address={{ locality: property?.location ?? "The Sustainable City", region: property?.region ?? "Dubai", country: "AE" }}
+        pricePerNight={pricePerNight}
         currency="EUR"
-        maxGuests={8}
-        bedrooms={4}
-        bathrooms={3}
+        maxGuests={property?.capacity ?? 8}
+        bedrooms={property?.bedrooms ?? 4}
+        bathrooms={property?.bathrooms ?? 3}
       />
       <Header />
 
-      <ArabiaHero heroImage={heroImage} imageCount={images.length} />
+      <ArabiaHero property={property ?? null} heroImage={property?.hero_image ?? null} imageCount={images.length} />
 
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-          {/* Left column */}
           <div className="flex-1 min-w-0">
-            <ArabiaContent />
+            <ArabiaContent property={property ?? null} />
 
             <FadeIn>
               <ArabiaRooms />
@@ -136,7 +134,7 @@ const ArabiaPage = () => {
             </FadeIn>
 
             <FadeIn>
-              <ArabiaInfo />
+              <ArabiaInfo property={property ?? null} />
             </FadeIn>
 
             <FadeIn>
@@ -150,10 +148,10 @@ const ArabiaPage = () => {
             </FadeIn>
           </div>
 
-          {/* Right column — sticky booking sidebar (desktop only) */}
           <div className="hidden lg:block w-[380px] shrink-0">
             <div className="sticky top-[100px]">
               <ArabiaBookingSidebar
+                property={property ?? null}
                 checkIn={checkIn}
                 checkOut={checkOut}
                 setCheckIn={setCheckIn}
@@ -170,7 +168,6 @@ const ArabiaPage = () => {
         </div>
       </div>
 
-      {/* Community section — full-bleed */}
       <PropertyCommunity propertyId={PROPERTY_ID} photos={regionPhotos} />
 
       <FadeIn>
@@ -180,6 +177,7 @@ const ArabiaPage = () => {
       <Footer />
 
       <ArabiaMobileBookingBar
+        property={property ?? null}
         checkIn={checkIn}
         checkOut={checkOut}
         setCheckIn={setCheckIn}

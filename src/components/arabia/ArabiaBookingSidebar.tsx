@@ -5,8 +5,10 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import type { PropertyData } from "@/hooks/useProperty";
 
 interface Props {
+  property: PropertyData | null;
   checkIn?: Date;
   checkOut?: Date;
   setCheckIn: (d: Date | undefined) => void;
@@ -20,16 +22,20 @@ interface Props {
 }
 
 const ArabiaBookingSidebar = ({
-  checkIn, checkOut, setCheckIn, setCheckOut,
+  property, checkIn, checkOut, setCheckIn, setCheckOut,
   guests, setGuests, disabledDates,
   pricePerNight, nights, total,
 }: Props) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [guestOpen, setGuestOpen] = useState(false);
 
-  const bookSubject = checkIn && checkOut
-    ? `Booking Maison Arabia — ${format(checkIn, "dd/MM/yyyy")} to ${format(checkOut, "dd/MM/yyyy")} — ${guests} guest${guests > 1 ? "s" : ""}`
-    : "Booking Maison Arabia";
+  const name = property?.name ?? "Maison Arabia";
+  const slug = property?.slug?.toLowerCase() ?? "arabia";
+  const airbnbUrl = property?.airbnb_link;
+  const rating = property?.airbnb_rating ?? 5.0;
+  const reviewsCount = property?.airbnb_reviews_count;
+  const capacity = property?.capacity ?? 6;
+  const isSuperhost = property?.tags?.includes("Superhost");
 
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
@@ -60,18 +66,23 @@ const ArabiaBookingSidebar = ({
   return (
     <div className="border border-[hsl(0,0%,88%)] p-6">
       <p className="font-body uppercase tracking-[0.1em] text-sm font-medium text-foreground mb-1">
-        Maison Arabia
+        {name}
       </p>
       <div className="flex items-center gap-1.5 mb-5">
         <Star size={14} className="text-primary fill-primary" />
         <span className="font-body font-light text-sm text-muted-foreground">
-          5.0 · Superhost ·{" "}
-          <a href="#reviews" className="underline underline-offset-2 hover:text-foreground transition-colors cursor-pointer">2 reviews</a>
+          {rating}{isSuperhost ? " · Superhost" : ""}
+          {reviewsCount ? (
+            <> ·{" "}
+              <a href="#reviews" className="underline underline-offset-2 hover:text-foreground transition-colors cursor-pointer">
+                {reviewsCount} reviews
+              </a>
+            </>
+          ) : null}
         </span>
       </div>
 
       <div className="border-t border-[hsl(0,0%,88%)] pt-5 space-y-4">
-        {/* Dates */}
         <div>
           <label className="font-body font-light text-muted-foreground text-xs uppercase tracking-[0.1em] block mb-2">
             Dates
@@ -107,7 +118,6 @@ const ArabiaBookingSidebar = ({
           </Popover>
         </div>
 
-        {/* Guests */}
         <div>
           <label className="font-body font-light text-muted-foreground text-xs uppercase tracking-[0.1em] block mb-2">
             Guests
@@ -120,7 +130,7 @@ const ArabiaBookingSidebar = ({
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2 pointer-events-auto" align="start">
-              {[1, 2, 3, 4, 5, 6].map(n => (
+              {Array.from({ length: capacity }, (_, i) => i + 1).map(n => (
                 <button
                   key={n}
                   onClick={() => { setGuests(n); setGuestOpen(false); }}
@@ -137,7 +147,6 @@ const ArabiaBookingSidebar = ({
         </div>
       </div>
 
-      {/* Price */}
       <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5">
         {nights > 0 ? (
           <>
@@ -166,20 +175,31 @@ const ArabiaBookingSidebar = ({
         )}
       </div>
 
-      {/* Actions */}
       <div className="border-t border-[hsl(0,0%,88%)] mt-5 pt-5 space-y-3">
         <Link
-          to={`/book/arabia${checkIn && checkOut ? `?checkin=${format(checkIn, "yyyy-MM-dd")}&checkout=${format(checkOut, "yyyy-MM-dd")}&guests=${guests}` : ""}`}
+          to={`/book/${slug}${checkIn && checkOut ? `?checkin=${format(checkIn, "yyyy-MM-dd")}&checkout=${format(checkOut, "yyyy-MM-dd")}&guests=${guests}` : ""}`}
           className="block w-full bg-foreground text-background font-body uppercase text-xs tracking-[0.1em] py-3 text-center hover:opacity-90 transition-opacity"
         >
           Book with us
         </Link>
         <Link
-          to={`/contact?type=booking&property=arabia`}
+          to={`/contact?type=booking&property=${slug}`}
           className="block w-full border border-[hsl(0,0%,88%)] text-foreground font-body uppercase text-xs tracking-[0.1em] py-2.5 text-center hover:border-foreground transition-colors"
         >
           Contact us
         </Link>
+        {airbnbUrl && (
+          <p className="text-center">
+            <a
+              href={airbnbUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-body font-light text-xs text-muted-foreground underline hover:text-foreground transition-colors"
+            >
+              or book on Airbnb
+            </a>
+          </p>
+        )}
       </div>
       <p className="font-body font-light text-xs text-muted-foreground mt-3 text-center">
         chez@maisons.co

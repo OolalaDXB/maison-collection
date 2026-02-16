@@ -1,10 +1,18 @@
 import heroImg from "@/assets/georgia-10.png";
+import type { PropertyData } from "@/hooks/useProperty";
 
 interface GeorgiaHeroProps {
+  property: PropertyData | null;
   imageCount: number;
 }
 
-const GeorgiaHero = ({ imageCount }: GeorgiaHeroProps) => {
+const GeorgiaHero = ({ property, imageCount }: GeorgiaHeroProps) => {
+  const name = property?.name ?? "Maison Georgia";
+  const location = property ? `${property.location} · ${property.region} · ${property.country}` : "Gudauri · Greater Caucasus · Georgia";
+  const specs = property
+    ? `${property.capacity ?? 6} guests · ${property.bedrooms ?? 2} bedrooms · ${property.bathrooms ?? 3} bathrooms · ${property.area_sqm ?? 100}m²`
+    : "6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m²";
+
   const handleViewPhotos = () => {
     const el = document.getElementById("georgia-gallery");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -16,7 +24,7 @@ const GeorgiaHero = ({ imageCount }: GeorgiaHeroProps) => {
         srcSet={`${heroImg} 1200w`}
         sizes="100vw"
         src={heroImg}
-        alt="Maison Georgia — ski loft in Gudauri, Caucasus"
+        alt={`${name} — ski loft in Gudauri, Caucasus`}
         className="w-full h-full object-cover"
         fetchPriority="high"
         decoding="sync"
@@ -25,13 +33,13 @@ const GeorgiaHero = ({ imageCount }: GeorgiaHeroProps) => {
 
       <div className="absolute bottom-8 left-[5%] md:bottom-12 md:left-[5%] max-w-xl">
         <p className="font-body uppercase tracking-[0.15em] text-[0.75rem] text-[rgba(255,255,255,0.7)] mb-2">
-          Gudauri · Greater Caucasus · Georgia
+          {location}
         </p>
         <h1 className="font-display font-normal text-4xl md:text-5xl text-white mb-3">
-          Maison Georgia
+          {name}
         </h1>
         <p className="font-body font-light text-[0.875rem] text-[rgba(255,255,255,0.8)] mb-6">
-          6 guests · 2 bedrooms · 3 beds · 3 bathrooms · 100m²
+          {specs}
         </p>
         <button
           onClick={handleViewPhotos}

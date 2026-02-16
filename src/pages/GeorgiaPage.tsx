@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useProperty } from "@/hooks/useProperty";
 import SEO from "@/components/SEO";
 import { VacationRentalSchema } from "@/components/StructuredData";
 import Header from "@/components/layout/Header";
@@ -27,12 +28,12 @@ const regionPhotos = [
   { src: regionHighway, alt: "Georgian Military Highway winding through mountains", caption: "Georgian Military Highway" },
 ];
 import GeorgiaMobileBookingBar from "@/components/georgia/GeorgiaMobileBookingBar";
-// Reuse the generic reviews component
 import AtlantiqueReviews from "@/components/atlantique/AtlantiqueReviews";
 
 const PROPERTY_ID = "cdcc1fb2-d8e8-4004-a900-e196312952f9";
 
 const GeorgiaPage = () => {
+  const { data: property } = useProperty(PROPERTY_ID);
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
@@ -54,41 +55,43 @@ const GeorgiaPage = () => {
     loadData();
   }, []);
 
-  const pricePerNight = 180;
+  const pricePerNight = property?.price_per_night ?? 180;
   const nights = checkIn && checkOut ? Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
   const total = nights * pricePerNight;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Maison Georgia"
-        description="A 5-star mountain retreat in Gudauri, Georgia. Perched at 2,200m in the Greater Caucasus with panoramic views, ski-in access, and year-round adventure."
+        title={property?.name ?? "Maison Georgia"}
+        description={property?.description ?? "A 5-star mountain retreat in Gudauri, Georgia."}
         path="/georgia"
         image="https://maisons.co/og-georgia.jpg"
       />
       <VacationRentalSchema
-        name="Maison Georgia"
-        description="5-star mountain retreat in Gudauri, Greater Caucasus"
+        name={property?.name ?? "Maison Georgia"}
+        description={property?.description ?? "5-star mountain retreat in Gudauri, Greater Caucasus"}
         url="https://maisons.co/georgia"
         image="https://maisons.co/og-georgia.jpg"
-        address={{ locality: "Gudauri", region: "Mtskheta-Mtianeti", country: "GE" }}
-        pricePerNight={120}
+        address={{ locality: property?.location ?? "Gudauri", region: property?.region ?? "Mtskheta-Mtianeti", country: "GE" }}
+        pricePerNight={pricePerNight}
         currency="EUR"
-        rating={5.0}
-        reviewCount={22}
-        maxGuests={6}
-        bedrooms={2}
-        bathrooms={2}
+        rating={property?.airbnb_rating ?? 5.0}
+        reviewCount={property?.airbnb_reviews_count ?? 22}
+        maxGuests={property?.capacity ?? 6}
+        bedrooms={property?.bedrooms ?? 2}
+        bathrooms={property?.bathrooms ?? 3}
       />
       <Header />
 
-      <GeorgiaHero imageCount={images.length || 10} />
+      <GeorgiaHero
+        property={property ?? null}
+        imageCount={images.length || 10}
+      />
 
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-          {/* Left column */}
           <div className="flex-1 min-w-0">
-            <GeorgiaContent />
+            <GeorgiaContent property={property ?? null} />
 
             <FadeIn>
               <GeorgiaRooms />
@@ -111,7 +114,7 @@ const GeorgiaPage = () => {
             </FadeIn>
 
             <FadeIn>
-              <GeorgiaInfo />
+              <GeorgiaInfo property={property ?? null} />
             </FadeIn>
 
             <FadeIn>
@@ -125,10 +128,10 @@ const GeorgiaPage = () => {
             )}
           </div>
 
-          {/* Right column — sticky booking sidebar (desktop only) */}
           <div className="hidden lg:block w-[380px] shrink-0">
             <div className="sticky top-[100px]">
               <GeorgiaBookingSidebar
+                property={property ?? null}
                 checkIn={checkIn}
                 checkOut={checkOut}
                 setCheckIn={setCheckIn}
@@ -154,6 +157,7 @@ const GeorgiaPage = () => {
       <Footer />
 
       <GeorgiaMobileBookingBar
+        property={property ?? null}
         checkIn={checkIn}
         checkOut={checkOut}
         setCheckIn={setCheckIn}
