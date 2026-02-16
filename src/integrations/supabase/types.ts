@@ -134,6 +134,7 @@ export type Database = {
         Row: {
           airbnb_confirmation_code: string | null
           airbnb_payout: number | null
+          airbnb_reference_code: string | null
           airbnb_service_fee: number | null
           base_price_per_night: number
           check_in: string
@@ -166,6 +167,7 @@ export type Database = {
         Insert: {
           airbnb_confirmation_code?: string | null
           airbnb_payout?: number | null
+          airbnb_reference_code?: string | null
           airbnb_service_fee?: number | null
           base_price_per_night: number
           check_in: string
@@ -198,6 +200,7 @@ export type Database = {
         Update: {
           airbnb_confirmation_code?: string | null
           airbnb_payout?: number | null
+          airbnb_reference_code?: string | null
           airbnb_service_fee?: number | null
           base_price_per_night?: number
           check_in?: string
