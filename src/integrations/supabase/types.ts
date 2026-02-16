@@ -103,6 +103,7 @@ export type Database = {
           created_at: string | null
           id: string
           ip_address: string | null
+          signature_url: string | null
         }
         Insert: {
           accepted_at?: string | null
@@ -111,6 +112,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           ip_address?: string | null
+          signature_url?: string | null
         }
         Update: {
           accepted_at?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           ip_address?: string | null
+          signature_url?: string | null
         }
         Relationships: [
           {
