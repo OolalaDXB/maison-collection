@@ -19,7 +19,7 @@ export function useDefaultBankAccount(currency: string) {
         .select("*")
         .eq("currency", currency)
         .eq("is_default", true)
-        .single();
+        .maybeSingle();
 
       if (error) return null;
       return data as unknown as BankAccount;

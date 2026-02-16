@@ -59,7 +59,7 @@ const BookingPage = () => {
         ]);
         setAvailability(avRes.data || []);
         setSeasonalPricing(spRes.data || []);
-        const { data: tmpl } = await supabase.from("contract_templates").select("body_html").eq("active", true).or(`property_id.eq.${data.id},property_id.is.null`).order("property_id", { ascending: false }).limit(1).single();
+        const { data: tmpl } = await supabase.from("contract_templates").select("body_html").eq("active", true).or(`property_id.eq.${data.id},property_id.is.null`).order("property_id", { ascending: false }).limit(1).maybeSingle();
         if (tmpl) setContractHtml(tmpl.body_html);
       }
     };
