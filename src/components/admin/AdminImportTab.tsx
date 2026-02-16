@@ -1,11 +1,13 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, FileText, CheckCircle, Loader2, Download } from "lucide-react";
+import { Upload, FileText, CheckCircle, Loader2, Download, Pencil, Check, X as XIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ParsedReservation {
@@ -294,6 +296,31 @@ const AdminImportTab = () => {
   const toImportCount = parsed.filter((r) => r.action === "create").length;
   const toSkipCount = parsed.filter((r) => r.action === "skip").length;
 
+  const updateRow = useCallback((index: number, updates: Partial<ParsedReservation>) => {
+    setParsed((prev) => prev.map((r, i) => {
+      if (i !== index) return r;
+      const updated = { ...r, ...updates };
+      // Re-evaluate action if property was assigned
+      if (updates.property_id && updated.action === "skip" && updated.skip_reason?.includes("Property not found")) {
+        const prop = properties.find((p: any) => p.id === updates.property_id);
+        updated.action = "create";
+        updated.property_slug = prop?.slug || null;
+        updated.skip_reason = undefined;
+      }
+      return updated;
+    }));
+  }, [properties]);
+
+  const toggleAction = useCallback((index: number) => {
+    setParsed((prev) => prev.map((r, i) => {
+      if (i !== index) return r;
+      if (r.action === "create") return { ...r, action: "skip" as const, skip_reason: "Manually skipped" };
+      // Can only re-enable if has property
+      if (!r.property_id) { toast.error("Assign a property first"); return r; }
+      return { ...r, action: "create" as const, skip_reason: undefined };
+    }));
+  }, []);
+
   if (imported) {
     return (
       <Card>
@@ -349,7 +376,7 @@ const AdminImportTab = () => {
       </Card>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-display">
               Preview — {parsed.length} reservations
@@ -358,38 +385,81 @@ const AdminImportTab = () => {
               <span className="text-[hsl(120,40%,50%)]">✓ {toImportCount} to import</span>
               {" · "}
               <span className="text-muted-foreground">⏭ {toSkipCount} to skip</span>
+              {" · "}
+              <span className="text-xs text-muted-foreground">Click rows to edit property or toggle action</span>
             </DialogDescription>
           </DialogHeader>
           <div className="overflow-auto flex-1">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code</TableHead>
+                  <TableHead className="w-[100px]">Code</TableHead>
                   <TableHead>Guest</TableHead>
                   <TableHead>Dates</TableHead>
-                  <TableHead>Nights</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Property</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="w-[60px]">Nights</TableHead>
+                  <TableHead className="w-[90px]">Amount</TableHead>
+                  <TableHead className="w-[180px]">Property</TableHead>
+                  <TableHead className="w-[100px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {parsed.map((r, i) => (
-                  <TableRow key={i} className={r.action === "skip" ? "opacity-50" : ""}>
+                  <TableRow key={i} className={r.action === "skip" ? "opacity-60" : ""}>
                     <TableCell className="text-xs font-mono">{r.confirmation_code}</TableCell>
-                    <TableCell className="text-sm">{r.guest_name}</TableCell>
-                    <TableCell className="text-xs">{r.check_in} → {r.check_out}</TableCell>
-                    <TableCell className="text-sm">{r.nights}</TableCell>
-                    <TableCell className="text-sm">€{r.earnings.toLocaleString()}</TableCell>
-                    <TableCell className="text-xs">{r.property_slug || "—"}</TableCell>
                     <TableCell>
-                      {r.action === "create" ? (
-                        <span className="text-xs text-[hsl(120,40%,50%)]">Import</span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground" title={r.skip_reason}>
-                          Skip{r.skip_reason ? ` — ${r.skip_reason}` : ""}
-                        </span>
-                      )}
+                      <Input
+                        value={r.guest_name}
+                        onChange={(e) => updateRow(i, { guest_name: e.target.value })}
+                        className="h-7 text-sm border-transparent hover:border-input focus:border-input bg-transparent px-1"
+                      />
+                    </TableCell>
+                    <TableCell className="text-xs">{r.check_in} → {r.check_out}</TableCell>
+                    <TableCell className="text-sm text-center">{r.nights}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={r.earnings}
+                        onChange={(e) => updateRow(i, { earnings: parseFloat(e.target.value) || 0 })}
+                        className="h-7 text-sm border-transparent hover:border-input focus:border-input bg-transparent px-1 w-20"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={r.property_id || "__none"}
+                        onValueChange={(val) => {
+                          if (val === "__none") {
+                            updateRow(i, { property_id: null, property_slug: null });
+                          } else {
+                            const prop = properties.find((p: any) => p.id === val);
+                            updateRow(i, { property_id: val, property_slug: prop?.slug || null });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-7 text-xs border-transparent hover:border-input bg-transparent">
+                          <SelectValue placeholder="Select property" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__none">— None —</SelectItem>
+                          {properties.map((p: any) => (
+                            <SelectItem key={p.id} value={p.id}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => toggleAction(i)}
+                        className={`text-xs px-2 py-1 rounded-sm transition-colors ${
+                          r.action === "create"
+                            ? "bg-[hsl(120,40%,95%)] text-[hsl(120,40%,35%)] hover:bg-[hsl(120,40%,90%)]"
+                            : "bg-muted text-muted-foreground hover:bg-accent"
+                        }`}
+                        title={r.skip_reason || "Click to toggle"}
+                      >
+                        {r.action === "create" ? "Import" : "Skip"}
+                      </button>
                     </TableCell>
                   </TableRow>
                 ))}
