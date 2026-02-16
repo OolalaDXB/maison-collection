@@ -22,29 +22,32 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-supabase': ['@supabase/supabase-js', '@tanstack/react-query'],
-          'vendor-motion': ['framer-motion'],
-          'vendor-charts': ['recharts'],
-          'vendor-ui': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-label',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-toast',
-          ],
-          'vendor-map': ['mapbox-gl'],
-          'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+        manualChunks(id) {
+          // Admin pages grouped into a single chunk
+          if (id.includes('/components/admin/') || id.includes('/pages/admin/') || id.includes('/pages/AdminLoginPage') || id.includes('/pages/AdminProfilePage') || id.includes('/pages/AdminDashboard')) {
+            return 'admin';
+          }
+          // Property detail pages (Arabia, Georgia, Atlantique)
+          if (id.includes('/components/arabia/') || id.includes('/pages/ArabiaPage') ||
+              id.includes('/components/georgia/') || id.includes('/pages/GeorgiaPage') ||
+              id.includes('/components/atlantique/') || id.includes('/pages/AtlantiquePage')) {
+            return 'properties';
+          }
+          // Booking flow
+          if (id.includes('/pages/BookingPage') || id.includes('/pages/BookingConfirmation') || id.includes('/components/BookingModal')) {
+            return 'booking';
+          }
+          if (!id.includes('node_modules')) return;
+          // Vendor chunks
+          if (id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor-react';
+          if (id.includes('@supabase') || id.includes('@tanstack/react-query')) return 'vendor-supabase';
+          if (id.includes('framer-motion')) return 'vendor-motion';
+          if (id.includes('recharts')) return 'vendor-charts';
+          if (id.includes('mapbox-gl')) return 'vendor-map';
+          if (id.includes('i18next') || id.includes('react-i18next')) return 'vendor-i18n';
+          if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) return 'vendor-forms';
+          if (id.includes('xlsx')) return 'vendor-xlsx';
+          if (id.includes('@radix-ui')) return 'vendor-ui';
         },
       },
     },

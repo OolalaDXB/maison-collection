@@ -17,21 +17,48 @@ const ManagementPage = lazy(() => import("./pages/ManagementPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const BookingConfirmationPage = lazy(() => import("./pages/BookingConfirmationPage"));
-const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
-const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
-const AdminPropertiesPage = lazy(() => import("./pages/admin/AdminPropertiesPage"));
-const AdminCalendarPage = lazy(() => import("./pages/admin/AdminCalendarPage"));
-const AdminPricingPage = lazy(() => import("./pages/admin/AdminPricingPage"));
-const AdminBookingsPage = lazy(() => import("./pages/admin/AdminBookingsPage"));
-const AdminGuestsPage = lazy(() => import("./pages/admin/AdminGuestsPage"));
-const AdminReviewsPage = lazy(() => import("./pages/admin/AdminReviewsPage"));
-const AdminContentPage = lazy(() => import("./pages/admin/AdminContentPage"));
-const AdminInquiriesPage = lazy(() => import("./pages/admin/AdminInquiriesPage"));
-const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
-const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
-const AdminProfilePage = lazy(() => import("./pages/AdminProfilePage"));
-const AdminImportPage = lazy(() => import("./pages/admin/AdminImportPage"));
-const AdminFinancePage = lazy(() => import("./pages/admin/AdminFinancePage"));
+// Admin pages — prefetch all when any is accessed (single chunk)
+const adminImports = {
+  login: () => import("./pages/AdminLoginPage"),
+  dashboard: () => import("./pages/admin/AdminDashboardPage"),
+  properties: () => import("./pages/admin/AdminPropertiesPage"),
+  calendar: () => import("./pages/admin/AdminCalendarPage"),
+  pricing: () => import("./pages/admin/AdminPricingPage"),
+  bookings: () => import("./pages/admin/AdminBookingsPage"),
+  guests: () => import("./pages/admin/AdminGuestsPage"),
+  reviews: () => import("./pages/admin/AdminReviewsPage"),
+  content: () => import("./pages/admin/AdminContentPage"),
+  inquiries: () => import("./pages/admin/AdminInquiriesPage"),
+  payments: () => import("./pages/admin/AdminPaymentsPage"),
+  settings: () => import("./pages/admin/AdminSettingsPage"),
+  profile: () => import("./pages/AdminProfilePage"),
+  importExport: () => import("./pages/admin/AdminImportPage"),
+  finance: () => import("./pages/admin/AdminFinancePage"),
+};
+
+// Prefetch all admin pages once any admin route is visited
+let adminPrefetched = false;
+const prefetchAdmin = () => {
+  if (adminPrefetched) return;
+  adminPrefetched = true;
+  Object.values(adminImports).forEach((load) => load());
+};
+
+const AdminLoginPage = lazy(() => { prefetchAdmin(); return adminImports.login(); });
+const AdminDashboardPage = lazy(() => { prefetchAdmin(); return adminImports.dashboard(); });
+const AdminPropertiesPage = lazy(() => { prefetchAdmin(); return adminImports.properties(); });
+const AdminCalendarPage = lazy(() => { prefetchAdmin(); return adminImports.calendar(); });
+const AdminPricingPage = lazy(() => { prefetchAdmin(); return adminImports.pricing(); });
+const AdminBookingsPage = lazy(() => { prefetchAdmin(); return adminImports.bookings(); });
+const AdminGuestsPage = lazy(() => { prefetchAdmin(); return adminImports.guests(); });
+const AdminReviewsPage = lazy(() => { prefetchAdmin(); return adminImports.reviews(); });
+const AdminContentPage = lazy(() => { prefetchAdmin(); return adminImports.content(); });
+const AdminInquiriesPage = lazy(() => { prefetchAdmin(); return adminImports.inquiries(); });
+const AdminPaymentsPage = lazy(() => { prefetchAdmin(); return adminImports.payments(); });
+const AdminSettingsPage = lazy(() => { prefetchAdmin(); return adminImports.settings(); });
+const AdminProfilePage = lazy(() => { prefetchAdmin(); return adminImports.profile(); });
+const AdminImportPage = lazy(() => { prefetchAdmin(); return adminImports.importExport(); });
+const AdminFinancePage = lazy(() => { prefetchAdmin(); return adminImports.finance(); });
 const BookingPage = lazy(() => import("./pages/BookingPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
