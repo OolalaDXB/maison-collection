@@ -93,6 +93,11 @@ const AdminPricingPage = () => {
   const [seasonDialog, setSeasonDialog] = useState(false);
   const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>(emptySeasonDefaults());
 
+  // Duplicate dialog
+  const [dupDialog, setDupDialog] = useState(false);
+  const [dupSource, setDupSource] = useState<Season | null>(null);
+  const [dupYears, setDupYears] = useState<number[]>([1]);
+
   // Promo dialog
   const [promoDialog, setPromoDialog] = useState(false);
   const [editPromo, setEditPromo] = useState<Partial<PromoCode>>({});
@@ -169,22 +174,54 @@ const AdminPricingPage = () => {
     loadAll();
   };
 
-  const duplicateSeason = (s: Season) => {
-    const startDate = new Date(s.start_date);
-    const endDate = new Date(s.end_date);
-    startDate.setFullYear(startDate.getFullYear() + 1);
-    endDate.setFullYear(endDate.getFullYear() + 1);
+  const openDuplicateDialog = (s: Season) => {
+    setDupSource(s);
+    setDupYears([1]);
+    setDupDialog(true);
+  };
 
-    setEditSeason({
-      property_id: s.property_id,
-      name: s.name,
-      start_date: startDate.toISOString().split("T")[0],
-      end_date: endDate.toISOString().split("T")[0],
-      price_per_night: s.price_per_night,
-      min_nights: s.min_nights,
-      is_recurring: s.is_recurring,
-    });
-    setSeasonDialog(true);
+  const executeDuplicate = async () => {
+    if (!dupSource || dupYears.length === 0) return;
+
+    const inserts = [];
+    const errors: string[] = [];
+
+    for (const yearOffset of dupYears) {
+      const startDate = new Date(dupSource.start_date);
+      const endDate = new Date(dupSource.end_date);
+      startDate.setFullYear(startDate.getFullYear() + yearOffset);
+      endDate.setFullYear(endDate.getFullYear() + yearOffset);
+      const startStr = startDate.toISOString().split("T")[0];
+      const endStr = endDate.toISOString().split("T")[0];
+
+      const overlap = await checkOverlap(dupSource.property_id, startStr, endStr);
+      if (overlap) {
+        errors.push(`+${yearOffset}y: conflit avec "${overlap}"`);
+        continue;
+      }
+
+      inserts.push({
+        property_id: dupSource.property_id,
+        name: dupSource.name,
+        start_date: startStr,
+        end_date: endStr,
+        price_per_night: dupSource.price_per_night,
+        min_nights: dupSource.min_nights,
+        is_recurring: dupSource.is_recurring ?? false,
+      });
+    }
+
+    if (inserts.length > 0) {
+      const { error } = await supabase.from("seasonal_pricing").insert(inserts);
+      if (error) { toast.error(error.message); return; }
+      toast.success(`${inserts.length} période(s) créée(s)`);
+    }
+    if (errors.length > 0) {
+      toast.error(errors.join(" · "));
+    }
+
+    setDupDialog(false);
+    loadAll();
   };
 
   const savePromo = async () => {
@@ -302,7 +339,7 @@ const AdminPricingPage = () => {
                   <TableCell className="text-sm">{s.min_nights || 1}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" title="Duplicate for next year" onClick={() => duplicateSeason(s)}><Copy size={14} /></Button>
+                      <Button size="icon" variant="ghost" title="Dupliquer sur plusieurs périodes" onClick={() => openDuplicateDialog(s)}><Copy size={14} /></Button>
                       <Button size="icon" variant="ghost" onClick={() => { setEditSeason(s); setSeasonDialog(true); }}><Pencil size={14} /></Button>
                       <Button size="icon" variant="ghost" onClick={() => deleteSeason(s.id)}><Trash2 size={14} /></Button>
                     </div>
@@ -429,6 +466,50 @@ const AdminPricingPage = () => {
               </select>
             </div>
             <Button onClick={savePromo} className="w-full">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Duplicate dialog */}
+      <Dialog open={dupDialog} onOpenChange={setDupDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle className="font-display">Dupliquer "{dupSource?.name}"</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Période source : {dupSource?.start_date} → {dupSource?.end_date}
+            </p>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Décalages (en années)</label>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3, 4, 5].map((y) => (
+                  <button
+                    key={y}
+                    onClick={() => setDupYears((prev) => prev.includes(y) ? prev.filter((v) => v !== y) : [...prev, y].sort())}
+                    className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${
+                      dupYears.includes(y)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:bg-accent"
+                    }`}
+                  >
+                    +{y} an{y > 1 ? "s" : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {dupSource && dupYears.length > 0 && (
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground text-sm">Périodes à créer :</p>
+                {dupYears.map((y) => {
+                  const s = new Date(dupSource.start_date);
+                  const e = new Date(dupSource.end_date);
+                  s.setFullYear(s.getFullYear() + y);
+                  e.setFullYear(e.getFullYear() + y);
+                  return <p key={y}>{s.toISOString().split("T")[0]} → {e.toISOString().split("T")[0]}</p>;
+                })}
+              </div>
+            )}
+            <Button onClick={executeDuplicate} className="w-full" disabled={dupYears.length === 0}>
+              Dupliquer {dupYears.length} période{dupYears.length > 1 ? "s" : ""}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
