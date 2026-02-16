@@ -97,6 +97,7 @@ const AdminPricingPage = () => {
   const [dupDialog, setDupDialog] = useState(false);
   const [dupSource, setDupSource] = useState<Season | null>(null);
   const [dupYears, setDupYears] = useState<number[]>([1]);
+  const [dupTargetPropertyIds, setDupTargetPropertyIds] = useState<string[]>([]);
 
   // Promo dialog
   const [promoDialog, setPromoDialog] = useState(false);
@@ -176,39 +177,51 @@ const AdminPricingPage = () => {
 
   const openDuplicateDialog = (s: Season) => {
     setDupSource(s);
-    setDupYears([1]);
+    setDupYears([0]);
+    setDupTargetPropertyIds([]);
     setDupDialog(true);
   };
 
   const executeDuplicate = async () => {
-    if (!dupSource || dupYears.length === 0) return;
+    if (!dupSource || (dupYears.length === 0 && dupTargetPropertyIds.length === 0)) return;
+
+    const targetPropIds = dupTargetPropertyIds.length > 0
+      ? dupTargetPropertyIds
+      : [dupSource.property_id];
+    const yearOffsets = dupYears.length > 0 ? dupYears : [0];
 
     const inserts = [];
     const errors: string[] = [];
 
-    for (const yearOffset of dupYears) {
-      const startDate = new Date(dupSource.start_date);
-      const endDate = new Date(dupSource.end_date);
-      startDate.setFullYear(startDate.getFullYear() + yearOffset);
-      endDate.setFullYear(endDate.getFullYear() + yearOffset);
-      const startStr = startDate.toISOString().split("T")[0];
-      const endStr = endDate.toISOString().split("T")[0];
+    for (const propId of targetPropIds) {
+      for (const yearOffset of yearOffsets) {
+        // Skip duplicating same property + same year (0 offset on source property)
+        if (propId === dupSource.property_id && yearOffset === 0) continue;
 
-      const overlap = await checkOverlap(dupSource.property_id, startStr, endStr);
-      if (overlap) {
-        errors.push(`+${yearOffset}y: conflit avec "${overlap}"`);
-        continue;
+        const startDate = new Date(dupSource.start_date);
+        const endDate = new Date(dupSource.end_date);
+        startDate.setFullYear(startDate.getFullYear() + yearOffset);
+        endDate.setFullYear(endDate.getFullYear() + yearOffset);
+        const startStr = startDate.toISOString().split("T")[0];
+        const endStr = endDate.toISOString().split("T")[0];
+
+        const overlap = await checkOverlap(propId, startStr, endStr);
+        if (overlap) {
+          const propName = properties.find((p) => p.id === propId)?.name || "?";
+          errors.push(`${propName} +${yearOffset}y: conflit avec "${overlap}"`);
+          continue;
+        }
+
+        inserts.push({
+          property_id: propId,
+          name: dupSource.name,
+          start_date: startStr,
+          end_date: endStr,
+          price_per_night: dupSource.price_per_night,
+          min_nights: dupSource.min_nights,
+          is_recurring: dupSource.is_recurring ?? false,
+        });
       }
-
-      inserts.push({
-        property_id: dupSource.property_id,
-        name: dupSource.name,
-        start_date: startStr,
-        end_date: endStr,
-        price_per_night: dupSource.price_per_night,
-        min_nights: dupSource.min_nights,
-        is_recurring: dupSource.is_recurring ?? false,
-      });
     }
 
     if (inserts.length > 0) {
@@ -475,12 +488,30 @@ const AdminPricingPage = () => {
           <DialogHeader><DialogTitle className="font-display">Dupliquer "{dupSource?.name}"</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Période source : {dupSource?.start_date} → {dupSource?.end_date}
+              Période source : {dupSource?.start_date} → {dupSource?.end_date} · €{dupSource?.price_per_night}/nuit
             </p>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Décalages (en années)</label>
+              <label className="text-xs text-muted-foreground mb-1 block">Aussi dupliquer vers d'autres propriétés</label>
               <div className="flex flex-wrap gap-2">
-                {[1, 2, 3, 4, 5].map((y) => (
+                {properties.filter((p) => p.id !== dupSource?.property_id).map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setDupTargetPropertyIds((prev) => prev.includes(p.id) ? prev.filter((v) => v !== p.id) : [...prev, p.id])}
+                    className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${
+                      dupTargetPropertyIds.includes(p.id)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:bg-accent"
+                    }`}
+                  >
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Décalage annuel</label>
+              <div className="flex flex-wrap gap-2">
+                {[0, 1, 2, 3, 4, 5].map((y) => (
                   <button
                     key={y}
                     onClick={() => setDupYears((prev) => prev.includes(y) ? prev.filter((v) => v !== y) : [...prev, y].sort())}
@@ -490,25 +521,41 @@ const AdminPricingPage = () => {
                         : "bg-background text-foreground border-border hover:bg-accent"
                     }`}
                   >
-                    +{y} an{y > 1 ? "s" : ""}
+                    {y === 0 ? "Mêmes dates" : `+${y} an${y > 1 ? "s" : ""}`}
                   </button>
                 ))}
               </div>
             </div>
-            {dupSource && dupYears.length > 0 && (
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p className="font-medium text-foreground text-sm">Périodes à créer :</p>
-                {dupYears.map((y) => {
+            {dupSource && (dupYears.length > 0 || dupTargetPropertyIds.length > 0) && (() => {
+              const targetPropIds = dupTargetPropertyIds.length > 0 ? dupTargetPropertyIds : [dupSource.property_id];
+              const yearOffsets = dupYears.length > 0 ? dupYears : [0];
+              const previews: { propName: string; start: string; end: string }[] = [];
+              for (const propId of targetPropIds) {
+                for (const y of yearOffsets) {
+                  if (propId === dupSource.property_id && y === 0) continue;
                   const s = new Date(dupSource.start_date);
                   const e = new Date(dupSource.end_date);
                   s.setFullYear(s.getFullYear() + y);
                   e.setFullYear(e.getFullYear() + y);
-                  return <p key={y}>{s.toISOString().split("T")[0]} → {e.toISOString().split("T")[0]}</p>;
-                })}
-              </div>
-            )}
-            <Button onClick={executeDuplicate} className="w-full" disabled={dupYears.length === 0}>
-              Dupliquer {dupYears.length} période{dupYears.length > 1 ? "s" : ""}
+                  previews.push({ propName: properties.find((p) => p.id === propId)?.name || "?", start: s.toISOString().split("T")[0], end: e.toISOString().split("T")[0] });
+                }
+              }
+              if (previews.length === 0) return null;
+              return (
+                <div className="text-xs text-muted-foreground space-y-1 max-h-32 overflow-y-auto">
+                  <p className="font-medium text-foreground text-sm">{previews.length} période(s) à créer :</p>
+                  {previews.map((p, i) => <p key={i}>{p.propName} : {p.start} → {p.end}</p>)}
+                </div>
+              );
+            })()}
+            <Button onClick={executeDuplicate} className="w-full" disabled={
+              (() => {
+                const targetPropIds = dupTargetPropertyIds.length > 0 ? dupTargetPropertyIds : [dupSource?.property_id || ""];
+                const yearOffsets = dupYears.length > 0 ? dupYears : [0];
+                return targetPropIds.every((pid) => yearOffsets.every((y) => pid === dupSource?.property_id && y === 0));
+              })()
+            }>
+              Dupliquer
             </Button>
           </div>
         </DialogContent>
