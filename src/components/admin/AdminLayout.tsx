@@ -55,7 +55,7 @@ const navSections: NavSection[] = [
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, isConcierge, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,10 +64,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   });
 
   useEffect(() => {
-    if (!loading && (!user || !isAdmin)) {
+    if (!loading && (!user || (!isAdmin && !isConcierge))) {
       navigate("/admin/login");
     }
-  }, [loading, user, isAdmin, navigate]);
+  }, [loading, user, isAdmin, isConcierge, navigate]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -77,7 +77,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("admin-light-mode", String(lightMode));
   }, [lightMode]);
 
-  if (loading || !user || !isAdmin) {
+  if (loading || !user || (!isAdmin && !isConcierge)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading…</p>
@@ -129,29 +129,35 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Nav sections */}
       <div className="flex-1 overflow-y-auto px-3 pt-2">
-        {navSections.map((section) => (
-          <div key={section.label}>
-            <p className={`text-[0.65rem] uppercase tracking-[0.15em] ${sectionLabelColor} mt-6 mb-2 px-3 font-medium`}>
-              {section.label}
-            </p>
-            <div className="space-y-0.5">
-              {section.items.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 font-body text-[0.82rem] tracking-wide transition-colors rounded-sm ${
-                    isActive(item.path)
-                      ? navActiveClass
-                      : `${navItemColor} ${navItemHover}`
-                  }`}
-                >
-                  <item.icon size={16} strokeWidth={1.8} />
-                  <span>{item.title}</span>
-                </Link>
-              ))}
+        {navSections.map((section) => {
+          // Hide Finance section for concierge users
+          if (!isAdmin && section.label === "Finance") return null;
+          if (!isAdmin && section.label === "Content") return null;
+          if (!isAdmin && section.label === "System") return null;
+          return (
+            <div key={section.label}>
+              <p className={`text-[0.65rem] uppercase tracking-[0.15em] ${sectionLabelColor} mt-6 mb-2 px-3 font-medium`}>
+                {section.label}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 font-body text-[0.82rem] tracking-wide transition-colors rounded-sm ${
+                      isActive(item.path)
+                        ? navActiveClass
+                        : `${navItemColor} ${navItemHover}`
+                    }`}
+                  >
+                    <item.icon size={16} strokeWidth={1.8} />
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Theme toggle + User section */}

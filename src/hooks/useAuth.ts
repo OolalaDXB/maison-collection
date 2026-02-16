@@ -6,6 +6,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isConcierge, setIsConcierge] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,19 +16,20 @@ export function useAuth() {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Check admin role using setTimeout to avoid Supabase deadlock
+          // Check roles using setTimeout to avoid Supabase deadlock
           setTimeout(async () => {
             const { data } = await supabase
               .from("user_roles")
               .select("role")
-              .eq("user_id", session.user.id)
-              .eq("role", "admin")
-              .maybeSingle();
-            setIsAdmin(!!data);
+              .eq("user_id", session.user.id);
+            const roles = (data || []).map((r) => r.role);
+            setIsAdmin(roles.includes("admin"));
+            setIsConcierge(roles.includes("concierge"));
             setLoading(false);
           }, 0);
         } else {
           setIsAdmin(false);
+          setIsConcierge(false);
           setLoading(false);
         }
       }
@@ -41,7 +43,6 @@ export function useAuth() {
 
     return () => subscription.unsubscribe();
   }, []);
-
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
@@ -51,5 +52,5 @@ export function useAuth() {
     await supabase.auth.signOut();
   };
 
-  return { user, session, isAdmin, loading, signIn, signOut };
+  return { user, session, isAdmin, isConcierge, loading, signIn, signOut };
 }
