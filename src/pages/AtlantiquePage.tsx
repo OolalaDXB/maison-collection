@@ -89,7 +89,7 @@ const AtlantiquePage = () => {
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
           <div className="flex-1 min-w-0">
-            <AtlantiqueContent property={property ?? null} />
+            <AtlantiqueContent />
 
             <FadeIn>
               <AtlantiqueRooms />
@@ -112,7 +112,7 @@ const AtlantiquePage = () => {
             </FadeIn>
 
             <FadeIn>
-              <AtlantiqueInfo property={property ?? null} />
+              <AtlantiqueInfo />
             </FadeIn>
 
             <FadeIn>

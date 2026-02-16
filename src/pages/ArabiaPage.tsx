@@ -106,12 +106,12 @@ const ArabiaPage = () => {
       />
       <Header />
 
-      <ArabiaHero property={property ?? null} heroImage={property?.hero_image ?? null} imageCount={images.length} />
+      <ArabiaHero heroImage={property?.hero_image ?? null} imageCount={images.length} />
 
       <div className="max-w-[1200px] mx-auto px-[5%] pt-10 pb-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
           <div className="flex-1 min-w-0">
-            <ArabiaContent property={property ?? null} />
+            <ArabiaContent />
 
             <FadeIn>
               <ArabiaRooms />
@@ -134,7 +134,7 @@ const ArabiaPage = () => {
             </FadeIn>
 
             <FadeIn>
-              <ArabiaInfo property={property ?? null} />
+              <ArabiaInfo />
             </FadeIn>
 
             <FadeIn>
