@@ -73,7 +73,7 @@ const Footer = () => {
                 {turnstileSiteKey && (
                   <Turnstile siteKey={turnstileSiteKey} onSuccess={(token) => setTurnstileToken(token)} onError={() => setTurnstileToken(null)} onExpire={() => setTurnstileToken(null)} options={{ theme: 'light', size: 'compact' }} />
                 )}
-                <p className="font-body font-light text-xs text-[#999999] leading-relaxed">
+                <p className="font-body font-light text-xs text-[#666666] leading-relaxed">
                   {t("footer.newsletter_desc")}
                 </p>
               </>
@@ -82,7 +82,7 @@ const Footer = () => {
 
           {/* Column 2: Destinations */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#666666] mb-4">
               {t("footer.destinations")}
             </p>
             <nav className="flex flex-col gap-2">
@@ -94,7 +94,7 @@ const Footer = () => {
 
           {/* Column 3: Maisons */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#666666] mb-4">
               {t("footer.maisons")}
             </p>
             <nav className="flex flex-col gap-2">
@@ -106,7 +106,7 @@ const Footer = () => {
 
           {/* Column 4: Contact Us */}
           <div>
-            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#999999] mb-4">
+            <p className="font-body font-normal uppercase tracking-wider text-xs text-[#666666] mb-4">
               {t("footer.contact_us")}
             </p>
             <nav className="flex flex-col gap-2">
@@ -124,7 +124,7 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-[#eeeeee] mt-12 pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <p className="font-body font-light text-xs text-[#bbbbbb]">
+          <p className="font-body font-light text-xs text-[#666666]">
             <Link
               to="/admin/login"
               className="no-underline hover:no-underline cursor-default"
@@ -135,14 +135,14 @@ const Footer = () => {
             2026 Maisons. {t("footer.copyright")}
           </p>
           <div className="flex items-center gap-1 text-xs">
-            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">{t("footer.privacy")}</a>
-            <span className="text-[#bbbbbb]">·</span>
-            <a href="#" className="font-body font-light text-[#bbbbbb] hover:text-[#666666] transition-colors">{t("footer.terms")}</a>
+            <a href="#" className="font-body font-light text-[#666666] hover:text-[hsl(var(--foreground))] transition-colors">{t("footer.privacy")}</a>
+            <span className="text-[#666666]">·</span>
+            <a href="#" className="font-body font-light text-[#666666] hover:text-[hsl(var(--foreground))] transition-colors">{t("footer.terms")}</a>
           </div>
           <div className="flex items-center gap-4">
-            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Instagram size={18} /></a>
-            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Facebook size={18} /></a>
-            <a href="#" className="text-[#999999] hover:text-[#1a1a1a] transition-colors"><Linkedin size={18} /></a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-[#666666] hover:text-[#1a1a1a] transition-colors" aria-label="Instagram"><Instagram size={18} aria-hidden="true" /></a>
+            <a href="#" className="text-[#666666] hover:text-[#1a1a1a] transition-colors" aria-label="Facebook"><Facebook size={18} aria-hidden="true" /></a>
+            <a href="#" className="text-[#666666] hover:text-[#1a1a1a] transition-colors" aria-label="LinkedIn"><Linkedin size={18} aria-hidden="true" /></a>
           </div>
         </div>
       </div>

@@ -13,6 +13,8 @@ const AtlantiqueHero = ({ imageCount }: AtlantiqueHeroProps) => {
   return (
     <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] bg-[#2a2a2a]">
       <img
+        srcSet={`${heroImg} 1200w`}
+        sizes="100vw"
         src={heroImg}
         alt="Maison Atlantique — contemporary stone house in Brittany"
         className="w-full h-full object-cover"

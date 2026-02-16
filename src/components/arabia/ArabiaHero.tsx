@@ -33,7 +33,7 @@ const ArabiaHero = ({ heroImage, imageCount }: ArabiaHeroProps) => {
   return (
     <section className="relative w-full h-[70vh] md:h-[80vh] mt-[72px] bg-[#2a2a2a]">
       <img
-        src={heroImage}
+        src={`${heroImage}?width=800&height=800&format=webp&quality=75`}
         alt="Maison Arabia — townhouse in The Sustainable City, Dubai"
         className="w-full h-full object-cover"
         fetchPriority="high"
