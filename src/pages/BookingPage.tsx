@@ -73,10 +73,14 @@ const BookingPage = () => {
     availability, seasonalPricing,
   });
 
+  const escapeHtml = (unsafe: string): string =>
+    unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
   const renderContract = () => {
     if (!contractHtml || !property || !price) return "<p>No contract template available.</p>";
     return contractHtml
-      .replace(/\{\{guest_name\}\}/g, form.guest_name)
+      .replace(/\{\{guest_name\}\}/g, escapeHtml(form.guest_name))
+      .replace(/\{\{guest_email\}\}/g, escapeHtml(form.guest_email))
       .replace(/\{\{property_name\}\}/g, property.name)
       .replace(/\{\{check_in\}\}/g, form.check_in)
       .replace(/\{\{check_out\}\}/g, form.check_out)
@@ -90,32 +94,48 @@ const BookingPage = () => {
     if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
 
-    const { data: booking, error: bError } = await supabase.from("bookings").insert({
-      property_id: property.id, guest_name: form.guest_name, guest_email: form.guest_email,
-      guest_phone: form.guest_phone || null, guests_count: form.guests_count,
-      check_in: form.check_in, check_out: form.check_out,
-      base_price_per_night: price.avgNightlyRate, cleaning_fee: price.cleaningFee,
-      tourist_tax_total: price.touristTax, total_price: price.total,
-      status: "pending", source: "direct", special_requests: form.special_requests || null,
-      payment_method: paymentMethod, payment_status: "pending",
-    } as any).select().single();
+    // Use atomic database function to prevent race conditions
+    const { data: bookingId, error: bError } = await supabase.rpc("create_booking_atomic" as any, {
+      p_property_id: property.id,
+      p_check_in: form.check_in,
+      p_check_out: form.check_out,
+      p_guest_name: form.guest_name,
+      p_guest_email: form.guest_email,
+      p_guest_phone: form.guest_phone || null,
+      p_guests_count: form.guests_count,
+      p_base_price_per_night: price.avgNightlyRate,
+      p_cleaning_fee: price.cleaningFee,
+      p_tourist_tax_total: price.touristTax,
+      p_total_price: price.total,
+      p_special_requests: form.special_requests || null,
+      p_payment_method: paymentMethod,
+      p_contract_html: contractHtml ? renderContract() : null,
+    });
 
-    if (bError) { toast.error(bError.message); setSubmitting(false); return; }
-
-    if (contractHtml) {
-      await supabase.from("booking_contracts").insert({ booking_id: booking.id, contract_html: renderContract(), accepted_at: new Date().toISOString() });
+    if (bError) {
+      const msg = bError.message.includes("DATES_UNAVAILABLE")
+        ? "These dates are no longer available. Please choose different dates."
+        : bError.message;
+      toast.error(msg);
+      setSubmitting(false);
+      return;
     }
 
-    for (let i = 0; i < price.nights; i++) {
-      const d = new Date(form.check_in); d.setDate(d.getDate() + i);
-      await supabase.from("availability").upsert({ property_id: property.id, date: d.toISOString().split("T")[0], available: false, source: "booking", booking_id: booking.id }, { onConflict: "property_id,date" });
-    }
-
-    await supabase.from("inquiries").insert({ name: form.guest_name, email: form.guest_email, phone: form.guest_phone || null, type: "booking", property_id: property.id, message: `Booking request: ${form.check_in} → ${form.check_out}, ${price.nights} nights, €${price.total}, payment: ${paymentMethod}` });
+    // Create inquiry notification (non-blocking)
+    supabase.from("inquiries").insert({
+      name: form.guest_name, email: form.guest_email, phone: form.guest_phone || null,
+      type: "booking", property_id: property.id,
+      message: `Booking request: ${form.check_in} → ${form.check_out}, ${price.nights} nights, €${price.total}, payment: ${paymentMethod}`,
+    });
 
     if (paymentMethod === "card") {
       const { data: session, error: sError } = await supabase.functions.invoke("create-checkout", {
-        body: { booking_id: booking.id, amount: Math.round(price.total * 100), currency: "eur", property_name: property.name, guest_email: form.guest_email, success_url: `${window.location.origin}/book/${slug}/confirmation?booking_id=${booking.id}`, cancel_url: `${window.location.origin}/book/${slug}?step=4` },
+        body: {
+          booking_id: bookingId, amount: Math.round(price.total * 100), currency: "eur",
+          property_name: property.name, guest_email: form.guest_email,
+          success_url: `${window.location.origin}/book/${slug}/confirmation?booking_id=${bookingId}`,
+          cancel_url: `${window.location.origin}/book/${slug}?step=4`,
+        },
       });
       if (sError || !session?.url) { toast.error("Payment setup failed."); setSubmitting(false); return; }
       window.location.href = session.url;
@@ -123,7 +143,7 @@ const BookingPage = () => {
     }
 
     setSubmitting(false);
-    navigate(`/book/${slug}/confirmation?booking_id=${booking.id}`);
+    navigate(`/book/${slug}/confirmation?booking_id=${bookingId}`);
   };
 
   if (!property) {
