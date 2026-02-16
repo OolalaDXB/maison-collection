@@ -4,6 +4,8 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Percent, TrendingUp, CalendarDays } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ResponsiveContainer, Cell } from "recharts";
 import SEO from "@/components/SEO";
 
 interface KpiData {
@@ -11,6 +13,7 @@ interface KpiData {
   occupancyRate: number;
   avgNightlyRate: number | null;
   bookingsCount: number;
+  revpar: number | null;
 }
 
 interface UpcomingBooking {
@@ -31,10 +34,34 @@ interface RecentInquiry {
   message: string | null;
 }
 
+interface MonthlyRevenue {
+  month: string;
+  revenue: number;
+  nights: number;
+}
+
+interface PropertyRevenue {
+  name: string;
+  revenue: number;
+  nights: number;
+  occupancy: number;
+  revpar: number;
+}
+
+const CHART_COLORS = [
+  "hsl(36, 60%, 50%)",
+  "hsl(210, 60%, 50%)",
+  "hsl(150, 50%, 45%)",
+  "hsl(0, 50%, 55%)",
+  "hsl(270, 50%, 55%)",
+];
+
 const AdminDashboardPage = () => {
-  const [kpis, setKpis] = useState<KpiData>({ revenueMtd: 0, occupancyRate: 0, avgNightlyRate: null, bookingsCount: 0 });
+  const [kpis, setKpis] = useState<KpiData>({ revenueMtd: 0, occupancyRate: 0, avgNightlyRate: null, bookingsCount: 0, revpar: null });
   const [upcoming, setUpcoming] = useState<UpcomingBooking[]>([]);
   const [inquiries, setInquiries] = useState<RecentInquiry[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyRevenue[]>([]);
+  const [propertyData, setPropertyData] = useState<PropertyRevenue[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,8 +70,13 @@ const AdminDashboardPage = () => {
       const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
       const monthEnd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}`;
 
-      const [bookingsRes, upcomingRes, inquiriesRes, propertiesRes] = await Promise.all([
+      // Last 6 months start
+      const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      const sixMonthsStart = `${sixMonthsAgo.getFullYear()}-${String(sixMonthsAgo.getMonth() + 1).padStart(2, "0")}-01`;
+
+      const [bookingsRes, allBookingsRes, upcomingRes, inquiriesRes, propertiesRes] = await Promise.all([
         supabase.from("bookings").select("total_price, nights, base_price_per_night, status").gte("check_in", monthStart).lte("check_in", monthEnd),
+        supabase.from("bookings").select("total_price, nights, check_in, status, property_id").gte("check_in", sixMonthsStart).in("status", ["confirmed", "completed"]),
         supabase.from("bookings").select("id, guest_name, check_in, check_out, status, property_id").gte("check_in", now.toISOString().split("T")[0]).order("check_in").limit(5),
         supabase.from("inquiries").select("*").order("created_at", { ascending: false }).limit(5),
         supabase.from("properties").select("id, name"),
@@ -57,11 +89,69 @@ const AdminDashboardPage = () => {
       const avgRate = totalNights > 0 ? revenue / totalNights : null;
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       const propCount = propertiesRes.data?.length || 1;
-      const occupancy = totalNights > 0 ? Math.round((totalNights / (daysInMonth * propCount)) * 100) : 0;
+      const totalAvailableNights = daysInMonth * propCount;
+      const occupancy = totalNights > 0 ? Math.round((totalNights / totalAvailableNights) * 100) : 0;
+      const revpar = totalAvailableNights > 0 ? revenue / totalAvailableNights : null;
 
-      setKpis({ revenueMtd: revenue, occupancyRate: occupancy, avgNightlyRate: avgRate, bookingsCount: bookings.length });
+      setKpis({ revenueMtd: revenue, occupancyRate: occupancy, avgNightlyRate: avgRate, bookingsCount: bookings.length, revpar });
 
+      // Monthly revenue trend (last 6 months)
+      const allBookings = allBookingsRes.data || [];
+      const monthlyMap = new Map<string, { revenue: number; nights: number }>();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        monthlyMap.set(key, { revenue: 0, nights: 0 });
+      }
+      allBookings.forEach((b) => {
+        const key = (b.check_in as string).substring(0, 7);
+        const existing = monthlyMap.get(key);
+        if (existing) {
+          existing.revenue += Number(b.total_price) || 0;
+          existing.nights += b.nights || 0;
+        }
+      });
+      const monthNames = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+      setMonthlyData(
+        Array.from(monthlyMap.entries()).map(([key, val]) => ({
+          month: monthNames[parseInt(key.split("-")[1]) - 1],
+          revenue: Math.round(val.revenue),
+          nights: val.nights,
+        }))
+      );
+
+      // Revenue by property
       const propMap = new Map((propertiesRes.data || []).map((p: any) => [p.id, p.name]));
+      const propRevMap = new Map<string, { revenue: number; nights: number }>();
+      // Use current month bookings for property breakdown
+      confirmedBookings.forEach((b: any) => {
+        const pid = b.property_id || "unknown";
+        const existing = propRevMap.get(pid) || { revenue: 0, nights: 0 };
+        existing.revenue += Number(b.total_price) || 0;
+        existing.nights += b.nights || 0;
+        propRevMap.set(pid, existing);
+      });
+      // Also add from allBookings for current month if not already covered
+      allBookings.forEach((b: any) => {
+        const key = (b.check_in as string).substring(0, 7);
+        const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+        if (key === currentKey) {
+          const pid = b.property_id || "unknown";
+          if (!propRevMap.has(pid)) {
+            propRevMap.set(pid, { revenue: Number(b.total_price) || 0, nights: b.nights || 0 });
+          }
+        }
+      });
+      setPropertyData(
+        Array.from(propRevMap.entries()).map(([pid, val]) => ({
+          name: (propMap.get(pid) || "Autre").split(" ").slice(0, 2).join(" "),
+          revenue: Math.round(val.revenue),
+          nights: val.nights,
+          occupancy: daysInMonth > 0 ? Math.round((val.nights / daysInMonth) * 100) : 0,
+          revpar: daysInMonth > 0 ? Math.round(val.revenue / daysInMonth) : 0,
+        }))
+      );
+
       setUpcoming((upcomingRes.data || []).map((b: any) => ({ ...b, property_name: propMap.get(b.property_id) || "—" })));
       setInquiries((inquiriesRes.data as RecentInquiry[]) || []);
       setLoading(false);
@@ -79,29 +169,124 @@ const AdminDashboardPage = () => {
     return `${days}d ago`;
   };
 
+  const revenueChartConfig = { revenue: { label: "Revenus", color: "hsl(36, 60%, 50%)" } };
+  const propertyChartConfig = { revenue: { label: "Revenus", color: "hsl(36, 60%, 50%)" } };
+
   return (
     <AdminLayout>
       <SEO title="Admin Dashboard" description="" path="/admin" noindex={true} />
       <div className="mb-8">
         <h1 className="font-display text-2xl">Dashboard</h1>
-        <p className="font-body text-sm text-muted-foreground mt-1">Overview of your properties</p>
+        <p className="font-body text-sm text-muted-foreground mt-1">Vue d'ensemble de vos propriétés</p>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <KpiCard icon={DollarSign} label="Revenue MTD" value={`€${kpis.revenueMtd.toLocaleString()}`} loading={loading} />
-        <KpiCard icon={Percent} label="Occupancy Rate" value={`${kpis.occupancyRate}%`} loading={loading} />
-        <KpiCard icon={TrendingUp} label="Avg Nightly Rate" value={kpis.avgNightlyRate ? `€${Math.round(kpis.avgNightlyRate)}` : "—"} loading={loading} />
-        <KpiCard icon={CalendarDays} label="Bookings This Month" value={String(kpis.bookingsCount)} loading={loading} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <KpiCard icon={DollarSign} label="Revenus MTD" value={`€${kpis.revenueMtd.toLocaleString()}`} loading={loading} />
+        <KpiCard icon={Percent} label="Taux d'occupation" value={`${kpis.occupancyRate}%`} loading={loading} />
+        <KpiCard icon={TrendingUp} label="Tarif moyen / nuit" value={kpis.avgNightlyRate ? `€${Math.round(kpis.avgNightlyRate)}` : "—"} loading={loading} />
+        <KpiCard icon={TrendingUp} label="RevPAR" value={kpis.revpar ? `€${Math.round(kpis.revpar)}` : "—"} loading={loading} />
+        <KpiCard icon={CalendarDays} label="Réservations ce mois" value={String(kpis.bookingsCount)} loading={loading} />
       </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Revenue Trend */}
+        <Card className="border-[hsl(36,15%,90%)]">
+          <CardHeader>
+            <CardTitle className="text-base font-display">Tendance des revenus (6 mois)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="h-[250px] flex items-center justify-center text-sm text-muted-foreground">Chargement…</div>
+            ) : (
+              <ChartContainer config={revenueChartConfig} className="h-[250px] w-full">
+                <LineChart data={monthlyData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(36,15%,90%)" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(36,10%,60%)" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(36,10%,60%)" tickFormatter={(v) => `€${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value) => `€${Number(value).toLocaleString()}`} />} />
+                  <Line type="monotone" dataKey="revenue" stroke="hsl(36, 60%, 50%)" strokeWidth={2} dot={{ r: 4, fill: "hsl(36, 60%, 50%)" }} />
+                </LineChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Revenue by Property */}
+        <Card className="border-[hsl(36,15%,90%)]">
+          <CardHeader>
+            <CardTitle className="text-base font-display">Revenus par propriété (ce mois)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="h-[250px] flex items-center justify-center text-sm text-muted-foreground">Chargement…</div>
+            ) : propertyData.length === 0 ? (
+              <div className="h-[250px] flex items-center justify-center text-sm text-muted-foreground">Aucune donnée ce mois</div>
+            ) : (
+              <ChartContainer config={propertyChartConfig} className="h-[250px] w-full">
+                <BarChart data={propertyData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(36,15%,90%)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(36,10%,60%)" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(36,10%,60%)" tickFormatter={(v) => `€${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value) => `€${Number(value).toLocaleString()}`} />} />
+                  <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
+                    {propertyData.map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Property Performance Table */}
+      {!loading && propertyData.length > 0 && (
+        <Card className="border-[hsl(36,15%,90%)] mb-8">
+          <CardHeader>
+            <CardTitle className="text-base font-display">Performance par propriété</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[hsl(36,15%,90%)]">
+                    <th className="text-left py-2 pr-4 font-display text-muted-foreground text-xs uppercase tracking-wider">Propriété</th>
+                    <th className="text-right py-2 px-4 font-display text-muted-foreground text-xs uppercase tracking-wider">Revenus</th>
+                    <th className="text-right py-2 px-4 font-display text-muted-foreground text-xs uppercase tracking-wider">Nuitées</th>
+                    <th className="text-right py-2 px-4 font-display text-muted-foreground text-xs uppercase tracking-wider">Occupation</th>
+                    <th className="text-right py-2 pl-4 font-display text-muted-foreground text-xs uppercase tracking-wider">RevPAR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {propertyData.map((p, i) => (
+                    <tr key={i} className="border-b border-[hsl(36,15%,92%)] last:border-0">
+                      <td className="py-2.5 pr-4 font-medium text-foreground flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                        {p.name}
+                      </td>
+                      <td className="text-right py-2.5 px-4 text-foreground">€{p.revenue.toLocaleString()}</td>
+                      <td className="text-right py-2.5 px-4 text-muted-foreground">{p.nights}</td>
+                      <td className="text-right py-2.5 px-4 text-muted-foreground">{p.occupancy}%</td>
+                      <td className="text-right py-2.5 pl-4 text-foreground font-medium">€{p.revpar}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming check-ins */}
         <Card className="border-[hsl(36,15%,90%)]">
-          <CardHeader><CardTitle className="text-base font-display">Upcoming Check-ins</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base font-display">Prochains check-ins</CardTitle></CardHeader>
           <CardContent>
-            {loading ? <p className="text-sm text-muted-foreground">Loading…</p> :
-              upcoming.length === 0 ? <p className="text-sm text-muted-foreground">No upcoming check-ins</p> : (
+            {loading ? <p className="text-sm text-muted-foreground">Chargement…</p> :
+              upcoming.length === 0 ? <p className="text-sm text-muted-foreground">Aucun check-in à venir</p> : (
                 <div className="space-y-2">
                   {upcoming.map((b) => (
                     <Link key={b.id} to={`/admin/bookings`} className="flex items-center justify-between p-3 border border-[hsl(36,15%,90%)] hover:border-primary/40 transition-colors">
@@ -122,10 +307,10 @@ const AdminDashboardPage = () => {
 
         {/* Recent inquiries */}
         <Card className="border-[hsl(36,15%,90%)]">
-          <CardHeader><CardTitle className="text-base font-display">Recent Inquiries</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base font-display">Dernières demandes</CardTitle></CardHeader>
           <CardContent>
-            {loading ? <p className="text-sm text-muted-foreground">Loading…</p> :
-              inquiries.length === 0 ? <p className="text-sm text-muted-foreground">No inquiries yet</p> : (
+            {loading ? <p className="text-sm text-muted-foreground">Chargement…</p> :
+              inquiries.length === 0 ? <p className="text-sm text-muted-foreground">Aucune demande</p> : (
                 <div className="space-y-2">
                   {inquiries.map((inq) => (
                     <Link key={inq.id} to="/admin/inquiries" className="block p-3 border border-[hsl(36,15%,90%)] hover:border-primary/40 transition-colors">
