@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Upload, FileText, CheckCircle, Loader2 } from "lucide-react";
+import { Upload, FileText, CheckCircle, Loader2, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ParsedReservation {
@@ -98,6 +98,18 @@ const AdminImportTab = () => {
   const [imported, setImported] = useState(false);
   const [stats, setStats] = useState({ created: 0, skipped: 0 });
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  const downloadTemplate = () => {
+    const headers = "Confirmation Code,Status,Guest,# Guests,Check-In,Check-Out,Nights,Listing,Earnings,Currency";
+    const example = "HM1234ABC,confirmed,Jean Dupont,4,2026-03-15,2026-03-22,7,Maison Georgia,1250.00,EUR";
+    const blob = new Blob([headers + "\n" + example + "\n"], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "airbnb-import-template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -316,9 +328,14 @@ const AdminImportTab = () => {
               Upload your Airbnb reservation CSV export. Past reservations will be imported with guest names and earnings. Duplicates are automatically skipped.
             </p>
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect} />
-            <Button onClick={() => fileRef.current?.click()}>
-              <FileText size={16} className="mr-2" /> Choose CSV file
-            </Button>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={() => fileRef.current?.click()}>
+                <FileText size={16} className="mr-2" /> Choose CSV file
+              </Button>
+              <Button variant="outline" onClick={downloadTemplate}>
+                <Download size={16} className="mr-2" /> Download template
+              </Button>
+            </div>
             <div className="text-left mt-8 border-t border-border pt-6">
               <p className="text-xs font-medium text-foreground mb-2">How to export from Airbnb:</p>
               <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
