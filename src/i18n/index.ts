@@ -6,6 +6,13 @@ import en from "./locales/en.json";
 import fr from "./locales/fr.json";
 import ru from "./locales/ru.json";
 
+// Suppress i18next Locize promotional log
+const originalLog = console.log;
+console.log = (...args: any[]) => {
+  if (typeof args[0] === "string" && args[0].includes("Locize")) return;
+  originalLog(...args);
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
