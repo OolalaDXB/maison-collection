@@ -14,7 +14,7 @@ const GeorgiaCrossSell = () => {
     supabase
       .from("properties")
       .select("slug, name, location, region, country, description, hero_image, price_per_night, status")
-      .neq("slug", "georgia")
+      .neq("slug", "Georgia")
       .order("display_order")
       .then(({ data }) => { if (data) setProperties(data); });
   }, []);
