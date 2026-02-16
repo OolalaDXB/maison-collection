@@ -8,6 +8,7 @@ import { useDefaultBankAccount } from "@/hooks/useBankAccounts";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SEO from "@/components/SEO";
+import SignaturePad from "@/components/SignaturePad";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ const BookingPage = () => {
   const [seasonalPricing, setSeasonalPricing] = useState<any[]>([]);
   const [contractHtml, setContractHtml] = useState("");
   const [contractAccepted, setContractAccepted] = useState(false);
+  const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -88,13 +90,30 @@ const BookingPage = () => {
       .replace(/\{\{total_price\}\}/g, `€${price.total}`);
   };
 
+  const uploadSignature = async (bookingId: string): Promise<string | null> => {
+    if (!signatureDataUrl) return null;
+    try {
+      const res = await fetch(signatureDataUrl);
+      const blob = await res.blob();
+      const fileName = `${bookingId}.png`;
+      const { error } = await supabase.storage
+        .from("contract-signatures")
+        .upload(fileName, blob, { contentType: "image/png", upsert: true });
+      if (error) { console.error("Signature upload error:", error); return null; }
+      const { data: urlData } = supabase.storage.from("contract-signatures").getPublicUrl(fileName);
+      return urlData.publicUrl;
+    } catch (e) {
+      console.error("Signature upload failed:", e);
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!property || !price || !paymentMethod) return;
     if (honeypot) return;
     if (turnstileSiteKey && !turnstileToken) return;
     setSubmitting(true);
 
-    // Use atomic database function to prevent race conditions
     const { data: bookingId, error: bError } = await supabase.rpc("create_booking_atomic" as any, {
       p_property_id: property.id,
       p_check_in: form.check_in,
@@ -119,6 +138,18 @@ const BookingPage = () => {
       toast.error(msg);
       setSubmitting(false);
       return;
+    }
+
+    // Upload signature and update contract (non-blocking for UX)
+    if (signatureDataUrl && bookingId) {
+      uploadSignature(bookingId as string).then(async (signatureUrl) => {
+        if (signatureUrl) {
+          await supabase
+            .from("booking_contracts")
+            .update({ signature_url: signatureUrl } as any)
+            .eq("booking_id", bookingId as string);
+        }
+      });
     }
 
     // Create inquiry notification (non-blocking)
@@ -188,13 +219,23 @@ const BookingPage = () => {
             <div className="space-y-4">
               <h2 className="font-display text-xl mb-4">{t("booking.rental_agreement")}</h2>
               <div className="border border-border p-6 max-h-[400px] overflow-y-auto text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: renderContract() }} />
+              
+              {/* Digital signature */}
+              <div className="space-y-2">
+                <h3 className="font-display text-base">Signature électronique</h3>
+                <p className="text-xs text-muted-foreground">En signant ci-dessous, vous acceptez les termes du contrat de location.</p>
+                <SignaturePad onSignatureChange={setSignatureDataUrl} />
+              </div>
+
               <label className="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" checked={contractAccepted} onChange={(e) => setContractAccepted(e.target.checked)} className="mt-1" />
                 <span className="text-sm">{t("booking.accept_agreement")}</span>
               </label>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)}>{t("booking.back")}</Button>
-                <Button className="flex-1" disabled={!contractAccepted} onClick={() => setStep(3)}>{t("booking.continue")}</Button>
+                <Button className="flex-1" disabled={!contractAccepted || !signatureDataUrl} onClick={() => setStep(3)}>
+                  {t("booking.continue")}
+                </Button>
               </div>
             </div>
           )}
@@ -242,8 +283,13 @@ const BookingPage = () => {
                 {price.promoDiscount > 0 && <div className="flex justify-between text-primary"><span>Promo discount</span><span>-€{price.promoDiscount}</span></div>}
                 <div className="flex justify-between font-display text-lg border-t border-border pt-2 mt-2"><span>{t("booking.total")}</span><span>€{price.total}</span></div>
               </div>
-              <div className="border border-border p-4 text-sm">
+              <div className="border border-border p-4 text-sm space-y-2">
                 <p className="text-muted-foreground">{t("booking.payment_method")}: <span className="text-foreground font-medium">{paymentMethods.find((m) => m.code === paymentMethod)?.name || paymentMethod}</span></p>
+                {signatureDataUrl && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-[hsl(120,40%,35%)]">✓</span> Contrat signé électroniquement
+                  </div>
+                )}
               </div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(3)}>{t("booking.back")}</Button>
