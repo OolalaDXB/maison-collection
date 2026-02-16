@@ -100,6 +100,7 @@ const AdminImportTab = () => {
   const [imported, setImported] = useState(false);
   const [stats, setStats] = useState({ created: 0, skipped: 0 });
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const downloadTemplate = () => {
     const headers = "Confirmation Code,Status,Guest,# Guests,Check-In,Check-Out,Nights,Listing,Earnings,Currency";
@@ -113,9 +114,8 @@ const AdminImportTab = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
+    if (!file.name.endsWith(".csv")) { toast.error("Please upload a CSV file"); return; }
 
     const { data: props } = await supabase.from("properties").select("id, slug, name, airbnb_link");
     setProperties(props || []);
@@ -188,6 +188,21 @@ const AdminImportTab = () => {
     setPreviewOpen(true);
     toast.success(`${reservations.length} reservations found`);
   };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
+  const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setDragging(false); };
 
   const handleImport = async () => {
     setImporting(true);
@@ -346,13 +361,18 @@ const AdminImportTab = () => {
 
   return (
     <>
-      <Card>
+      <Card
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        className={`transition-colors ${dragging ? "border-primary border-2 bg-primary/5" : ""}`}
+      >
         <CardContent className="py-12">
           <div className="text-center space-y-4 max-w-md mx-auto">
-            <Upload className="mx-auto text-muted-foreground" size={48} />
+            <Upload className={`mx-auto transition-colors ${dragging ? "text-primary" : "text-muted-foreground"}`} size={48} />
             <h2 className="font-display text-lg">Upload Airbnb CSV</h2>
             <p className="text-sm text-muted-foreground">
-              Upload your Airbnb reservation CSV export. Past reservations will be imported with guest names and earnings. Duplicates are automatically skipped.
+              {dragging ? "Drop your CSV file here" : "Upload your Airbnb reservation CSV export. Drag & drop or click below. Duplicates are automatically skipped."}
             </p>
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect} />
             <div className="flex gap-3 justify-center">
