@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import type { PropertyData } from "@/hooks/useProperty";
 import FadeIn from "@/components/FadeIn";
 import {
   Leaf, Home, Users, Waves, Baby, Sun,
@@ -21,8 +22,14 @@ const features = [
   { icon: ShieldCheck, label: "Gated community, 24/7 security" },
 ];
 
-const ArabiaContent = () => {
+const ArabiaContent = ({ property }: { property: PropertyData | null }) => {
   const [expanded, setExpanded] = useState(false);
+
+  const name = property?.name ?? "Maison Arabia";
+  const location = property ? `${property.location}, ${property.region}, ${property.country}` : "The Sustainable City, Dubai, UAE";
+  const specs = property
+    ? `${property.capacity ?? 6} guests · ${property.bedrooms ?? 4} bedrooms · ${property.bathrooms ?? 3} bathrooms · ${property.area_sqm ? property.area_sqm + "m² · " : ""}3 levels`
+    : "6 guests · 4 bedrooms · 3 bathrooms · 3 levels";
 
   return (
     <div>
@@ -30,15 +37,15 @@ const ArabiaContent = () => {
         <nav className="mb-6">
           <p className="font-body font-light text-sm text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">Collection</Link>
-            {" > "}Dubai{" > "}The Sustainable City
+            {" > "}{property?.country ?? "UAE"}{" > "}{property?.region ?? "Dubai"}{" > "}{property?.location ?? "The Sustainable City"}
           </p>
         </nav>
 
         <div className="mb-8">
-          <h2 className="font-display text-3xl text-foreground mb-1">Maison Arabia</h2>
-          <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">The Sustainable City, Dubai, UAE</p>
+          <h2 className="font-display text-3xl text-foreground mb-1">{name}</h2>
+          <p className="font-body font-light text-[hsl(0,0%,40%)] text-sm mb-1">{location}</p>
           <p className="font-body font-light text-muted-foreground text-sm">
-            6 guests · 4 bedrooms · 3 bathrooms · 3 levels
+            {specs}
           </p>
         </div>
 

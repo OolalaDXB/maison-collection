@@ -1,6 +1,11 @@
 import { Calendar, Car, Check } from "lucide-react";
+import type { PropertyData } from "@/hooks/useProperty";
 
-const AtlantiqueInfo = () => {
+const AtlantiqueInfo = ({ property }: { property: PropertyData | null }) => {
+  const checkIn = property?.check_in_time ?? "15:00";
+  const checkOut = property?.check_out_time ?? "11:00";
+  const parking = property?.parking_info ?? "Free, 4 spaces";
+
   return (
     <div className="border-t border-border pt-10 mb-10">
       <h3 className="font-body uppercase tracking-[0.1em] text-sm text-foreground font-medium mb-6">
@@ -12,21 +17,21 @@ const AtlantiqueInfo = () => {
           <Calendar size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Check-in</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">15:00</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">{checkIn}</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Calendar size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Check-out</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">11:00</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">{checkOut}</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Car size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Parking</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">Free, 4 spaces</p>
+            <p className="font-body font-light text-sm text-foreground mt-1">{parking}</p>
           </div>
         </div>
       </div>

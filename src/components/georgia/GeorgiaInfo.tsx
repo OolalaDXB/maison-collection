@@ -1,6 +1,11 @@
 import { Calendar, Car, Lock, Ban } from "lucide-react";
+import type { PropertyData } from "@/hooks/useProperty";
 
-const GeorgiaInfo = () => {
+const GeorgiaInfo = ({ property }: { property: PropertyData | null }) => {
+  const checkIn = property?.check_in_time ?? "15:00";
+  const checkOut = property?.check_out_time ?? "11:00";
+  const parking = property?.parking_info ?? "Free, in front of building (non-reserved)";
+
   return (
     <div className="border-t border-border pt-10 mb-10">
       <h3 className="font-body uppercase tracking-[0.1em] text-sm text-foreground font-medium mb-6">
@@ -10,15 +15,15 @@ const GeorgiaInfo = () => {
       <div className="space-y-4">
         <div className="flex items-start gap-3">
           <Calendar size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />
-          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Check-in: 15:00 (free early check-in if available)</span>
+          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Check-in: {checkIn}</span>
         </div>
         <div className="flex items-start gap-3">
           <Calendar size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />
-          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Check-out: 11:00 (late checkout possible on request)</span>
+          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Check-out: {checkOut}</span>
         </div>
         <div className="flex items-start gap-3">
           <Car size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />
-          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Parking: Free, in front of building (non-reserved)</span>
+          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Parking: {parking}</span>
         </div>
         <div className="flex items-start gap-3">
           <Lock size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />
