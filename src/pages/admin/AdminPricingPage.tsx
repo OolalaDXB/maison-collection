@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Copy } from "lucide-react";
 
 interface Property {
   id: string;
@@ -28,6 +29,7 @@ interface Season {
   end_date: string;
   price_per_night: number;
   min_nights: number | null;
+  is_recurring: boolean | null;
 }
 
 interface PromoCode {
@@ -43,6 +45,43 @@ interface PromoCode {
   active: boolean | null;
 }
 
+const emptySeasonDefaults = (): Partial<Season> & { property_id: string } => ({
+  property_id: "",
+  name: "",
+  start_date: "",
+  end_date: "",
+  price_per_night: undefined as unknown as number,
+  min_nights: undefined as unknown as number,
+  is_recurring: false,
+});
+
+const checkOverlap = async (propertyId: string, startDate: string, endDate: string, excludeId?: string) => {
+  const { data: existingSeasons } = await supabase
+    .from("seasonal_pricing")
+    .select("id, name, start_date, end_date")
+    .eq("property_id", propertyId);
+
+  if (!existingSeasons) return null;
+
+  const newStart = new Date(startDate);
+  const newEnd = new Date(endDate);
+
+  for (const season of existingSeasons) {
+    if (excludeId && season.id === excludeId) continue;
+    const existingStart = new Date(season.start_date);
+    const existingEnd = new Date(season.end_date);
+
+    if (
+      (newStart >= existingStart && newStart <= existingEnd) ||
+      (newEnd >= existingStart && newEnd <= existingEnd) ||
+      (newStart <= existingStart && newEnd >= existingEnd)
+    ) {
+      return season.name;
+    }
+  }
+  return null;
+};
+
 const AdminPricingPage = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [seasons, setSeasons] = useState<Season[]>([]);
@@ -52,7 +91,7 @@ const AdminPricingPage = () => {
 
   // Season dialog
   const [seasonDialog, setSeasonDialog] = useState(false);
-  const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>({ property_id: "", name: "", start_date: "", end_date: "", price_per_night: undefined as unknown as number, min_nights: undefined as unknown as number });
+  const [editSeason, setEditSeason] = useState<Partial<Season> & { property_id: string }>(emptySeasonDefaults());
 
   // Promo dialog
   const [promoDialog, setPromoDialog] = useState(false);
@@ -94,11 +133,28 @@ const AdminPricingPage = () => {
     if (!s.property_id || !s.name || !s.start_date || !s.end_date || !s.price_per_night) {
       toast.error("Fill all required fields"); return;
     }
+
+    // Frontend overlap check
+    const overlap = await checkOverlap(s.property_id, s.start_date, s.end_date, s.id);
+    if (overlap) {
+      toast.error(`Dates overlap with "${overlap}". Please adjust the dates.`);
+      return;
+    }
+
+    const payload = {
+      name: s.name,
+      start_date: s.start_date,
+      end_date: s.end_date,
+      price_per_night: Number(s.price_per_night),
+      min_nights: s.min_nights ? Number(s.min_nights) : null,
+      is_recurring: s.is_recurring ?? false,
+    };
+
     if (s.id) {
-      const { error } = await supabase.from("seasonal_pricing").update({ name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: Number(s.price_per_night), min_nights: s.min_nights ? Number(s.min_nights) : null }).eq("id", s.id);
+      const { error } = await supabase.from("seasonal_pricing").update(payload).eq("id", s.id);
       if (error) { toast.error(error.message); return; }
     } else {
-      const { error } = await supabase.from("seasonal_pricing").insert({ property_id: s.property_id, name: s.name, start_date: s.start_date, end_date: s.end_date, price_per_night: Number(s.price_per_night), min_nights: s.min_nights ? Number(s.min_nights) : null }).select();
+      const { error } = await supabase.from("seasonal_pricing").insert({ ...payload, property_id: s.property_id }).select();
       if (error) { toast.error(error.message); return; }
     }
     toast.success("Season saved");
@@ -111,6 +167,24 @@ const AdminPricingPage = () => {
     await supabase.from("seasonal_pricing").delete().eq("id", id);
     toast.success("Deleted");
     loadAll();
+  };
+
+  const duplicateSeason = (s: Season) => {
+    const startDate = new Date(s.start_date);
+    const endDate = new Date(s.end_date);
+    startDate.setFullYear(startDate.getFullYear() + 1);
+    endDate.setFullYear(endDate.getFullYear() + 1);
+
+    setEditSeason({
+      property_id: s.property_id,
+      name: s.name,
+      start_date: startDate.toISOString().split("T")[0],
+      end_date: endDate.toISOString().split("T")[0],
+      price_per_night: s.price_per_night,
+      min_nights: s.min_nights,
+      is_recurring: s.is_recurring,
+    });
+    setSeasonDialog(true);
   };
 
   const savePromo = async () => {
@@ -196,7 +270,7 @@ const AdminPricingPage = () => {
         {/* Seasonal */}
         <TabsContent value="seasonal" className="mt-4">
           <div className="flex justify-end mb-4">
-            <Button size="sm" onClick={() => { setEditSeason({ property_id: properties[0]?.id || "", name: "", start_date: "", end_date: "", price_per_night: undefined as unknown as number, min_nights: undefined as unknown as number }); setSeasonDialog(true); }}>
+            <Button size="sm" onClick={() => { setEditSeason({ ...emptySeasonDefaults(), property_id: properties[0]?.id || "" }); setSeasonDialog(true); }}>
               <Plus size={14} className="mr-1" /> Add Season
             </Button>
           </div>
@@ -209,20 +283,26 @@ const AdminPricingPage = () => {
                 <TableHead>End</TableHead>
                 <TableHead>€/night</TableHead>
                 <TableHead>Min nights</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {seasons.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell className="text-sm">{properties.find((p) => p.id === s.property_id)?.name || "—"}</TableCell>
-                  <TableCell className="text-sm">{s.name}</TableCell>
+                  <TableCell className="text-sm">
+                    <span>{s.name}</span>
+                    {s.is_recurring && (
+                      <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-accent text-accent-foreground rounded">Recurring</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-sm">{s.start_date}</TableCell>
                   <TableCell className="text-sm">{s.end_date}</TableCell>
                   <TableCell className="text-sm">€{s.price_per_night}</TableCell>
                   <TableCell className="text-sm">{s.min_nights || 1}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" title="Duplicate for next year" onClick={() => duplicateSeason(s)}><Copy size={14} /></Button>
                       <Button size="icon" variant="ghost" onClick={() => { setEditSeason(s); setSeasonDialog(true); }}><Pencil size={14} /></Button>
                       <Button size="icon" variant="ghost" onClick={() => deleteSeason(s.id)}><Trash2 size={14} /></Button>
                     </div>
@@ -313,6 +393,13 @@ const AdminPricingPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <div><label className="text-xs text-muted-foreground">Price/night (€)</label><Input type="number" value={editSeason.price_per_night ?? ""} placeholder="e.g. 250" onChange={(e) => setEditSeason({ ...editSeason, price_per_night: e.target.value ? parseFloat(e.target.value) : undefined as unknown as number })} /></div>
               <div><label className="text-xs text-muted-foreground">Min nights</label><Input type="number" value={editSeason.min_nights ?? ""} placeholder="e.g. 2" onChange={(e) => setEditSeason({ ...editSeason, min_nights: e.target.value ? parseInt(e.target.value) : undefined as unknown as number })} /></div>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <div>
+                <p className="text-sm font-medium">Repeat annually</p>
+                <p className="text-xs text-muted-foreground">Automatically duplicate this season every year</p>
+              </div>
+              <Switch checked={editSeason.is_recurring ?? false} onCheckedChange={(checked) => setEditSeason({ ...editSeason, is_recurring: checked })} />
             </div>
             <Button onClick={saveSeason} className="w-full">Save</Button>
           </div>
