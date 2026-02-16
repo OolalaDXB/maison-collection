@@ -105,6 +105,9 @@ const AdminPricingPage = () => {
   // Multi-period date ranges for season creation
   const [seasonDateRanges, setSeasonDateRanges] = useState<{ start: string; end: string }[]>([{ start: "", end: "" }]);
 
+  // Bulk selection for seasons
+  const [selectedSeasonIds, setSelectedSeasonIds] = useState<Set<string>>(new Set());
+
   // Promo dialog
   const [promoDialog, setPromoDialog] = useState(false);
   const [editPromo, setEditPromo] = useState<Partial<PromoCode>>({});
@@ -188,6 +191,15 @@ const AdminPricingPage = () => {
     loadAll();
   };
 
+  const bulkDeleteSeasons = async () => {
+    if (selectedSeasonIds.size === 0) return;
+    if (!confirm(`Supprimer ${selectedSeasonIds.size} saison(s) ?`)) return;
+    const { error } = await supabase.from("seasonal_pricing").delete().in("id", Array.from(selectedSeasonIds));
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selectedSeasonIds.size} saison(s) supprimée(s)`);
+    setSelectedSeasonIds(new Set());
+    loadAll();
+  };
   const openDuplicateDialog = (s: Season) => {
     setDupSource(s);
     setDupYears([0]);
@@ -356,52 +368,89 @@ const AdminPricingPage = () => {
                 {p.name}
               </button>
             ))}
-            <div className="ml-auto">
+            <div className="ml-auto flex gap-2">
+              {selectedSeasonIds.size > 0 && (
+                <Button size="sm" variant="destructive" onClick={bulkDeleteSeasons}>
+                  <Trash2 size={14} className="mr-1" /> Supprimer ({selectedSeasonIds.size})
+                </Button>
+              )}
               <Button size="sm" onClick={() => { setEditSeason({ ...emptySeasonDefaults(), property_id: properties[0]?.id || "" }); setSeasonDateRanges([{ start: "", end: "" }]); setSeasonDialog(true); }}>
                 <Plus size={14} className="mr-1" /> Add Season
               </Button>
             </div>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Property</TableHead>
-                <TableHead>Season</TableHead>
-                <TableHead>Start</TableHead>
-                <TableHead>End</TableHead>
-                <TableHead>€/night</TableHead>
-                <TableHead>Min nights</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {seasons.filter((s) => seasonFilter === "all" || s.property_id === seasonFilter).map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="text-sm">{properties.find((p) => p.id === s.property_id)?.name || "—"}</TableCell>
-                  <TableCell className="text-sm">
-                    <span>{s.name}</span>
-                    {s.is_recurring && (
-                      <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-accent text-accent-foreground rounded">Recurring</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm">{s.start_date}</TableCell>
-                  <TableCell className="text-sm">{s.end_date}</TableCell>
-                  <TableCell className="text-sm">€{s.price_per_night}</TableCell>
-                  <TableCell className="text-sm">{s.min_nights || 1}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" title="Dupliquer sur plusieurs périodes" onClick={() => openDuplicateDialog(s)}><Copy size={14} /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => { setEditSeason(s); setSeasonDateRanges([{ start: s.start_date, end: s.end_date }]); setSeasonDialog(true); }}><Pencil size={14} /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => deleteSeason(s.id)}><Trash2 size={14} /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {seasons.filter((s) => seasonFilter === "all" || s.property_id === seasonFilter).length === 0 && (
-                <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">No seasonal pricing configured</TableCell></TableRow>
-              )}
-            </TableBody>
-          </Table>
+          {(() => {
+            const filtered = seasons.filter((s) => seasonFilter === "all" || s.property_id === seasonFilter);
+            const allFilteredSelected = filtered.length > 0 && filtered.every((s) => selectedSeasonIds.has(s.id));
+            return (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10">
+                      <input
+                        type="checkbox"
+                        checked={allFilteredSelected}
+                        onChange={() => {
+                          if (allFilteredSelected) {
+                            setSelectedSeasonIds(new Set());
+                          } else {
+                            setSelectedSeasonIds(new Set(filtered.map((s) => s.id)));
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-border"
+                      />
+                    </TableHead>
+                    <TableHead>Property</TableHead>
+                    <TableHead>Season</TableHead>
+                    <TableHead>Start</TableHead>
+                    <TableHead>End</TableHead>
+                    <TableHead>€/night</TableHead>
+                    <TableHead>Min nights</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((s) => (
+                    <TableRow key={s.id} className={selectedSeasonIds.has(s.id) ? "bg-accent/50" : ""}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selectedSeasonIds.has(s.id)}
+                          onChange={() => {
+                            const next = new Set(selectedSeasonIds);
+                            if (next.has(s.id)) next.delete(s.id); else next.add(s.id);
+                            setSelectedSeasonIds(next);
+                          }}
+                          className="h-4 w-4 rounded border-border"
+                        />
+                      </TableCell>
+                      <TableCell className="text-sm">{properties.find((p) => p.id === s.property_id)?.name || "—"}</TableCell>
+                      <TableCell className="text-sm">
+                        <span>{s.name}</span>
+                        {s.is_recurring && (
+                          <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-accent text-accent-foreground rounded">Recurring</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm">{s.start_date}</TableCell>
+                      <TableCell className="text-sm">{s.end_date}</TableCell>
+                      <TableCell className="text-sm">€{s.price_per_night}</TableCell>
+                      <TableCell className="text-sm">{s.min_nights || 1}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="ghost" title="Dupliquer sur plusieurs périodes" onClick={() => openDuplicateDialog(s)}><Copy size={14} /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => { setEditSeason(s); setSeasonDateRanges([{ start: s.start_date, end: s.end_date }]); setSeasonDialog(true); }}><Pencil size={14} /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => deleteSeason(s.id)}><Trash2 size={14} /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filtered.length === 0 && (
+                    <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">No seasonal pricing configured</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            );
+          })()}
         </TabsContent>
 
         {/* Smart Pricing */}
