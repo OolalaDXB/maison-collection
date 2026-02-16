@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -114,19 +114,21 @@ const Header = () => {
       <AnimatePresence>
         {menuOpen && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
+              style={{ willChange: 'opacity' }}
               className="fixed inset-0 z-[60] bg-[rgba(0,0,0,0.4)]"
               onClick={() => setMenuOpen(false)}
             />
-            <motion.div
+            <m.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.3, ease: "easeOut" }}
+              style={{ willChange: 'transform' }}
               className="fixed top-0 left-0 bottom-0 z-[70] bg-white w-[85vw] max-w-[380px] flex flex-col"
             >
               <div className="flex justify-end p-5">
@@ -175,7 +177,7 @@ const Header = () => {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>
