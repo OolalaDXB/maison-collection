@@ -43,7 +43,7 @@ interface Booking {
   created_at: string | null;
 }
 
-interface PropertyOption { id: string; name: string; cleaning_fee: number | null; tourist_tax_per_person: number | null; price_per_night: number | null; }
+interface PropertyOption { id: string; name: string; cleaning_fee: number | null; tourist_tax_per_person: number | null; price_per_night: number | null; currency: string; }
 
 const STATUS_COLORS: Record<string, string> = {
   confirmed: "bg-[hsl(120,40%,92%)] text-[hsl(120,40%,30%)]",
@@ -77,7 +77,7 @@ const AdminBookingsPage = () => {
   const [importDialog, setImportDialog] = useState(false);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
   const [saving, setSaving] = useState(false);
-  const { convertFromEur, formatPrice } = useFxRates();
+  const { convertFromEur, convertToEur, formatPrice } = useFxRates();
   const { isAdmin } = useAuth();
   // New booking form
   const [nb, setNb] = useState({ property_id: "", guest_name: "", guest_email: "", guest_phone: "", guests_count: 1, check_in: "", check_out: "", base_price_per_night: 0, cleaning_fee: 0, tourist_tax_total: 0, discount_amount: 0, special_requests: "" });
@@ -85,7 +85,7 @@ const AdminBookingsPage = () => {
   const loadData = async () => {
     const [bRes, pRes] = await Promise.all([
       supabase.from("bookings").select("*").order("check_in", { ascending: false }),
-      supabase.from("properties").select("id, name, cleaning_fee, tourist_tax_per_person, price_per_night").order("display_order"),
+      supabase.from("properties").select("id, name, cleaning_fee, tourist_tax_per_person, price_per_night, currency").order("display_order"),
     ]);
     setBookings(bRes.data || []);
     setProperties(pRes.data || []);
@@ -287,7 +287,17 @@ const AdminBookingsPage = () => {
               <TableCell className="text-sm">{b.check_in}</TableCell>
               <TableCell className="text-sm">{b.check_out}</TableCell>
               <TableCell className="text-sm">{b.nights}</TableCell>
-              {isAdmin && <TableCell className="text-sm">{fmt(conv(b.total_price))}</TableCell>}
+              {isAdmin && (
+                <TableCell className="text-sm">
+                  <span>{fmt(conv(b.total_price))}</span>
+                  {(() => {
+                    const propCurrency = properties.find(p => p.id === b.property_id)?.currency || "EUR";
+                    return propCurrency !== "EUR" && currency === "EUR" ? (
+                      <span className="text-xs text-muted-foreground ml-1">≈ {formatPrice(Math.round(convertFromEur(b.total_price, propCurrency)), propCurrency)}</span>
+                    ) : null;
+                  })()}
+                </TableCell>
+              )}
               <TableCell><span className={`text-[0.65rem] px-2 py-0.5 uppercase tracking-wider ${STATUS_COLORS[b.status || ""] || "bg-muted text-muted-foreground"}`}>{b.status}</span></TableCell>
               <TableCell className="text-sm text-muted-foreground">{b.source}</TableCell>
             </TableRow>
@@ -412,6 +422,19 @@ const AdminBookingsPage = () => {
                 {isAdmin && (
                   <div className="border border-border rounded-md p-4 space-y-4">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Informations financières</p>
+
+                    {/* Show property currency if not EUR */}
+                    {(() => {
+                      const propCurrency = properties.find(p => p.id === editBooking.property_id)?.currency || "EUR";
+                      const showConversion = propCurrency !== "EUR" && currency === "EUR";
+                      return showConversion ? (
+                        <div className="flex items-center gap-2 px-3 py-2 bg-[hsl(36,20%,95%)] text-xs text-muted-foreground rounded">
+                          <span>Devise propriété : <strong>{propCurrency}</strong></span>
+                          <span>·</span>
+                          <span>Total ≈ {formatPrice(Math.round(convertFromEur(editTotal, propCurrency)), propCurrency)}</span>
+                        </div>
+                      ) : null;
+                    })()}
 
                     <div className="grid grid-cols-3 gap-3">
                       <Field label="Prix / nuit (€)"><Input type="number" step="0.01" value={editBooking.base_price_per_night} onChange={(e) => setField("base_price_per_night", parseFloat(e.target.value) || 0)} /></Field>
