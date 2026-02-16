@@ -31,6 +31,7 @@ interface BookingBar {
   check_in: string;
   check_out: string;
   status: string | null;
+  source: string | null;
 }
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -43,6 +44,8 @@ const PROP_COLORS = [
   { bg: "hsl(45,70%,50%)", light: "hsl(45,60%,90%)", border: "hsl(45,50%,70%)" },    // gold
   { bg: "hsl(280,40%,55%)", light: "hsl(280,35%,92%)", border: "hsl(280,30%,75%)" }, // purple
 ];
+
+const AIRBNB_COLOR = { bg: "hsl(210,80%,55%)", light: "hsl(210,70%,92%)", border: "hsl(210,60%,75%)" };
 
 const AdminCalendarPage = () => {
   const [properties, setProperties] = useState<PropertyOption[]>([]);
@@ -76,7 +79,7 @@ const AdminCalendarPage = () => {
     const end = `${monthStr}-${daysInMonth}`;
     Promise.all([
       supabase.from("availability").select("*").gte("date", start).lte("date", end),
-      supabase.from("bookings").select("id, property_id, guest_name, check_in, check_out, status").or(`check_in.lte.${end},check_out.gte.${start}`),
+      supabase.from("bookings").select("id, property_id, guest_name, check_in, check_out, status, source").or(`check_in.lte.${end},check_out.gte.${start}`),
     ]).then(([avRes, bkRes]) => {
       setAvailability(avRes.data || []);
       setBookings(bkRes.data || []);
@@ -275,9 +278,10 @@ const AdminCalendarPage = () => {
                   <span className="text-xs text-muted-foreground">{day}</span>
                   <div className="space-y-0.5 mt-1">
                     {dayBookings.map((b) => {
-                      const c = propColorMap.get(b.property_id);
+                      const isAirbnb = b.source?.startsWith("airbnb");
+                      const c = isAirbnb ? AIRBNB_COLOR : propColorMap.get(b.property_id);
                       return (
-                        <div key={b.id} className="text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5 truncate" style={{ backgroundColor: c?.bg }} title={`${propShortName.get(b.property_id)} — ${b.guest_name}`}>
+                        <div key={b.id} className="text-[0.55rem] text-[hsl(0,0%,100%)] px-1 py-0.5 truncate" style={{ backgroundColor: c?.bg }} title={`${isAirbnb ? "Airbnb · " : ""}${propShortName.get(b.property_id)} — ${b.guest_name}`}>
                           {b.guest_name}
                         </div>
                       );
