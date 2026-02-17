@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Home, CalendarDays, DollarSign, ClipboardList,
-  Users, Star, FileText, Mail, CreditCard, Settings, Upload, LogOut, Menu, X, BarChart3, Sun, Moon
+  Users, Star, FileText, Mail, CreditCard, Settings, Upload, LogOut, Menu, X, BarChart3, Sun, Moon, FileSignature
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
@@ -21,6 +21,7 @@ const navSections: NavSection[] = [
       { title: "Properties", path: "/admin/properties", icon: Home },
       { title: "Calendar", path: "/admin/calendar", icon: CalendarDays },
       { title: "Bookings", path: "/admin/bookings", icon: ClipboardList },
+      { title: "Contracts", path: "/admin/contracts", icon: FileSignature },
     ],
   },
   {

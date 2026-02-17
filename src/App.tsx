@@ -34,6 +34,7 @@ const adminImports = {
   profile: () => import("./pages/AdminProfilePage"),
   importExport: () => import("./pages/admin/AdminImportPage"),
   finance: () => import("./pages/admin/AdminFinancePage"),
+  contracts: () => import("./pages/admin/AdminContractsPage"),
 };
 
 // Prefetch all admin pages once any admin route is visited
@@ -59,6 +60,7 @@ const AdminSettingsPage = lazy(() => { prefetchAdmin(); return adminImports.sett
 const AdminProfilePage = lazy(() => { prefetchAdmin(); return adminImports.profile(); });
 const AdminImportPage = lazy(() => { prefetchAdmin(); return adminImports.importExport(); });
 const AdminFinancePage = lazy(() => { prefetchAdmin(); return adminImports.finance(); });
+const AdminContractsPage = lazy(() => { prefetchAdmin(); return adminImports.contracts(); });
 const BookingPage = lazy(() => import("./pages/BookingPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -111,6 +113,7 @@ const AppContent = () => {
             <Route path="/admin/payments" element={<AdminPaymentsPage />} />
             <Route path="/admin/settings" element={<AdminSettingsPage />} />
             <Route path="/admin/finance" element={<AdminFinancePage />} />
+            <Route path="/admin/contracts" element={<AdminContractsPage />} />
             <Route path="/admin/import" element={<AdminImportPage />} />
             <Route path="/admin/profile" element={<AdminProfilePage />} />
             <Route path="*" element={<NotFound />} />
