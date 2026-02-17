@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => ({
           }
           if (!id.includes('node_modules')) return;
           // Vendor chunks
-          if (id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor-react';
+          if (id.includes('/react/') || id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor-react';
           if (id.includes('@supabase') || id.includes('@tanstack/react-query')) return 'vendor-supabase';
           if (id.includes('framer-motion')) return 'vendor-motion';
           if (id.includes('recharts')) return 'vendor-charts';
