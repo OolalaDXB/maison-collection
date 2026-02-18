@@ -77,5 +77,29 @@
     "en": "EN",
     "fr": "FR",
     "ru": "RU"
+  },
+  "management": {
+    "view_property": "View the property →",
+    "send": "Send",
+    "sending": "Sending…",
+    "name_placeholder": "Your name",
+    "email_placeholder": "Your email",
+    "message_placeholder": "Tell us about your property — where it is, what it's like, and what you need.",
+    "tag_styling": "Interior styling",
+    "tag_photography": "Professional photography",
+    "tag_listing": "Listing narrative",
+    "tag_amenity": "Amenity audit",
+    "tag_operational": "Operational setup",
+    "tag_arch": "Architectural consultation",
+    "faq_0_q": "What kind of properties do you work with?",
+    "faq_0_a": "Homes with character — architectural renovations, well-designed apartments in exceptional locations, heritage properties with a story. We're looking for places guests will remember, not generic rentals. If you're unsure, just reach out.",
+    "faq_1_q": "How much does it cost?",
+    "faq_1_a": "Our fee is 15–20% of booking revenue, depending on the scope. No setup fees, no hidden costs. We discuss everything before we start.",
+    "faq_2_q": "What if my property needs work first?",
+    "faq_2_a": "That's part of what we do. We'll visit, give you an honest assessment, and propose a plan — from light staging to a full renovation. We manage the process end to end.",
+    "faq_3_q": "Where do you operate?",
+    "faq_3_a": "Today: Brittany, the Caucasus, and Dubai. We're expanding selectively. If your property is elsewhere and it's exceptional, talk to us.",
+    "faq_4_q": "How quickly can my property go live?",
+    "faq_4_a": "If it's ready: 2–4 weeks (photos, listing, setup). If it needs work: depends on scope, but we move fast and we'll give you a timeline upfront."
   }
 }

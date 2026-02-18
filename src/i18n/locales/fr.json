@@ -77,5 +77,29 @@
     "en": "EN",
     "fr": "FR",
     "ru": "RU"
+  },
+  "management": {
+    "view_property": "Voir la propriété →",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "name_placeholder": "Votre nom",
+    "email_placeholder": "Votre email",
+    "message_placeholder": "Parlez-nous de votre bien — où il se trouve, comment il est, et ce dont vous avez besoin.",
+    "tag_styling": "Décoration intérieure",
+    "tag_photography": "Photographie professionnelle",
+    "tag_listing": "Rédaction de l'annonce",
+    "tag_amenity": "Audit des équipements",
+    "tag_operational": "Mise en place opérationnelle",
+    "tag_arch": "Consultation architecturale",
+    "faq_0_q": "Quel type de biens gérez-vous ?",
+    "faq_0_a": "Des maisons avec du caractère — rénovations architecturales, appartements bien conçus dans des endroits d'exception, propriétés de caractère avec une histoire. Nous cherchons des lieux dont les voyageurs se souviendront, pas des locations banales. Si vous n'êtes pas sûr, contactez-nous.",
+    "faq_1_q": "Combien ça coûte ?",
+    "faq_1_a": "Notre commission est de 15 à 20 % des revenus de réservation, selon la portée. Pas de frais de mise en place, pas de coûts cachés. Nous discutons de tout avant de commencer.",
+    "faq_2_q": "Et si mon bien nécessite des travaux ?",
+    "faq_2_a": "C'est une partie de ce que nous faisons. Nous visitons, donnons une évaluation honnête et proposons un plan — de la mise en scène légère à la rénovation complète. Nous gérons le processus de bout en bout.",
+    "faq_3_q": "Où opérez-vous ?",
+    "faq_3_a": "Aujourd'hui : Bretagne, Caucase et Dubaï. Nous nous développons de façon sélective. Si votre bien est ailleurs et qu'il est exceptionnel, parlez-nous-en.",
+    "faq_4_q": "En combien de temps mon bien peut-il être mis en ligne ?",
+    "faq_4_a": "S'il est prêt : 2 à 4 semaines (photos, annonce, installation). S'il nécessite des travaux : selon la portée, mais nous allons vite et vous fournirons un calendrier dès le départ."
   }
 }
