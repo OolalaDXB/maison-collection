@@ -58,35 +58,55 @@ const AtlantiqueContent = ({ property }: { property: PropertyData | null }) => {
 
         {/* Description */}
         <div className="mb-4">
-          <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-            Welcome to a 19th-century Breton Pen Ty house, reimagined by an architecture 
-            studio between 2020 and 2022. Ancient stone meets contemporary design: original 
-            rubble masonry and a black Douglas fir extension creating 120m² of refined living 
-            space, complemented by 40m² of terraces — including a covered, enclosable 
-            terrace — set on 5 000m² of private wooded grounds.
-          </p>
-          <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-            Large bay windows frame the landscape — fields, centuries-old oak forests, 
-            Breton sky — and flood the spaces with light. The heated pool (12×6m) is 
-            sheltered beneath an elegant enclosure, extending the swimming season from 
-            late April through September. Steps from the historic village of Poul Fétan, 
-            in absolute tranquility, 30 minutes from Morbihan beaches.
-          </p>
-
-          {expanded && (
-            <div className="mt-4">
+          {desc ? (
+            <div className="space-y-4">
+              {desc.split(/\n\n+/).map((para, i) => (
+                <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+              ))}
+            </div>
+          ) : (
+            <>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-                Designed for both work and relaxation: fibre WiFi, a bright dedicated 
-                workspace overlooking the garden, covered terrace, and pellet stove for 
-                cool evenings. The upper floor offers an open space perfect for children.
+                Welcome to a 19th-century Breton Pen Ty house, reimagined by an architecture 
+                studio between 2020 and 2022. Ancient stone meets contemporary design: original 
+                rubble masonry and a black Douglas fir extension creating 120m² of refined living 
+                space, complemented by 40m² of terraces — including a covered, enclosable 
+                terrace — set on 5 000m² of private wooded grounds.
               </p>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-                The garden features a zip line, swing, basketball court, and football area. 
-                Many hiking trails surround the house. The Blavet Valley is 5 minutes away, 
-                and the beaches of Carnac, Quiberon, and the Gulf of Morbihan are all 
-                within easy reach.
+                Large bay windows frame the landscape — fields, centuries-old oak forests, 
+                Breton sky — and flood the spaces with light. The heated pool (12×6m) is 
+                sheltered beneath an elegant enclosure, extending the swimming season from 
+                late April through September. Steps from the historic village of Poul Fétan, 
+                in absolute tranquility, 30 minutes from Morbihan beaches.
               </p>
-            </div>
+            </>
+          )}
+
+          {property?.long_description ? (
+            expanded && (
+              <div className="space-y-4 mt-4">
+                {property.long_description.split(/\n\n+/).map((para, i) => (
+                  <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+                ))}
+              </div>
+            )
+          ) : (
+            expanded && (
+              <div className="mt-4">
+                <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
+                  Designed for both work and relaxation: fibre WiFi, a bright dedicated 
+                  workspace overlooking the garden, covered terrace, and pellet stove for 
+                  cool evenings. The upper floor offers an open space perfect for children.
+                </p>
+                <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
+                  The garden features a zip line, swing, basketball court, and football area. 
+                  Many hiking trails surround the house. The Blavet Valley is 5 minutes away, 
+                  and the beaches of Carnac, Quiberon, and the Gulf of Morbihan are all 
+                  within easy reach.
+                </p>
+              </div>
+            )
           )}
         </div>
         <button
