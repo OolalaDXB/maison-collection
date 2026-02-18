@@ -23,7 +23,7 @@ const GeorgiaInfo = ({ property }: { property: PropertyData | null }) => {
         </div>
         <div className="flex items-start gap-3">
           <Car size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />
-          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">Parking: {parking}</span>
+          <span className="font-body font-light text-sm text-[hsl(0,0%,27%)] whitespace-pre-wrap">Parking: {parking}</span>
         </div>
         <div className="flex items-start gap-3">
           <Lock size={18} className="text-[hsl(0,0%,27%)] shrink-0 mt-0.5" strokeWidth={1.5} />

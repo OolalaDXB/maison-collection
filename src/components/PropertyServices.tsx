@@ -32,7 +32,12 @@ const PropertyServices = ({ propertyId }: Props) => {
                 {included.map((s) => (
                   <div key={s.id} className="flex items-start gap-3">
                     <Check size={16} className="text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
-                    <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s.label}</span>
+                    <div>
+                      <span className="font-body font-light text-sm text-[hsl(0,0%,27%)]">{s.label}</span>
+                      {s.description && (
+                        <p className="font-body font-light text-xs text-muted-foreground mt-0.5 whitespace-pre-wrap leading-relaxed">{s.description}</p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
