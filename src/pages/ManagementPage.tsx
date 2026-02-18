@@ -10,6 +10,7 @@ import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import atlantiqueHero from "@/assets/atlantique-hero.avif";
+import georgiaHero from "@/assets/georgia-10.avif";
 import atlantiqueCoast from "@/assets/management-atlantique-coast.jpg";
 import {
   Accordion,
@@ -107,10 +108,10 @@ const ManagementPage = () => {
 
       {/* S1: Hero with image */}
       <section className="pt-24 md:pt-32">
-        {/* Hero — Maison Atlantique */}
+        {/* Hero — Côte atlantique bretonne */}
         <FadeIn>
           <div className="w-full h-[38vh] md:h-[48vh] overflow-hidden">
-            <img src={atlantiqueHero} alt="Maison Atlantique — Bretagne" className="w-full h-full object-cover object-center" loading="eager" />
+            <img src={atlantiqueCoast} alt="Côte atlantique bretonne — Bretagne" className="w-full h-full object-cover object-center" loading="eager" />
           </div>
         </FadeIn>
 
@@ -175,7 +176,11 @@ const ManagementPage = () => {
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FadeIn delay={0.1}>
-              <div className="border border-[hsl(0,0%,93%)] p-8">
+              <div className="border border-[hsl(0,0%,93%)] overflow-hidden">
+                <div className="h-40 overflow-hidden">
+                  <img src={georgiaHero} alt="Maison Georgia — Caucase" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
+                </div>
+                <div className="p-8">
                 <h3 className="font-display text-xl text-foreground mb-1">
                   Maison Georgia
                 </h3>
@@ -199,12 +204,13 @@ const ManagementPage = () => {
                 >
                   {t("management.view_property")}
                 </Link>
+                </div>
               </div>
             </FadeIn>
             <FadeIn delay={0.2}>
               <div className="border border-[hsl(0,0%,93%)] overflow-hidden">
                 <div className="h-40 overflow-hidden">
-                  <img src={atlantiqueCoast} alt="Côte atlantique bretonne" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
+                  <img src={atlantiqueHero} alt="Maison Atlantique — Bretagne" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
                 </div>
                 <div className="p-8">
                 <h3 className="font-display text-xl text-foreground mb-1">
