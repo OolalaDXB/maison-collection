@@ -59,7 +59,7 @@ const GeorgiaRooms = () => {
         {rooms.map((room) => (
           <div
             key={room.name}
-            className="min-w-[300px] md:min-w-[48%] snap-start bg-[hsl(0,0%,97%)] p-6 shrink-0"
+            className="w-[280px] md:w-[48%] min-w-0 snap-start bg-[hsl(0,0%,97%)] p-6 shrink-0"
           >
             <h4 className="font-body font-medium text-base text-foreground mb-3">{room.name}</h4>
             <p className="font-body font-light text-sm text-[hsl(0,0%,27%)] leading-relaxed mb-4">
