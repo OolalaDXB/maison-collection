@@ -1,4 +1,6 @@
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminPoiMap from "@/components/admin/AdminPoiMap";
+import GeocodingField from "@/components/admin/GeocodingField";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -476,42 +478,65 @@ const AdminPropertiesPage = () => {
       )}
 
       {/* POIs modal */}
-      {managingPois && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-background border border-border max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-display text-xl">POIs — {properties.find((p) => p.id === managingPois)?.name}</h2>
-              <button onClick={() => { setManagingPois(null); setEditingPoi(null); }}><X size={20} /></button>
-            </div>
-            {editingPoi && (
-              <div className="border border-border p-6 mb-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Field label="Label" value={editingPoi.label} onChange={(v) => setEditingPoi({ ...editingPoi, label: v })} />
-                  <Field label="Emoji" value={editingPoi.emoji} onChange={(v) => setEditingPoi({ ...editingPoi, emoji: v })} />
-                  <Field label="Latitude" value={editingPoi.latitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, latitude: parseFloat(v) || 0 })} type="number" />
-                  <Field label="Longitude" value={editingPoi.longitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, longitude: parseFloat(v) || 0 })} type="number" />
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={handleSavePoi} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save POI"}</button>
-                  <button onClick={() => setEditingPoi(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
-                </div>
+      {managingPois && (() => {
+        const prop = properties.find((p) => p.id === managingPois);
+        const mapCenter: [number, number] = prop?.longitude != null && prop?.latitude != null
+          ? [prop.longitude, prop.latitude]
+          : [2.3522, 48.8566]; // Paris fallback
+        return (
+          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-background border border-border max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-display text-xl">POIs — {prop?.name}</h2>
+                <button onClick={() => { setManagingPois(null); setEditingPoi(null); }}><X size={20} /></button>
               </div>
-            )}
-            <div className="space-y-3 mb-6">
-              {poisList.map((poi) => (
-                <div key={poi.id} className="flex items-center gap-4 p-4 border border-border">
-                  <span className="text-lg">{poi.emoji}</span>
-                  <div className="flex-1"><p className="text-sm font-medium text-foreground">{poi.label}</p><p className="text-xs text-muted-foreground">{poi.latitude}, {poi.longitude}</p></div>
-                  <button onClick={() => setEditingPoi(poi)} className="p-2 hover:bg-secondary transition-colors"><Pencil size={14} /></button>
-                  <button onClick={() => handleDeletePoi(poi.id)} className="p-2 hover:bg-secondary transition-colors text-destructive"><Trash2 size={14} /></button>
+
+              {/* Live map preview */}
+              <AdminPoiMap
+                center={mapCenter}
+                pois={poisList}
+                editingPoi={editingPoi}
+                onPoiCoordChange={(lat, lng) => {
+                  if (editingPoi) setEditingPoi({ ...editingPoi, latitude: lat, longitude: lng });
+                }}
+              />
+
+              {/* POI edit form */}
+              {editingPoi && (
+                <div className="border border-border p-6 mt-6 mb-4 space-y-4 bg-secondary/20">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Editing POI</p>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Field label="Label" value={editingPoi.label} onChange={(v) => setEditingPoi({ ...editingPoi, label: v })} />
+                    <Field label="Emoji" value={editingPoi.emoji} onChange={(v) => setEditingPoi({ ...editingPoi, emoji: v })} />
+                    <Field label="Latitude" value={editingPoi.latitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, latitude: parseFloat(v) || 0 })} type="number" />
+                    <Field label="Longitude" value={editingPoi.longitude.toString()} onChange={(v) => setEditingPoi({ ...editingPoi, longitude: parseFloat(v) || 0 })} type="number" />
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={handleSavePoi} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground text-sm flex items-center gap-2"><Save size={14} /> {saving ? "Saving…" : "Save POI"}</button>
+                    <button onClick={() => setEditingPoi(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
+                  </div>
                 </div>
-              ))}
-              {poisList.length === 0 && <p className="text-center text-muted-foreground py-8">No POIs yet.</p>}
+              )}
+
+              <div className="space-y-3 mt-6 mb-6">
+                {poisList.map((poi) => (
+                  <div key={poi.id} className={`flex items-center gap-4 p-4 border transition-colors ${editingPoi?.id === poi.id ? "border-primary bg-primary/5" : "border-border"}`}>
+                    <span className="text-lg">{poi.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{poi.label}</p>
+                      <p className="text-xs text-muted-foreground">{poi.latitude}, {poi.longitude}</p>
+                    </div>
+                    <button onClick={() => setEditingPoi(poi)} className="p-2 hover:bg-secondary transition-colors"><Pencil size={14} /></button>
+                    <button onClick={() => handleDeletePoi(poi.id)} className="p-2 hover:bg-secondary transition-colors text-destructive"><Trash2 size={14} /></button>
+                  </div>
+                ))}
+                {poisList.length === 0 && <p className="text-center text-muted-foreground py-8">No POIs yet. Add one below then drag its marker on the map.</p>}
+              </div>
+              <button onClick={() => setEditingPoi(newPoi(managingPois))} className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary transition-colors"><Plus size={14} /> Add POI</button>
             </div>
-            <button onClick={() => setEditingPoi(newPoi(managingPois))} className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary transition-colors"><Plus size={14} /> Add POI</button>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Reviews modal */}
       {managingReviews && (
@@ -685,10 +710,21 @@ const AdminPropertiesPage = () => {
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground mb-3">Map Location</p>
+              <div className="mb-3">
+                <GeocodingField
+                  onSelect={(lat, lng) => setEditing({ ...editing, latitude: lat, longitude: lng })}
+                  placeholder="Search property address to auto-fill coordinates…"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Latitude" value={editing.latitude?.toString() || ""} onChange={(v) => setEditing({ ...editing, latitude: v ? parseFloat(v) : null })} type="number" />
                 <Field label="Longitude" value={editing.longitude?.toString() || ""} onChange={(v) => setEditing({ ...editing, longitude: v ? parseFloat(v) : null })} type="number" />
               </div>
+              {editing.latitude && editing.longitude && (
+                <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                  <MapPin size={11} /> {editing.latitude}, {editing.longitude}
+                </p>
+              )}
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground mb-3">Integrations</p>
