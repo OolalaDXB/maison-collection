@@ -43,7 +43,9 @@ const PropertyMap = ({ center, zoom = 14, propertyName, pois = [] }: PropertyMap
   const map = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapToken || !mapContainer.current || map.current) return;
+    if (!mapToken || !mapContainer.current) return;
+    // Destroy previous instance before re-creating (handles center/POI changes)
+    if (map.current) { map.current.remove(); map.current = null; }
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,

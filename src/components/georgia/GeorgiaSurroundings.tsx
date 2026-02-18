@@ -1,6 +1,12 @@
 import PropertyMap from "@/components/PropertyMap";
+import { usePropertyMapData } from "@/hooks/usePropertyMapData";
+
+const GEORGIA_ID = "cdcc1fb2-d8e8-4004-a900-e196312952f9";
+const FALLBACK_CENTER: [number, number] = [44.4735, 42.4575];
 
 const GeorgiaSurroundings = () => {
+  const { center, pois } = usePropertyMapData(GEORGIA_ID, FALLBACK_CENTER);
+
   return (
     <div className="border-t border-border pt-10 mb-10">
       <h3 className="font-body uppercase tracking-[0.1em] text-sm text-foreground font-medium mb-1">
@@ -9,9 +15,10 @@ const GeorgiaSurroundings = () => {
       <p className="font-body font-light text-sm text-muted-foreground mb-6">Gudauri, Greater Caucasus</p>
 
       <PropertyMap
-        center={[44.4735, 42.4575]}
+        center={center}
         zoom={14}
         propertyName="Maison Georgia"
+        pois={pois}
       />
 
       <div className="grid grid-cols-2 gap-8 mt-8">
