@@ -1,6 +1,12 @@
 import PropertyMap from "@/components/PropertyMap";
+import { usePropertyMapData } from "@/hooks/usePropertyMapData";
+
+const ARABIA_ID = "2cded4d5-47f4-4168-9b0e-824891c3c69e";
+const FALLBACK_CENTER: [number, number] = [55.3033, 25.1161];
 
 const ArabiaSurroundings = () => {
+  const { center, pois } = usePropertyMapData(ARABIA_ID, FALLBACK_CENTER);
+
   return (
     <div className="border-t border-border pt-10 mb-10">
       <h3 className="font-body uppercase tracking-[0.1em] text-sm text-foreground font-medium mb-1">
@@ -9,9 +15,10 @@ const ArabiaSurroundings = () => {
       <p className="font-body font-light text-sm text-muted-foreground mb-6">The Sustainable City, Dubai</p>
 
       <PropertyMap
-        center={[55.3033, 25.1161]}
+        center={center}
         zoom={13}
         propertyName="Maison Arabia"
+        pois={pois}
       />
 
       <div className="grid grid-cols-2 gap-8 mt-8">
