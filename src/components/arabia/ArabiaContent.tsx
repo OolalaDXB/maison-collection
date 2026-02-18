@@ -50,22 +50,42 @@ const ArabiaContent = ({ property }: { property: PropertyData | null }) => {
         </div>
 
         <div className="mb-4">
-          <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-            A different way of living in Dubai. This townhouse sits inside The Sustainable City — the region's first net-zero energy community, a gated car-free village of 500 homes surrounded by a 30-metre tree belt, 11 bio-dome greenhouses, and urban farms. No glass towers. No highways. Just green streets where children play freely, families walk to the pool, and solar panels power every home.
-          </p>
-          <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-            Three levels of generous family space: an open-plan ground floor with living room, dining area, and fully equipped kitchen. Four bedrooms on the first floor — one queen, one double, and two singles — each with its own bathroom. On top, a rooftop terrace shaded by solar panels with a ping-pong table and sunset views over the community.
-          </p>
-
-          {expanded && (
-            <div className="mt-4">
+          {property?.description ? (
+            <div className="space-y-4">
+              {property.description.split(/\n\n+/).map((para, i) => (
+                <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+              ))}
+            </div>
+          ) : (
+            <>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
-                During your stay, you'll be assisted by Imelda, our dedicated live-in helper. Discreet and attentive, she ensures your stay runs effortlessly — from keeping the house impeccable to helping with whatever you need. This is a level of comfort rarely found in short-term stays.
+                A different way of living in Dubai. This townhouse sits inside The Sustainable City — the region's first net-zero energy community, a gated car-free village of 500 homes surrounded by a 30-metre tree belt, 11 bio-dome greenhouses, and urban farms. No glass towers. No highways. Just green streets where children play freely, families walk to the pool, and solar panels power every home.
               </p>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-                The Sustainable City is 15 minutes from Mall of the Emirates, 10 minutes from Global Village, and 25 minutes from the coast. Within the compound: swimming pools (including a kids' pool), fitness center, a 4 km cycling and jogging track, four playgrounds, tennis court, football pitch, an equestrian center, a farm area with animals, restaurants, and a small supermarket. Everything you need is within walking distance — or a free electric buggy ride.
+                Three levels of generous family space: an open-plan ground floor with living room, dining area, and fully equipped kitchen. Four bedrooms on the first floor — one queen, one double, and two singles — each with its own bathroom. On top, a rooftop terrace shaded by solar panels with a ping-pong table and sunset views over the community.
               </p>
-            </div>
+            </>
+          )}
+
+          {property?.long_description ? (
+            expanded && (
+              <div className="space-y-4 mt-4">
+                {property.long_description.split(/\n\n+/).map((para, i) => (
+                  <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+                ))}
+              </div>
+            )
+          ) : (
+            expanded && (
+              <div className="mt-4">
+                <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
+                  During your stay, you'll be assisted by Imelda, our dedicated live-in helper. Discreet and attentive, she ensures your stay runs effortlessly — from keeping the house impeccable to helping with whatever you need. This is a level of comfort rarely found in short-term stays.
+                </p>
+                <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
+                  The Sustainable City is 15 minutes from Mall of the Emirates, 10 minutes from Global Village, and 25 minutes from the coast. Within the compound: swimming pools (including a kids' pool), fitness center, a 4 km cycling and jogging track, four playgrounds, tennis court, football pitch, an equestrian center, a farm area with animals, restaurants, and a small supermarket. Everything you need is within walking distance — or a free electric buggy ride.
+                </p>
+              </div>
+            )
           )}
         </div>
         <button

@@ -53,7 +53,11 @@ const GeorgiaContent = ({ property }: { property: PropertyData | null }) => {
         {/* Description */}
         <div className="mb-4">
           {desc ? (
-            <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">{desc}</p>
+            <div className="space-y-4">
+              {desc.split(/\n\n+/).map((para, i) => (
+                <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+              ))}
+            </div>
           ) : (
             <>
               <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8]">
@@ -73,9 +77,11 @@ const GeorgiaContent = ({ property }: { property: PropertyData | null }) => {
 
           {property?.long_description ? (
             expanded && (
-              <p className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] mt-4">
-                {property.long_description}
-              </p>
+              <div className="space-y-4 mt-4">
+                {property.long_description.split(/\n\n+/).map((para, i) => (
+                  <p key={i} className="font-body font-light text-[hsl(0,0%,27%)] text-[1.05rem] leading-[1.8] whitespace-pre-wrap">{para}</p>
+                ))}
+              </div>
             )
           ) : (
             expanded && (
