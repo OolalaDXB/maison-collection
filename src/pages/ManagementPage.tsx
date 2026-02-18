@@ -174,69 +174,69 @@ const ManagementPage = () => {
               {proofTitle}
             </h2>
           </FadeIn>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FadeIn delay={0.1}>
-              <div className="border border-[hsl(0,0%,93%)] overflow-hidden">
-                <div className="h-40 overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <FadeIn delay={0.1} className="flex">
+              <div className="border border-[hsl(0,0%,93%)] overflow-hidden flex flex-col w-full">
+                <div className="h-48 overflow-hidden flex-shrink-0">
                   <img src={georgiaHero} alt="Maison Georgia — Caucase" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
                 </div>
-                <div className="p-8">
-                <h3 className="font-display text-xl text-foreground mb-1">
-                  Maison Georgia
-                </h3>
-                <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
-                  {t("management.georgia_location")}
-                </p>
-                <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
-                  <Star
-                    size={14}
-                    className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
-                  />
-                  {t("management.georgia_reviews")}
-                </p>
-                <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
-                  <p>{t("management.georgia_stat1")}</p>
-                  <p>{t("management.georgia_stat2")}</p>
-                </div>
-                <Link
-                  to="/georgia"
-                  className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  {t("management.view_property")}
-                </Link>
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-display text-xl text-foreground mb-1">
+                    Maison Georgia
+                  </h3>
+                  <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
+                    {t("management.georgia_location")}
+                  </p>
+                  <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
+                    <Star
+                      size={14}
+                      className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
+                    />
+                    {t("management.georgia_reviews")}
+                  </p>
+                  <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6 flex-1">
+                    <p>{t("management.georgia_stat1")}</p>
+                    <p>{t("management.georgia_stat2")}</p>
+                  </div>
+                  <Link
+                    to="/georgia"
+                    className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    {t("management.view_property")}
+                  </Link>
                 </div>
               </div>
             </FadeIn>
-            <FadeIn delay={0.2}>
-              <div className="border border-[hsl(0,0%,93%)] overflow-hidden">
-                <div className="h-40 overflow-hidden">
+            <FadeIn delay={0.2} className="flex">
+              <div className="border border-[hsl(0,0%,93%)] overflow-hidden flex flex-col w-full">
+                <div className="h-48 overflow-hidden flex-shrink-0">
                   <img src={atlantiqueHero} alt="Maison Atlantique — Bretagne" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
                 </div>
-                <div className="p-8">
-                <h3 className="font-display text-xl text-foreground mb-1">
-                  Maison Atlantique
-                </h3>
-                <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
-                  {t("management.atlantique_location")}
-                </p>
-                <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
-                  <Star
-                    size={14}
-                    className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
-                  />
-                  {t("management.atlantique_reviews")}
-                </p>
-                <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
-                  <p>{t("management.atlantique_stat1")}</p>
-                  <p>{t("management.atlantique_stat2")}</p>
-                  <p>{t("management.atlantique_stat3")}</p>
-                </div>
-                <Link
-                  to="/atlantique"
-                  className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  {t("management.view_property")}
-                </Link>
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-display text-xl text-foreground mb-1">
+                    Maison Atlantique
+                  </h3>
+                  <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
+                    {t("management.atlantique_location")}
+                  </p>
+                  <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
+                    <Star
+                      size={14}
+                      className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
+                    />
+                    {t("management.atlantique_reviews")}
+                  </p>
+                  <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6 flex-1">
+                    <p>{t("management.atlantique_stat1")}</p>
+                    <p>{t("management.atlantique_stat2")}</p>
+                    <p>{t("management.atlantique_stat3")}</p>
+                  </div>
+                  <Link
+                    to="/atlantique"
+                    className="font-body text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    {t("management.view_property")}
+                  </Link>
                 </div>
               </div>
             </FadeIn>
