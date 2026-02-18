@@ -185,18 +185,18 @@ const ManagementPage = () => {
                   Maison Georgia
                 </h3>
                 <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
-                  Gudauri, Caucasus
+                  {t("management.georgia_location")}
                 </p>
                 <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
                   <Star
                     size={14}
                     className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
                   />
-                  5.0 · 22+ reviews · Superhost · Guest Favourite
+                  {t("management.georgia_reviews")}
                 </p>
                 <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
-                  <p>+35% net revenue growth in 2 years</p>
-                  <p>90%+ occupancy in season</p>
+                  <p>{t("management.georgia_stat1")}</p>
+                  <p>{t("management.georgia_stat2")}</p>
                 </div>
                 <Link
                   to="/georgia"
@@ -217,19 +217,19 @@ const ManagementPage = () => {
                   Maison Atlantique
                 </h3>
                 <p className="font-body font-light text-sm text-[hsl(0,0%,60%)] mb-4">
-                  Quistinic, Brittany
+                  {t("management.atlantique_location")}
                 </p>
                 <p className="font-body text-sm text-[hsl(0,0%,27%)] mb-4">
                   <Star
                     size={14}
                     className="inline text-[hsl(var(--primary))] fill-[hsl(var(--primary))] -mt-0.5 mr-1"
                   />
-                  5.0 · 22 reviews · Superhost
+                  {t("management.atlantique_reviews")}
                 </p>
                 <div className="space-y-1 font-body font-light text-sm text-[hsl(0,0%,27%)] mb-6">
-                  <p>Architecture by Anthropie (2020–2022)</p>
-                  <p>Featured in Archibien, Houzz</p>
-                  <p>First full season: fully booked</p>
+                  <p>{t("management.atlantique_stat1")}</p>
+                  <p>{t("management.atlantique_stat2")}</p>
+                  <p>{t("management.atlantique_stat3")}</p>
                 </div>
                 <Link
                   to="/atlantique"
