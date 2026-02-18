@@ -31,7 +31,7 @@ const AtlantiqueInfo = ({ property }: { property: PropertyData | null }) => {
           <Car size={18} className="text-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Parking</p>
-            <p className="font-body font-light text-sm text-foreground mt-1">{parking}</p>
+            <p className="font-body font-light text-sm text-foreground mt-1 whitespace-pre-wrap">{parking}</p>
           </div>
         </div>
       </div>
