@@ -9,7 +9,9 @@ import FadeIn from "@/components/FadeIn";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import managementHero from "@/assets/management-hero.jpg";
+import georgiaHero from "@/assets/georgia-10.avif";
+import atlantiqueHero from "@/assets/atlantique-hero.avif";
+import arabiaHero from "@/assets/arabia-interior-1.jpeg";
 import {
   Accordion,
   AccordionContent,
@@ -106,15 +108,18 @@ const ManagementPage = () => {
 
       {/* S1: Hero with image */}
       <section className="pt-24 md:pt-32">
-        {/* Hero image — full width, restrained height */}
+        {/* Hero triptyque — vraies photos des 3 maisons */}
         <FadeIn>
-          <div className="w-full h-[38vh] md:h-[48vh] overflow-hidden">
-            <img
-              src={managementHero}
-              alt="Maison Atlantique — Bretagne"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-            />
+          <div className="w-full h-[38vh] md:h-[48vh] flex gap-0.5 overflow-hidden">
+            <div className="flex-1 overflow-hidden">
+              <img src={atlantiqueHero} alt="Maison Atlantique — Bretagne" className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700" loading="eager" />
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <img src={georgiaHero} alt="Maison Georgia — Caucase" className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700" loading="eager" />
+            </div>
+            <div className="flex-1 overflow-hidden hidden md:block">
+              <img src={arabiaHero} alt="Maison Arabia — Dubaï" className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700" loading="eager" />
+            </div>
           </div>
         </FadeIn>
 
