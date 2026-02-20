@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, GripVertical, Image, Save, X, MessageSquare, MapPin, RefreshCw, Download, RotateCcw, Sparkles, Globe } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
+import { useQueryClient } from "@tanstack/react-query";
 import { seedAtlantiqueImages } from "@/utils/seedAtlantiqueImages";
 import { seedGeorgiaImages } from "@/utils/seedGeorgiaImages";
 
@@ -61,6 +62,7 @@ const AdminPropertiesPage = () => {
   const [editingCard, setEditingCard] = useState<RegionCardRow | null>(null);
   const [editingLink, setEditingLink] = useState<RegionLinkRow | null>(null);
   const { rates, isLoading: fxLoading, lastUpdated, formatPrice } = useFxRates();
+  const queryClient = useQueryClient();
   const [refreshingFx, setRefreshingFx] = useState(false);
 
   useEffect(() => { fetchProperties(); }, []);
@@ -818,7 +820,7 @@ const AdminPropertiesPage = () => {
               const { data, error } = await supabase.functions.invoke("refresh-fx-rates");
               if (error) throw error;
               toast.success(`Rates refreshed — ${data?.updated || 0} updated`);
-              window.location.reload();
+              queryClient.invalidateQueries({ queryKey: ["fx-rates"] });
             } catch (e: any) { toast.error(e.message || "Failed to refresh rates"); }
             finally { setRefreshingFx(false); }
           }} disabled={refreshingFx} className="px-4 py-2 border border-border text-sm flex items-center gap-2 hover:border-primary transition-colors disabled:opacity-50">

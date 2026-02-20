@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, GripVertical, LogOut, Image, Save, X, MessageSquare, MapPin, RefreshCw } from "lucide-react";
 import { useFxRates } from "@/hooks/useFxRates";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PropertyRow {
   id: string;
@@ -70,6 +71,7 @@ interface PoiRow {
 
 const AdminDashboard = () => {
   const { rates, isLoading: fxLoading, lastUpdated, formatPrice } = useFxRates();
+  const queryClient = useQueryClient();
   const [refreshingFx, setRefreshingFx] = useState(false);
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -579,8 +581,7 @@ const AdminDashboard = () => {
                   const { data, error } = await supabase.functions.invoke("refresh-fx-rates");
                   if (error) throw error;
                   toast.success(`Rates refreshed — ${data?.updated || 0} updated`);
-                  // Invalidate react-query cache
-                  window.location.reload();
+                  queryClient.invalidateQueries({ queryKey: ["fx-rates"] });
                 } catch (e: any) {
                   toast.error(e.message || "Failed to refresh rates");
                 } finally {
