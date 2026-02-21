@@ -42,6 +42,14 @@ interface Booking {
   stripe_payment_intent: string | null;
   stripe_session_id: string | null;
   created_at: string | null;
+  num_adults: number | null;
+  num_children: number | null;
+  num_infants: number | null;
+  booked_date: string | null;
+  airbnb_status: string | null;
+  guest_address: string | null;
+  guest_city: string | null;
+  guest_country: string | null;
 }
 
 interface PropertyOption { id: string; name: string; cleaning_fee: number | null; tourist_tax_per_person: number | null; price_per_night: number | null; currency: string; }
@@ -300,6 +308,12 @@ const AdminBookingsPage = () => {
       special_requests: editBooking.special_requests || null,
       internal_notes: editBooking.internal_notes || null,
       paid_at: editBooking.paid_at || null,
+      num_adults: editBooking.num_adults || 0,
+      num_children: editBooking.num_children || 0,
+      num_infants: editBooking.num_infants || 0,
+      guest_address: editBooking.guest_address || null,
+      guest_city: editBooking.guest_city || null,
+      guest_country: editBooking.guest_country || null,
     }).eq("id", editBooking.id);
     setSaving(false);
 
@@ -473,6 +487,16 @@ const AdminBookingsPage = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <Field label="Guests"><Input type="number" min={1} value={editBooking.guests_count || 1} onChange={(e) => setField("guests_count", parseInt(e.target.value) || 1)} readOnly={!isAdmin} /></Field>
+                    <Field label="Adults"><Input type="number" min={0} value={editBooking.num_adults || 0} onChange={(e) => setField("num_adults", parseInt(e.target.value) || 0)} readOnly={!isAdmin} /></Field>
+                    <Field label="Enfants"><Input type="number" min={0} value={editBooking.num_children || 0} onChange={(e) => setField("num_children", parseInt(e.target.value) || 0)} readOnly={!isAdmin} /></Field>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Field label="Bébés"><Input type="number" min={0} value={editBooking.num_infants || 0} onChange={(e) => setField("num_infants", parseInt(e.target.value) || 0)} readOnly={!isAdmin} /></Field>
+                    <Field label="Adresse"><Input value={editBooking.guest_address || ""} onChange={(e) => setField("guest_address", e.target.value)} placeholder="Non renseignée" /></Field>
+                    <Field label="Ville"><Input value={editBooking.guest_city || ""} onChange={(e) => setField("guest_city", e.target.value)} placeholder="Non renseignée" /></Field>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Field label="Pays"><Input value={editBooking.guest_country || ""} onChange={(e) => setField("guest_country", e.target.value)} placeholder="Non renseigné" /></Field>
                     <Field label="Propriété">
                       <select className="w-full px-3 py-2 border border-border bg-background text-sm h-9" value={editBooking.property_id} onChange={(e) => setField("property_id", e.target.value)} disabled={!isAdmin}>
                         {properties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -502,7 +526,25 @@ const AdminBookingsPage = () => {
                         <div className="h-9 flex items-center text-sm font-mono">{editBooking.airbnb_confirmation_code}</div>
                       </Field>
                     )}
+                    {editBooking.booked_date && (
+                      <Field label="Réservé le">
+                        <div className="h-9 flex items-center text-sm">{editBooking.booked_date}</div>
+                      </Field>
+                    )}
                   </div>
+                  {editBooking.airbnb_status && (
+                    <div className="grid grid-cols-3 gap-3">
+                      <Field label="Statut Airbnb">
+                        <div className="h-9 flex items-center text-sm">{editBooking.airbnb_status}</div>
+                      </Field>
+                    </div>
+                  )}
+                  {editBooking.guest_phone && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <a href={`tel:${editBooking.guest_phone}`} className="text-primary hover:underline">📞 {editBooking.guest_phone}</a>
+                      <a href={`https://wa.me/${editBooking.guest_phone.replace(/[^0-9+]/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-[hsl(120,50%,40%)] hover:underline">💬 WhatsApp</a>
+                    </div>
+                  )}
 
                   <Field label="Demandes spéciales"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={2} value={editBooking.special_requests || ""} onChange={(e) => setField("special_requests", e.target.value)} readOnly={!isAdmin} /></Field>
                   <Field label="Notes internes"><textarea className="w-full px-3 py-2 border border-border bg-background text-sm resize-y" rows={2} value={editBooking.internal_notes || ""} onChange={(e) => setField("internal_notes", e.target.value)} readOnly={!isAdmin} /></Field>

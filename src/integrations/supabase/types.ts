@@ -139,7 +139,9 @@ export type Database = {
           airbnb_payout: number | null
           airbnb_reference_code: string | null
           airbnb_service_fee: number | null
+          airbnb_status: string | null
           base_price_per_night: number
+          booked_date: string | null
           check_in: string
           check_out: string
           cleaning_fee: number | null
@@ -147,6 +149,9 @@ export type Database = {
           created_at: string | null
           discount_amount: number | null
           discount_reason: string | null
+          guest_address: string | null
+          guest_city: string | null
+          guest_country: string | null
           guest_email: string
           guest_name: string
           guest_phone: string | null
@@ -154,6 +159,9 @@ export type Database = {
           id: string
           internal_notes: string | null
           nights: number | null
+          num_adults: number | null
+          num_children: number | null
+          num_infants: number | null
           paid_at: string | null
           payment_method: string | null
           payment_status: string | null
@@ -172,7 +180,9 @@ export type Database = {
           airbnb_payout?: number | null
           airbnb_reference_code?: string | null
           airbnb_service_fee?: number | null
+          airbnb_status?: string | null
           base_price_per_night: number
+          booked_date?: string | null
           check_in: string
           check_out: string
           cleaning_fee?: number | null
@@ -180,6 +190,9 @@ export type Database = {
           created_at?: string | null
           discount_amount?: number | null
           discount_reason?: string | null
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_country?: string | null
           guest_email: string
           guest_name: string
           guest_phone?: string | null
@@ -187,6 +200,9 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           nights?: number | null
+          num_adults?: number | null
+          num_children?: number | null
+          num_infants?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_status?: string | null
@@ -205,7 +221,9 @@ export type Database = {
           airbnb_payout?: number | null
           airbnb_reference_code?: string | null
           airbnb_service_fee?: number | null
+          airbnb_status?: string | null
           base_price_per_night?: number
+          booked_date?: string | null
           check_in?: string
           check_out?: string
           cleaning_fee?: number | null
@@ -213,6 +231,9 @@ export type Database = {
           created_at?: string | null
           discount_amount?: number | null
           discount_reason?: string | null
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_country?: string | null
           guest_email?: string
           guest_name?: string
           guest_phone?: string | null
@@ -220,6 +241,9 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           nights?: number | null
+          num_adults?: number | null
+          num_children?: number | null
+          num_infants?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_status?: string | null
