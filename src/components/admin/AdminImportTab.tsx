@@ -14,6 +14,9 @@ interface ParsedReservation {
   confirmation_code: string;
   status: string;
   guest_name: string;
+  guest_email: string;
+  guest_city: string;
+  guest_country: string;
   guests_count: number;
   check_in: string;
   check_out: string;
@@ -49,6 +52,9 @@ const COLUMN_MAPS: Record<string, string[]> = {
   num_children: ["# of children", "children", "enfants"],
   num_infants: ["# of infants", "infants", "bébés"],
   booked_date: ["booked", "date de réservation", "booking date"],
+  guest_email: ["email", "e-mail", "guest email", "email du voyageur"],
+  guest_city: ["city", "ville", "guest city"],
+  guest_country: ["country", "pays", "guest country"],
 };
 
 function findColumn(headers: string[], aliases: string[]): number {
@@ -114,8 +120,8 @@ const AdminImportTab = () => {
   const [dragging, setDragging] = useState(false);
 
   const downloadTemplate = () => {
-    const headers = "Confirmation code,Status,Guest name,Contact,# of adults,# of children,# of infants,Start date,End date,# of nights,Booked,Listing,Earnings";
-    const example = "HM1234ABC,Confirmed,Jean Dupont,+33 6 12 34 56 78,4,0,0,03/15/2026,03/22/2026,7,02/01/2026,Maison Georgia,$1250.00";
+    const headers = "Confirmation code,Status,Guest name,Email,City,Country,Contact,# of adults,# of children,# of infants,Start date,End date,# of nights,Booked,Listing,Earnings";
+    const example = "HM1234ABC,Confirmed,Jean Dupont,jean@example.com,Paris,France,+33 6 12 34 56 78,4,0,0,03/15/2026,03/22/2026,7,02/01/2026,Maison Georgia,$1250.00";
     const blob = new Blob([headers + "\n" + example + "\n"], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -185,6 +191,9 @@ const AdminImportTab = () => {
         confirmation_code: code,
         status: airbnbStatus || "confirmed",
         guest_name: colIdx.guest_name !== -1 ? row[colIdx.guest_name]?.trim() || "Airbnb Guest" : "Airbnb Guest",
+        guest_email: colIdx.guest_email !== -1 ? row[colIdx.guest_email]?.trim() || "" : "",
+        guest_city: colIdx.guest_city !== -1 ? row[colIdx.guest_city]?.trim() || "" : "",
+        guest_country: colIdx.guest_country !== -1 ? row[colIdx.guest_country]?.trim() || "" : "",
         guests_count: colIdx.guests_count !== -1 ? parseInt(row[colIdx.guests_count]) || 1 : (colIdx.num_adults !== -1 ? parseInt(row[colIdx.num_adults]) || 1 : 1),
         check_in: checkIn,
         check_out: checkOut,
@@ -245,7 +254,9 @@ const AdminImportTab = () => {
         .insert({
           property_id: res.property_id,
           guest_name: res.guest_name,
-          guest_email: "airbnb@imported.com",
+          guest_email: res.guest_email || "airbnb@imported.com",
+          guest_city: res.guest_city || null,
+          guest_country: res.guest_country || null,
           guests_count: res.guests_count,
           check_in: res.check_in,
           check_out: res.check_out,
@@ -450,15 +461,18 @@ const AdminImportTab = () => {
                 <TableRow>
                   <TableHead className="w-[90px]">Code</TableHead>
                   <TableHead>Guest</TableHead>
-                  <TableHead className="w-[130px]">Phone</TableHead>
-                  <TableHead className="w-[100px]">Dates</TableHead>
-                  <TableHead className="w-[50px]">Nts</TableHead>
-                  <TableHead className="w-[50px]">👤</TableHead>
-                  <TableHead className="w-[50px]">👶</TableHead>
-                  <TableHead className="w-[80px]">Amount</TableHead>
-                  <TableHead className="w-[80px]">Status</TableHead>
-                  <TableHead className="w-[160px]">Property</TableHead>
-                  <TableHead className="w-[80px]">Action</TableHead>
+                  <TableHead className="w-[150px]">Email</TableHead>
+                  <TableHead className="w-[100px]">Phone</TableHead>
+                  <TableHead className="w-[90px]">City</TableHead>
+                  <TableHead className="w-[70px]">Country</TableHead>
+                  <TableHead className="w-[90px]">Dates</TableHead>
+                  <TableHead className="w-[40px]">Nts</TableHead>
+                  <TableHead className="w-[40px]">👤</TableHead>
+                  <TableHead className="w-[40px]">👶</TableHead>
+                  <TableHead className="w-[70px]">Amt</TableHead>
+                  <TableHead className="w-[70px]">Status</TableHead>
+                  <TableHead className="w-[140px]">Property</TableHead>
+                  <TableHead className="w-[60px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -474,8 +488,32 @@ const AdminImportTab = () => {
                     </TableCell>
                     <TableCell>
                       <Input
+                        value={r.guest_email || ""}
+                        onChange={(e) => updateRow(i, { guest_email: e.target.value })}
+                        placeholder="email"
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
                         value={r.guest_phone || ""}
                         onChange={(e) => updateRow(i, { guest_phone: e.target.value })}
+                        placeholder="—"
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={r.guest_city || ""}
+                        onChange={(e) => updateRow(i, { guest_city: e.target.value })}
+                        placeholder="—"
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={r.guest_country || ""}
+                        onChange={(e) => updateRow(i, { guest_country: e.target.value })}
                         placeholder="—"
                         className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1"
                       />
