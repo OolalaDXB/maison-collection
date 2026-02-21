@@ -25,6 +25,12 @@ interface ParsedReservation {
   property_slug: string | null;
   action: "create" | "skip";
   skip_reason?: string;
+  guest_phone?: string;
+  num_adults?: number;
+  num_children?: number;
+  num_infants?: number;
+  booked_date?: string;
+  airbnb_status?: string;
 }
 
 const COLUMN_MAPS: Record<string, string[]> = {
@@ -32,12 +38,17 @@ const COLUMN_MAPS: Record<string, string[]> = {
   status: ["status", "statut"],
   guest_name: ["guest", "guest name", "voyageur", "nom du voyageur"],
   guests_count: ["# guests", "guests", "# of guests", "voyageurs", "nombre de voyageurs"],
-  check_in: ["check-in", "checkin", "check in", "arrivée", "date d'arrivée"],
-  check_out: ["check-out", "checkout", "check out", "départ", "date de départ"],
-  nights: ["nights", "nuits", "durée"],
+  check_in: ["check-in", "checkin", "check in", "arrivée", "date d'arrivée", "start date", "date de début"],
+  check_out: ["check-out", "checkout", "check out", "départ", "date de départ", "end date", "date de fin"],
+  nights: ["nights", "nuits", "durée", "# of nights"],
   listing_name: ["listing", "listing name", "annonce", "nom de l'annonce"],
   earnings: ["earnings", "host earnings", "amount", "revenus", "gains"],
   currency: ["currency", "devise"],
+  guest_phone: ["contact", "phone", "téléphone"],
+  num_adults: ["# of adults", "adults", "adultes"],
+  num_children: ["# of children", "children", "enfants"],
+  num_infants: ["# of infants", "infants", "bébés"],
+  booked_date: ["booked", "date de réservation", "booking date"],
 };
 
 function findColumn(headers: string[], aliases: string[]): number {
@@ -103,8 +114,8 @@ const AdminImportTab = () => {
   const [dragging, setDragging] = useState(false);
 
   const downloadTemplate = () => {
-    const headers = "Confirmation Code,Status,Guest,# Guests,Check-In,Check-Out,Nights,Listing,Earnings,Currency";
-    const example = "HM1234ABC,confirmed,Jean Dupont,4,2026-03-15,2026-03-22,7,Maison Georgia,1250.00,EUR";
+    const headers = "Confirmation code,Status,Guest name,Contact,# of adults,# of children,# of infants,Start date,End date,# of nights,Booked,Listing,Earnings";
+    const example = "HM1234ABC,Confirmed,Jean Dupont,+33 6 12 34 56 78,4,0,0,03/15/2026,03/22/2026,7,02/01/2026,Maison Georgia,$1250.00";
     const blob = new Blob([headers + "\n" + example + "\n"], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -164,23 +175,33 @@ const AdminImportTab = () => {
       else if (!matchedProp) { action = "skip"; skipReason = `Property not found for "${listingName}"`; }
       else if (!checkIn || !checkOut) { action = "skip"; skipReason = "Invalid dates"; }
 
-      const earningsStr = colIdx.earnings !== -1 ? row[colIdx.earnings]?.trim().replace(/[^0-9.,]/g, "").replace(",", ".") : "0";
+      const rawEarnings = colIdx.earnings !== -1 ? row[colIdx.earnings]?.trim() || "" : "";
+      const earningsCurrency = rawEarnings.includes("€") ? "EUR" : rawEarnings.includes("$") ? "USD" : rawEarnings.includes("AED") ? "AED" : (colIdx.currency !== -1 ? row[colIdx.currency]?.trim() || "EUR" : "EUR");
+      const earningsStr = rawEarnings.replace(/[^0-9.,]/g, "").replace(",", ".");
+
+      const airbnbStatus = colIdx.status !== -1 ? row[colIdx.status]?.trim() || "" : "";
 
       reservations.push({
         confirmation_code: code,
-        status: colIdx.status !== -1 ? row[colIdx.status]?.trim() || "confirmed" : "confirmed",
+        status: airbnbStatus || "confirmed",
         guest_name: colIdx.guest_name !== -1 ? row[colIdx.guest_name]?.trim() || "Airbnb Guest" : "Airbnb Guest",
-        guests_count: colIdx.guests_count !== -1 ? parseInt(row[colIdx.guests_count]) || 1 : 1,
+        guests_count: colIdx.guests_count !== -1 ? parseInt(row[colIdx.guests_count]) || 1 : (colIdx.num_adults !== -1 ? parseInt(row[colIdx.num_adults]) || 1 : 1),
         check_in: checkIn,
         check_out: checkOut,
         nights: colIdx.nights !== -1 ? parseInt(row[colIdx.nights]) || 0 : 0,
         listing_name: listingName,
         earnings: parseFloat(earningsStr) || 0,
-        currency: colIdx.currency !== -1 ? row[colIdx.currency]?.trim() || "EUR" : "EUR",
+        currency: earningsCurrency,
         property_id: matchedProp?.id || null,
         property_slug: matchedProp?.slug || null,
         action,
         skip_reason: skipReason,
+        guest_phone: colIdx.guest_phone !== -1 ? row[colIdx.guest_phone]?.trim() || undefined : undefined,
+        num_adults: colIdx.num_adults !== -1 ? parseInt(row[colIdx.num_adults]) || 0 : undefined,
+        num_children: colIdx.num_children !== -1 ? parseInt(row[colIdx.num_children]) || 0 : undefined,
+        num_infants: colIdx.num_infants !== -1 ? parseInt(row[colIdx.num_infants]) || 0 : undefined,
+        booked_date: colIdx.booked_date !== -1 ? parseDate(row[colIdx.booked_date] || "") || undefined : undefined,
+        airbnb_status: airbnbStatus || undefined,
       });
     }
 
@@ -213,6 +234,12 @@ const AdminImportTab = () => {
     for (const res of toImport) {
       if (!res.property_id) { skipped++; continue; }
 
+      const mappedStatus = res.airbnb_status
+        ? (res.airbnb_status.toLowerCase().includes("cancel") ? "cancelled"
+          : res.airbnb_status.toLowerCase().includes("past guest") ? "completed"
+          : "confirmed")
+        : (res.status.toLowerCase().includes("cancel") ? "cancelled" : "confirmed");
+
       const { data: booking, error: bErr } = await supabase
         .from("bookings")
         .insert({
@@ -224,12 +251,20 @@ const AdminImportTab = () => {
           check_out: res.check_out,
           base_price_per_night: res.nights > 0 ? Math.round(res.earnings / res.nights) : 0,
           total_price: res.earnings,
-          status: res.status.toLowerCase().includes("cancel") ? "cancelled" : "confirmed",
+          status: mappedStatus,
           source: "airbnb_csv",
           airbnb_confirmation_code: res.confirmation_code,
           airbnb_payout: res.earnings,
           internal_notes: `Imported from Airbnb CSV — ${res.listing_name}`,
-          paid_at: new Date().toISOString(),
+          paid_at: res.booked_date ? new Date(res.booked_date).toISOString() : new Date().toISOString(),
+          guest_phone: res.guest_phone || null,
+          num_adults: res.num_adults ?? 0,
+          num_children: res.num_children ?? 0,
+          num_infants: res.num_infants ?? 0,
+          booked_date: res.booked_date || null,
+          airbnb_status: res.airbnb_status || null,
+          payment_status: "paid",
+          payment_method: "airbnb",
         } as any)
         .select()
         .single();
