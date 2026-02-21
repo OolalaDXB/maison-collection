@@ -431,7 +431,7 @@ const AdminImportTab = () => {
       </Card>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-7xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-display">
               Preview — {parsed.length} reservations
@@ -448,13 +448,17 @@ const AdminImportTab = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Code</TableHead>
+                  <TableHead className="w-[90px]">Code</TableHead>
                   <TableHead>Guest</TableHead>
-                  <TableHead>Dates</TableHead>
-                  <TableHead className="w-[60px]">Nights</TableHead>
-                  <TableHead className="w-[90px]">Amount</TableHead>
-                  <TableHead className="w-[180px]">Property</TableHead>
-                  <TableHead className="w-[100px]">Action</TableHead>
+                  <TableHead className="w-[130px]">Phone</TableHead>
+                  <TableHead className="w-[100px]">Dates</TableHead>
+                  <TableHead className="w-[50px]">Nts</TableHead>
+                  <TableHead className="w-[50px]">👤</TableHead>
+                  <TableHead className="w-[50px]">👶</TableHead>
+                  <TableHead className="w-[80px]">Amount</TableHead>
+                  <TableHead className="w-[80px]">Status</TableHead>
+                  <TableHead className="w-[160px]">Property</TableHead>
+                  <TableHead className="w-[80px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -468,16 +472,41 @@ const AdminImportTab = () => {
                         className="h-7 text-sm border-transparent hover:border-input focus:border-input bg-transparent px-1"
                       />
                     </TableCell>
-                    <TableCell className="text-xs">{r.check_in} → {r.check_out}</TableCell>
+                    <TableCell>
+                      <Input
+                        value={r.guest_phone || ""}
+                        onChange={(e) => updateRow(i, { guest_phone: e.target.value })}
+                        placeholder="—"
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1"
+                      />
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap">{r.check_in}<br/>{r.check_out}</TableCell>
                     <TableCell className="text-sm text-center">{r.nights}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={r.num_adults ?? 0}
+                        onChange={(e) => updateRow(i, { num_adults: parseInt(e.target.value) || 0 })}
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1 w-12"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={(r.num_children ?? 0) + (r.num_infants ?? 0)}
+                        onChange={(e) => updateRow(i, { num_children: parseInt(e.target.value) || 0, num_infants: 0 })}
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1 w-12"
+                      />
+                    </TableCell>
                     <TableCell>
                       <Input
                         type="number"
                         value={r.earnings}
                         onChange={(e) => updateRow(i, { earnings: parseFloat(e.target.value) || 0 })}
-                        className="h-7 text-sm border-transparent hover:border-input focus:border-input bg-transparent px-1 w-20"
+                        className="h-7 text-xs border-transparent hover:border-input focus:border-input bg-transparent px-1 w-16"
                       />
                     </TableCell>
+                    <TableCell className="text-xs">{r.airbnb_status || r.status}</TableCell>
                     <TableCell>
                       <Select
                         value={r.property_id || "__none"}
